@@ -6,4 +6,3 @@ LOGGER: Logger = getLogger(__package__)
 NAME = "TVXML EPG"
 DOMAIN = "tvxml_epg"
 VERSION = "0.0.0"
-ATTRIBUTION = "TVXML EPG ATTRIBUTION" # TODO Add attribution
