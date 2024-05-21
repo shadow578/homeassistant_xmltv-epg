@@ -6,12 +6,13 @@ https://github.com/ludeeus/integration_blueprint
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import DOMAIN
-#from .coordinator import BlueprintDataUpdateCoordinator
+from .coordinator import TVXMLDataUpdateCoordinator
+from .api import TVXMLClient
 
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
@@ -21,12 +22,11 @@ PLATFORMS: list[Platform] = [
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up this integration using UI."""
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = coordinator = BlueprintDataUpdateCoordinator(
+    hass.data[DOMAIN][entry.entry_id] = coordinator = TVXMLDataUpdateCoordinator(
         hass=hass,
-        client=IntegrationBlueprintApiClient(
-            username=entry.data[CONF_USERNAME],
-            password=entry.data[CONF_PASSWORD],
+        client=TVXMLClient(
             session=async_get_clientsession(hass),
+            url="https://example.com/tvxml.xml" # TODO configure URL
         ),
     )
     # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities

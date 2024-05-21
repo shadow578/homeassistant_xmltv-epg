@@ -186,6 +186,10 @@ class TVGuide:
         self.channels = []
         self.programs = []
 
+    def get_channel(self, channel_id: str) -> TVChannel:
+        """Get channel by ID."""
+        return next((c for c in self.channels if c.id == channel_id), None)
+
     @classmethod
     def from_xml(cls, xml: ET.Element) -> 'TVGuide':
         """Initialize TV Guide from XML Node, if possible.

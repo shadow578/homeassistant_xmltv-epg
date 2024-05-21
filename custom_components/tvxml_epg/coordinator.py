@@ -9,26 +9,24 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
 )
-from homeassistant.exceptions import ConfigEntryAuthFailed
 
-from .tvxml import (
-    IntegrationBlueprintApiClient,
-    IntegrationBlueprintApiClientAuthenticationError,
-    IntegrationBlueprintApiClientError,
+from .api import (
+    TVXMLClient,
+    TVXMLClientError,
 )
 from .const import DOMAIN, LOGGER
 
 
 # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
-class BlueprintDataUpdateCoordinator(DataUpdateCoordinator):
-    """Class to manage fetching data from the API."""
+class TVXMLDataUpdateCoordinator(DataUpdateCoordinator):
+    """Class to manage fetching data from TVXML."""
 
     config_entry: ConfigEntry
 
     def __init__(
         self,
         hass: HomeAssistant,
-        client: IntegrationBlueprintApiClient,
+        client: TVXMLClient,
     ) -> None:
         """Initialize."""
         self.client = client
@@ -36,14 +34,12 @@ class BlueprintDataUpdateCoordinator(DataUpdateCoordinator):
             hass=hass,
             logger=LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(minutes=5),
+            update_interval=timedelta(minutes=5), # TODO configure update interval
         )
 
     async def _async_update_data(self):
-        """Update data via library."""
+        """Update data."""
         try:
             return await self.client.async_get_data()
-        except IntegrationBlueprintApiClientAuthenticationError as exception:
-            raise ConfigEntryAuthFailed(exception) from exception
-        except IntegrationBlueprintApiClientError as exception:
+        except TVXMLClientError as exception:
             raise UpdateFailed(exception) from exception

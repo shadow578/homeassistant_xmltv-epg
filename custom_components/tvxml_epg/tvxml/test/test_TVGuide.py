@@ -2,7 +2,7 @@
 
 import xml.etree.ElementTree as ET
 
-from ..model import TVGuide
+from ..model import TVGuide, TVChannel
 
 
 def test_from_xml():
@@ -31,3 +31,19 @@ def test_from_xml():
     # cross-linked ?
     assert guide.programs[0].channel is not None
     assert guide.programs[0].channel.id == 'CH1'
+
+
+def test_get_channel():
+    """Test TVGuide.get_channel method."""
+    guide = TVGuide()
+
+    # empty guide, cannot find channels
+    assert guide.get_channel('CH1') is None
+
+    # add channel(s)
+    guide.channels.append(TVChannel('CH1', 'Channel 1'))
+    guide.channels.append(TVChannel('CH2', 'Channel 2'))
+    assert guide.get_channel('CH1') is not None
+
+    # non-existing channel
+    assert guide.get_channel('CH3') is None
