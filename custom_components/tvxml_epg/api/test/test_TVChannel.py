@@ -1,4 +1,5 @@
-import pytest
+"""Test cases for TVChannel class."""
+
 from datetime import datetime
 import xml.etree.ElementTree as ET
 
@@ -34,7 +35,7 @@ def test_get_current_or_next_program():
     program_current = TVProgram('DE: WDR Essen', datetime(2020, 1, 1, 1, 0), datetime(2020, 1, 1, 2, 0), 'Program 2', 'Description 2')
     program_next = TVProgram('DE: WDR Essen', datetime(2020, 1, 1, 2, 0), datetime(2020, 1, 1, 3, 0), 'Program 3', 'Description 3')
 
-    channel = TVChannel('DE: WDR Essen')
+    channel = TVChannel('DE: WDR Essen', 'WDR Essen')
     channel.add_program(program_prev)
     channel.add_program(program_current)
     channel.add_program(program_next)

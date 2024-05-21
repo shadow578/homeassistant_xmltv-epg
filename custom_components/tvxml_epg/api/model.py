@@ -4,11 +4,13 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 
 def is_none_or_whitespace(s: str) -> bool:
-  return s is None or type(s) is not str or len(s.strip()) == 0
+    """Check if string is None, empty, or whitespace."""
+    return s is None or not isinstance(s, str) or len(s.strip()) == 0
 
 def get_child_as_text(parent: ET.Element, tag: str) -> str:
-  node = parent.find(tag)
-  return node.text if node is not None else None
+    """Get child node text as string, or None if not found."""
+    node = parent.find(tag)
+    return node.text if node is not None else None
 
 class TVChannel:
     """TV Channel Class."""
@@ -19,18 +21,18 @@ class TVChannel:
         """Initialize TV Channel."""
         self.id = id
         self.name = name
-        self._programs = []
+        self.programs = []
 
     def add_program(self, program: 'TVProgram'):
         """Add a program to channel."""
-        self._programs.append(program)
+        self.programs.append(program)
 
         # keep programs sorted by start time
-        self._programs.sort(key=lambda p: p.start)
+        self.programs.sort(key=lambda p: p.start)
 
     def get_current_program(self, time: datetime) -> 'TVProgram':
         """Get current program at given time."""
-        for program in self._programs:
+        for program in self.programs:
             if program.start <= time < program.end:
                 return program
 
@@ -38,7 +40,7 @@ class TVChannel:
 
     def get_next_program(self, time: datetime) -> 'TVProgram':
         """Get next program after given time."""
-        for program in self._programs:
+        for program in self.programs:
             if program.start >= time:
                 return program
 
@@ -58,7 +60,7 @@ class TVChannel:
         """
 
         # node must be a channel
-        if xml.tag != 'TVChannel'.TAG:
+        if xml.tag != cls.TAG:
             return None
 
         # get id and display name
@@ -90,6 +92,9 @@ class TVProgram:
                  episode: str = None,
                  subtitle: str = None):
         """Initialize TV Program."""
+        if end <= start:
+            raise ValueError('End time must be after start time.')
+
         self._channel_id = channel_id
         self.start = start
         self.end = end
@@ -117,6 +122,7 @@ class TVProgram:
     @classmethod
     def from_xml(cls, xml: ET.Element) -> 'TVProgram':
         """Initialize TV Program from XML Node, if possible.
+
         Cross-link is not done here, call cross_link_channel() after all programs are created.
 
         :param xml: XML Node
@@ -132,7 +138,7 @@ class TVProgram:
         """
 
         # node must be a program
-        if xml.tag != 'TVProgram'.TAG:
+        if xml.tag != cls.TAG:
             return None
 
         # get start and end times
@@ -162,10 +168,15 @@ class TVProgram:
         if is_none_or_whitespace(title) or is_none_or_whitespace(description):
             return None
 
-        return cls(channel_id, start, end, title, description, episode, subtitle)
+        try:
+            return cls(channel_id, start, end, title, description, episode, subtitle)
+        except ValueError:
+            return None
 
 class TVGuide:
     """TV Guide Class."""
+
+    TAG = 'tv'
 
     def __init__(self, generator_name: str = None, generator_url: str = None):
         """Initialize TV Guide."""
@@ -190,7 +201,7 @@ class TVGuide:
         """
 
         # node must be a TV guide
-        if xml.tag != 'tv':
+        if xml.tag != cls.TAG:
             return None
 
         # parse generator info

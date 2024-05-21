@@ -1,8 +1,8 @@
-import pytest
-from datetime import datetime
+"""Test cases for TVGuide class."""
+
 import xml.etree.ElementTree as ET
 
-from ..model import TVChannel, TVProgram, TVGuide
+from ..model import TVGuide
 
 
 def test_from_xml():
@@ -12,7 +12,7 @@ def test_from_xml():
   <channel id="CH1">
     <display-name>Channel 1</display-name>
     </channel>
-    <programme start="20200101010000 +0000" stop="20200101020000 +0000">
+    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1">
         <title>Program 1</title>
         <desc>Description 1</desc>
     </programme>
