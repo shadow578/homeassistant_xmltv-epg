@@ -220,7 +220,12 @@ class TVGuide:
             if child.tag == TVChannel.TAG:
                 channel = TVChannel.from_xml(child)
                 if channel is not None:
-                    guide.channels.append(channel)
+                    # ensure no duplicate channel ids
+                    if guide.get_channel(channel.id) is None:
+                        guide.channels.append(channel)
+                    else:
+                        # ?!
+                        continue
             elif child.tag == TVProgram.TAG:
                 program = TVProgram.from_xml(child)
                 if program is not None:
