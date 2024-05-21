@@ -12,8 +12,14 @@ from .api import (
     TVXMLClientError,
     TVXMLClientCommunicationError,
 )
-from .const import DOMAIN, LOGGER
-
+from .const import (
+    DOMAIN,
+    LOGGER,
+    OPT_UPDATE_INTERVAL,
+    OPT_PROGRAM_LOOKAHEAD,
+    DEFAULT_UPDATE_INTERVAL,
+    DEFAULT_PROGRAM_LOOKAHEAD,
+)
 
 class TVXMLFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for TVXML."""
@@ -67,3 +73,63 @@ class TVXMLFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             url=url,
         )
         await client.async_get_data()
+
+    @staticmethod
+    def async_get_options_flow(config_entry: config_entries.ConfigEntry):
+        """Get options flow handler."""
+        return TVXMLOptionsFlowHandler(config_entry)
+
+
+class TVXMLOptionsFlowHandler(config_entries.OptionsFlow):
+    """TVXML options flow."""
+
+    VERSION = 1
+
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        """Initialize TVXML options flow."""
+        self.config_entry = config_entry
+
+        async def async_step_init(
+                self,
+                user_input: dict | None = None,
+        ) -> config_entries.FlowResult:
+            """TVXML Options Flow."""
+            if user_input is not None:
+                return self.async_create_entry(
+                    data=user_input,
+                )
+
+            # show options form
+            return self.async_show_form(
+                step_id="init",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required(
+                            OPT_UPDATE_INTERVAL,
+                            default=self.config_entry.options.get(
+                                OPT_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
+                            ),
+                        ): selector.NumberSelector(
+                            selector.NumberSelectorConfig(
+                                min=1,
+                                step=1,
+                                unit_of_measurement="h",
+                                mode=selector.NumberSelectorMode.BOX,
+                            )
+                        ),
+                        vol.Required(
+                            OPT_PROGRAM_LOOKAHEAD,
+                            default=self.config_entry.options.get(
+                                OPT_PROGRAM_LOOKAHEAD, DEFAULT_PROGRAM_LOOKAHEAD
+                            ),
+                        ): selector.NumberSelector(
+                            selector.NumberSelectorConfig(
+                                min=0,
+                                step=1,
+                                unit_of_measurement="m",
+                                mode=selector.NumberSelectorMode.BOX,
+                            )
+                        ),
+                    }
+                ),
+            )

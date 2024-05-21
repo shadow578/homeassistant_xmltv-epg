@@ -10,7 +10,13 @@ from homeassistant.const import CONF_HOST, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .const import DOMAIN
+from .const import (
+    DOMAIN,
+    OPT_UPDATE_INTERVAL,
+    OPT_PROGRAM_LOOKAHEAD,
+    DEFAULT_UPDATE_INTERVAL,
+    DEFAULT_PROGRAM_LOOKAHEAD,
+)
 from .coordinator import TVXMLDataUpdateCoordinator
 from .api import TVXMLClient
 
@@ -28,6 +34,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             session=async_get_clientsession(hass),
             url=entry.data[CONF_HOST],
         ),
+        update_interval=entry.options.get(OPT_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
+        lookahead=entry.options.get(OPT_PROGRAM_LOOKAHEAD, DEFAULT_PROGRAM_LOOKAHEAD),
     )
     # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
     await coordinator.async_config_entry_first_refresh()

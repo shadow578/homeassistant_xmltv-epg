@@ -27,14 +27,17 @@ class TVXMLDataUpdateCoordinator(DataUpdateCoordinator):
         self,
         hass: HomeAssistant,
         client: TVXMLClient,
+        update_interval: int,
+        lookahead: int,
     ) -> None:
         """Initialize."""
         self.client = client
+        self._lookahead = timedelta(minutes=lookahead)
         super().__init__(
             hass=hass,
             logger=LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(minutes=5), # TODO configure update interval
+            update_interval=timedelta(hours=update_interval),
         )
 
     async def _async_update_data(self):
@@ -46,5 +49,4 @@ class TVXMLDataUpdateCoordinator(DataUpdateCoordinator):
 
     def get_current_time(self) -> datetime:
         """Get effective current time."""
-        # TODO: allow configuring offset to current time to "look into the future"
-        return datetime.now()
+        return datetime.now() + self._lookahead
