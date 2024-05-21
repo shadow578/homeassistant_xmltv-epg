@@ -1,9 +1,8 @@
 """Sensor platform for TVXML."""
 from __future__ import annotations
 import uuid
-from datetime import datetime
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription, SensorStateClass
+from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 
 from .const import DOMAIN, LOGGER
 from .coordinator import TVXMLDataUpdateCoordinator
