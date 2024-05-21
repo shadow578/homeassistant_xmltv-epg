@@ -43,7 +43,9 @@ class TVXMLDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Update data."""
         try:
-            return await self.client.async_get_data()
+            guide = await self.client.async_get_data()
+            LOGGER.debug(f"Updated TVXML guide /w {len(guide.channels)} channels and {len(guide.programs)} programs.")
+            return guide
         except TVXMLClientError as exception:
             raise UpdateFailed(exception) from exception
 
