@@ -1,0 +1,12 @@
+{
+  "domain": "tvxml_epg",
+  "name": "TVXML EPG",
+  "codeowners": [
+    "@shadow578"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/shadow578/homeassistant_tvxml_epg",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/shadow578/homeassistant_tvxml_epg/issues",
+  "version": "0.0.0"
+}
