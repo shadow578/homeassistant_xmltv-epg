@@ -1,11 +1,10 @@
 """Test cases for TVProgram class."""
 
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone
 import xml.etree.ElementTree as ET
 
 from ..model import TVProgram, TVChannel
-from datetime import datetime, timezone
 
 def test_from_xml():
     """Test TVProgram.from_xml method with valid input."""
