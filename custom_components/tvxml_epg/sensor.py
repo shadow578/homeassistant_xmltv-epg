@@ -20,8 +20,9 @@ async def async_setup_entry(hass, entry, async_add_devices):
 
     async_add_devices(
         [
-            TVXMLChannelSensor(coordinator, channel, False) # TODO: is_next true
+            TVXMLChannelSensor(coordinator, channel, is_next)
             for channel in guide.channels
+            for is_next in [False, True]
         ]
     )
 
