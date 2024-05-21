@@ -14,7 +14,7 @@ from .api import (
     TVXMLClient,
     TVXMLClientError,
 )
-from .const import DOMAIN, LOGGER
+from .const import DOMAIN, LOGGER, SENSOR_REFRESH_INTERVAL
 
 
 # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
@@ -37,17 +37,40 @@ class TVXMLDataUpdateCoordinator(DataUpdateCoordinator):
             hass=hass,
             logger=LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(hours=update_interval),
+            update_interval=timedelta(seconds=SENSOR_REFRESH_INTERVAL),
         )
 
-    async def _async_update_data(self):
-        """Update data."""
+        self._guide = None
+        self._last_refetch_time = None
+        self._refetch_interval = timedelta(hours=update_interval)
+
+    async def _refetch_tv_guide(self):
+        """Re-fetch TV guide data."""
         try:
             guide = await self.client.async_get_data()
             LOGGER.debug(f"Updated TVXML guide /w {len(guide.channels)} channels and {len(guide.programs)} programs.")
-            return guide
+
+            self._guide = guide
+            self._last_refetch_time = datetime.now()
         except TVXMLClientError as exception:
             raise UpdateFailed(exception) from exception
+
+    def _should_refetch(self) -> bool:
+        """Check if data should be refetched?."""
+        # no guide data yet ?
+        if not self._guide or not self._last_refetch_time:
+            return True
+
+        # check if refetch interval has passed
+        next_refetch_time = self._last_refetch_time + self._refetch_interval
+        return datetime.now() >= next_refetch_time
+
+    async def _async_update_data(self):
+        """Update data from cache or re-fetch if cache is expired."""
+        if self._should_refetch():
+            await self._refetch_tv_guide()
+
+        return self._guide
 
     def get_current_time(self) -> datetime:
         """Get effective current time."""
