@@ -33,7 +33,7 @@ class TVChannel:
     def get_current_program(self, time: datetime) -> 'TVProgram':
         """Get current program at given time."""
         for program in self.programs:
-            if program.start <= time < program.end:
+            if program.start.timestamp() <= time.timestamp() < program.end.timestamp():
                 return program
 
         return None
@@ -41,7 +41,7 @@ class TVChannel:
     def get_next_program(self, time: datetime) -> 'TVProgram':
         """Get next program after given time."""
         for program in self.programs:
-            if program.start >= time:
+            if program.start.timestamp() >= time.timestamp():
                 return program
 
         return None
