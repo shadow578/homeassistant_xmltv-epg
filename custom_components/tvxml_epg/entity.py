@@ -16,9 +16,8 @@ class TVXMLEntity(CoordinatorEntity):
     def __init__(self, coordinator: TVXMLDataUpdateCoordinator) -> None:
         """Initialize."""
         super().__init__(coordinator)
-        self._attr_unique_id = coordinator.config_entry.entry_id
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, self.unique_id)},
+            identifiers={(DOMAIN, "TODO")}, # TODO device identifier
             name=NAME,
             model=VERSION,
             manufacturer=NAME,
