@@ -2,17 +2,26 @@
     "config": {
         "step": {
             "user": {
-                "description": "If you need help with the configuration have a look here: https://github.com/ludeeus/integration_blueprint",
+                "description": "Configure the data source for the TV XML EPG integration.",
                 "data": {
-                    "username": "Username",
-                    "password": "Password"
+                    "host": "TV XML Source URL"
                 }
             }
         },
         "error": {
-            "auth": "Username/Password is wrong.",
-            "connection": "Unable to connect to the server.",
+            "connection": "Unable to fetch TV XML data.",
             "unknown": "Unknown error occurred."
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "description": "Change runtime settings for the TV XML EPG integration. Changes may require a reload of the integration.",
+                "data": {
+                    "update_interval_hours": "Update Interval (hours)",
+                    "program_lookahead_minutes": "Current Program Lookahead (minutes)"
+                }
+            }
         }
     }
 }
