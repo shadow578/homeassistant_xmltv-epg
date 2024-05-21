@@ -66,7 +66,7 @@ class TVXMLChannelSensor(TVXMLEntity, SensorEntity):
         if channel is None:
             return None
 
-        now = datetime.now()
+        now = self.coordinator.get_current_time()
 
         # get current or next program
         program = channel.get_next_program(now) if self._is_next else channel.get_current_program(now)

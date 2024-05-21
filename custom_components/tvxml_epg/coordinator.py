@@ -1,7 +1,7 @@
 """DataUpdateCoordinator for integration_blueprint."""
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -43,3 +43,8 @@ class TVXMLDataUpdateCoordinator(DataUpdateCoordinator):
             return await self.client.async_get_data()
         except TVXMLClientError as exception:
             raise UpdateFailed(exception) from exception
+
+    def get_current_time(self) -> datetime:
+        """Get effective current time."""
+        # TODO: allow configuring offset to current time to "look into the future"
+        return datetime.now()
