@@ -34,7 +34,7 @@ class TVXMLFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         _errors = {}
         if user_input is not None:
             try:
-                await self._test_connection(
+                generator_name = await self._test_connection(
                     url=user_input[CONF_HOST],
                 )
             except TVXMLClientCommunicationError as exception:
@@ -45,7 +45,7 @@ class TVXMLFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 _errors["base"] = "unknown"
             else:
                 return self.async_create_entry(
-                    title=user_input[CONF_HOST],
+                    title=generator_name,
                     data=user_input,
                 )
 
@@ -66,13 +66,17 @@ class TVXMLFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             errors=_errors,
         )
 
-    async def _test_connection(self, url: str) -> None:
+    async def _test_connection(self, url: str) -> str:
         """Validate connection."""
         client = TVXMLClient(
             session=async_create_clientsession(self.hass),
             url=url,
         )
-        await client.async_get_data()
+        guide = await client.async_get_data()
+        if not guide:
+            raise TVXMLClientCommunicationError("No data received")
+
+        return guide.generator_name
 
     @staticmethod
     def async_get_options_flow(config_entry: config_entries.ConfigEntry):
@@ -89,47 +93,54 @@ class TVXMLOptionsFlowHandler(config_entries.OptionsFlow):
         """Initialize TVXML options flow."""
         self.config_entry = config_entry
 
-        async def async_step_init(
-                self,
-                user_input: dict | None = None,
-        ) -> config_entries.FlowResult:
-            """TVXML Options Flow."""
-            if user_input is not None:
-                return self.async_create_entry(
-                    data=user_input,
-                )
+    async def async_step_init(
+        self,
+        user_input: dict | None = None
+    ) -> config_entries.FlowResult:
+        """TVXML Options Flow."""
+        return await self.async_step_menu(user_input)
 
-            # show options form
-            return self.async_show_form(
-                step_id="init",
-                data_schema=vol.Schema(
-                    {
-                        vol.Required(
-                            OPT_UPDATE_INTERVAL,
-                            default=self.config_entry.options.get(
-                                OPT_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
-                            ),
-                        ): selector.NumberSelector(
-                            selector.NumberSelectorConfig(
-                                min=1,
-                                step=1,
-                                unit_of_measurement="h",
-                                mode=selector.NumberSelectorMode.BOX,
-                            )
-                        ),
-                        vol.Required(
-                            OPT_PROGRAM_LOOKAHEAD,
-                            default=self.config_entry.options.get(
-                                OPT_PROGRAM_LOOKAHEAD, DEFAULT_PROGRAM_LOOKAHEAD
-                            ),
-                        ): selector.NumberSelector(
-                            selector.NumberSelectorConfig(
-                                min=0,
-                                step=1,
-                                unit_of_measurement="m",
-                                mode=selector.NumberSelectorMode.BOX,
-                            )
-                        ),
-                    }
-                ),
+    async def async_step_menu(
+        self,
+        user_input: dict | None = None
+    ) -> config_entries.FlowResult:
+        """TVXML Options Flow."""
+        if user_input is not None:
+            return self.async_create_entry(
+                data=user_input,
             )
+
+        # show options form
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        OPT_UPDATE_INTERVAL,
+                        default=self.config_entry.options.get(
+                            OPT_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
+                        ),
+                    ): selector.NumberSelector(
+                        selector.NumberSelectorConfig(
+                            min=1,
+                            step=1,
+                            unit_of_measurement="h",
+                            mode=selector.NumberSelectorMode.BOX,
+                        )
+                    ),
+
+                    vol.Required(
+                        OPT_PROGRAM_LOOKAHEAD,
+                        default=self.config_entry.options.get(
+                            OPT_PROGRAM_LOOKAHEAD, DEFAULT_PROGRAM_LOOKAHEAD
+                        ),
+                    ): selector.NumberSelector(
+                        selector.NumberSelectorConfig(
+                            step=1,
+                            unit_of_measurement="m",
+                            mode=selector.NumberSelectorMode.BOX,
+                        )
+                    ),
+                }
+            ),
+        )
