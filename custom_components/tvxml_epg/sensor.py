@@ -76,7 +76,7 @@ class TVXMLChannelSensor(TVXMLEntity, SensorEntity):
         LOGGER.debug(f"Updated Channel Sensor '{self.entity_description.key}': {program.title} ({program.start} - {program.end}).")
 
         # entity attributes contain program details
-        self._attr_attrs = {
+        self._attr_extra_state_attributes = {
             "start": program.start,
             "end": program.end,
             "title": program.title,
