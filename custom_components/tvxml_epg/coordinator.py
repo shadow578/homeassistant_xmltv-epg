@@ -79,4 +79,4 @@ class TVXMLDataUpdateCoordinator(DataUpdateCoordinator):
     @property
     def last_update_time(self) -> datetime:
         """Get last update time."""
-        return self._last_update_time
+        return self._last_refetch_time

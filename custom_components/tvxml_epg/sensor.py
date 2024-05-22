@@ -6,7 +6,6 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorEntityDescription,
     SensorDeviceClass,
-    SensorStateClass,
 )
 
 from .const import DOMAIN, LOGGER
@@ -31,7 +30,7 @@ async def async_setup_entry(hass, entry, async_add_devices):
     )
 
     # add sensor for coordinator status
-    async_add_devices([TVXMLStatusSensor(coordinator)])
+    async_add_devices([TVXMLStatusSensor(coordinator, guide)])
 
 
 class TVXMLChannelSensor(TVXMLEntity, SensorEntity):
@@ -108,7 +107,7 @@ class TVXMLStatusSensor(TVXMLEntity, SensorEntity):
         """Initialize the sensor class."""
         super().__init__(coordinator)
 
-        key = f"{guide.generator_name}_status"
+        key = f"{guide.generator_name}_last_update"
         self._attr_unique_id = str(
             uuid.uuid5(
                 uuid.NAMESPACE_X500,
@@ -118,10 +117,8 @@ class TVXMLStatusSensor(TVXMLEntity, SensorEntity):
 
         self.entity_description = SensorEntityDescription(
             key=key,
-            name=f"{guide.generator_name} Status",
-            icon="mdi:format-quote-close",
+            name=f"{guide.generator_name} Last Update Time",
             device_class=SensorDeviceClass.TIMESTAMP,
-            state_class=SensorStateClass.MEASUREMENT,
         )
 
         LOGGER.debug(f"Setup sensor for coordinator '{guide.generator_name}' status.")
@@ -139,4 +136,4 @@ class TVXMLStatusSensor(TVXMLEntity, SensorEntity):
         }
 
         # native value is last update time
-        return coordinator.last_update_time
+        return coordinator.last_update_time.astimezone()
