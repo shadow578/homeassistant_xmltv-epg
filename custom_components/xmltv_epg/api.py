@@ -5,7 +5,6 @@ import asyncio
 import socket
 
 import aiohttp
-import async_timeout
 
 import xml.etree.ElementTree as ET
 
@@ -36,40 +35,39 @@ class XMLTVClient:
     async def async_get_data(self) -> TVGuide:
         """Fetch XMLTV Guide data."""
         try:
-            async with async_timeout.timeout(10):
-                # fetch data
-                response = await self._session.request(
-                    method="GET",
-                    url=self._url,
+            # fetch data
+            response = await self._session.get(
+                url=self._url,
+                timeout=10
+             )
+            response.raise_for_status()
+
+            if response.content_type == "text/xml":
+                # raw XML text, read as-is
+                data = await response.text()
+
+            elif response.content_type == "application/gzip" or "xml.gz" in str(response.url):
+                # xml.gz file, read as binary and decompress
+                gzipped_data = await response.read()
+
+                # decompress the gzipped data
+                data = gzip.decompress(gzipped_data).decode()
+
+            else:
+                raise XMLTVClientError(
+                    f"Don't know how to handle content type '{response.content_type}' (from {response.url})",
                 )
-                response.raise_for_status()
 
-                if response.content_type == "text/xml":
-                    # raw XML text, read as-is
-                    data = await response.text()
+            # parse XML data
+            xml = ET.fromstring(data)
 
-                elif response.content_type == "application/gzip" or "xml.gz" in str(response.url):
-                    # xml.gz file, read as binary and decompress
-                    gzipped_data = await response.read()
+            guide = TVGuide.from_xml(xml)
+            if guide is None:
+                raise XMLTVClientError(
+                    "Failed to parse TV Guide data",
+                )
 
-                    # decompress the gzipped data
-                    data = gzip.decompress(gzipped_data).decode()
-
-                else:
-                    raise XMLTVClientError(
-                        f"Don't know how to handle content type '{response.content_type}' (from {response.url})",
-                    )
-
-                # parse XML data
-                xml = ET.fromstring(data)
-
-                guide = TVGuide.from_xml(xml)
-                if guide is None:
-                    raise XMLTVClientError(
-                        "Failed to parse TV Guide data",
-                    )
-
-                return guide
+            return guide
         except XMLTVClientError as exception:
             raise exception
         except asyncio.TimeoutError as exception:
