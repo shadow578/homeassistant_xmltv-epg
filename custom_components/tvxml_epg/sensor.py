@@ -82,11 +82,16 @@ class TVXMLChannelSensor(TVXMLEntity, SensorEntity):
 
         LOGGER.debug(f"Updated Channel Sensor '{self.entity_description.key}': {program.title} ({program.start} - {program.end}).")
 
+        # format duration to HH:MM
+        duration_seconds = program.duration.total_seconds()
+        duration_hours = int(duration_seconds // 3600)
+        duration_minutes = int((duration_seconds % 3600) // 60)
+
         # entity attributes contain program details
         self._attr_extra_state_attributes = {
             "start": program.start,
             "end": program.end,
-            "duration": program.duration,
+            "duration": f"{duration_hours:02d}:{duration_minutes:02d}",
             "title": program.title,
             "description": program.description,
             "episode": program.episode,
