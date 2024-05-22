@@ -71,3 +71,13 @@ def test_cross_link_channel():
 
     # channel should know program
     assert program in channel1.programs
+
+def test_duration():
+    """Test TVProgram.duration property."""
+    program = TVProgram('CH1',
+                        datetime(2020, 1, 1, 1, 0),  # 1:00
+                        datetime(2020, 1, 1, 2, 15), # 2:15 - 1h 15m
+                        'Program 1',
+                        'Description 1')
+
+    assert program.duration.total_seconds() == (60 + 15) * 60

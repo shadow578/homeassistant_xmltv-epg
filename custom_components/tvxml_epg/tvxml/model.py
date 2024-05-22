@@ -1,6 +1,6 @@
 """TVXML Model Classes & Parsing."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import xml.etree.ElementTree as ET
 
 def is_none_or_whitespace(s: str) -> bool:
@@ -118,6 +118,11 @@ class TVProgram:
         # cross-link
         self.channel = channel
         self.channel.add_program(self)
+
+    @property
+    def duration(self) -> timedelta:
+        """Get program duration."""
+        return self.end - self.start
 
     @classmethod
     def from_xml(cls, xml: ET.Element) -> 'TVProgram':

@@ -79,6 +79,7 @@ class TVXMLChannelSensor(TVXMLEntity, SensorEntity):
         self._attr_extra_state_attributes = {
             "start": program.start,
             "end": program.end,
+            "duration": program.duration,
             "title": program.title,
             "description": program.description,
             "episode": program.episode,
