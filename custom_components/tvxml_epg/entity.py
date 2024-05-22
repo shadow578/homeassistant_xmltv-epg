@@ -25,4 +25,4 @@ class TVXMLEntity(CoordinatorEntity):
             manufacturer=NAME,
         )
 
-        self._attr_attribution = f"Data provided by {guide.generator_name}"
+        self._attr_attribution = f"Data provided by {guide.generator_name}" # TODO localize

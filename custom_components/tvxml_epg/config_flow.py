@@ -124,7 +124,7 @@ class TVXMLOptionsFlowHandler(config_entries.OptionsFlow):
                         selector.NumberSelectorConfig(
                             min=1,
                             step=1,
-                            unit_of_measurement="hours",
+                            unit_of_measurement="hours", # TODO localize or better
                             mode=selector.NumberSelectorMode.BOX,
                         )
                     ),
@@ -137,7 +137,7 @@ class TVXMLOptionsFlowHandler(config_entries.OptionsFlow):
                     ): selector.NumberSelector(
                         selector.NumberSelectorConfig(
                             step=1,
-                            unit_of_measurement="minutes",
+                            unit_of_measurement="minutes", # TODO localize or better
                             mode=selector.NumberSelectorMode.BOX,
                         )
                     ),

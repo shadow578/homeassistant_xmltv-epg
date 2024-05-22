@@ -55,7 +55,7 @@ class TVXMLChannelSensor(TVXMLEntity, SensorEntity):
 
         self.entity_description = SensorEntityDescription(
             key=key,
-            name=f"{channel.name} {'Upcoming' if is_next else 'Current'} Program",
+            name=f"{channel.name} {'Upcoming' if is_next else 'Current'} Program", # TODO localize
             icon="mdi:format-quote-close",
         )
 
@@ -122,7 +122,7 @@ class TVXMLStatusSensor(TVXMLEntity, SensorEntity):
 
         self.entity_description = SensorEntityDescription(
             key=key,
-            name=f"{guide.generator_name} Last Update Time",
+            name=f"{guide.generator_name} Last Update Time", # TODO localize
             device_class=SensorDeviceClass.TIMESTAMP,
         )
 
