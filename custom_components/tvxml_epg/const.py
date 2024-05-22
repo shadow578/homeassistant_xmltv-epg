@@ -5,7 +5,6 @@ LOGGER: Logger = getLogger(__package__)
 
 NAME = "TVXML EPG"
 DOMAIN = "tvxml_epg"
-VERSION = "1.0.0"
 
 OPT_UPDATE_INTERVAL = "update_interval_hours"
 DEFAULT_UPDATE_INTERVAL = 12 # hours
