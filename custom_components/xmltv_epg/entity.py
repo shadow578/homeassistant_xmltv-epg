@@ -1,19 +1,19 @@
-"""TVXML Entity class."""
+"""XMLTV Entity class."""
 from __future__ import annotations
 
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, NAME
-from .coordinator import TVXMLDataUpdateCoordinator
+from .coordinator import XMLTVDataUpdateCoordinator
 
-from .tvxml.model import TVGuide
+from .xmltv.model import TVGuide
 
 
-class TVXMLEntity(CoordinatorEntity):
-    """TVXML Entity class."""
+class XMLTVEntity(CoordinatorEntity):
+    """XMLTV Entity class."""
 
-    def __init__(self, coordinator: TVXMLDataUpdateCoordinator) -> None:
+    def __init__(self, coordinator: XMLTVDataUpdateCoordinator) -> None:
         """Initialize."""
         super().__init__(coordinator)
 

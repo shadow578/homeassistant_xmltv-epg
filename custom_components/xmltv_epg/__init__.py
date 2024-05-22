@@ -1,7 +1,7 @@
-"""Custom integration to integrate TV XML EPG data with Home Assistant.
+"""Custom integration to integrate XMLTV EPG data with Home Assistant.
 
 For more details about this integration, please refer to
-https://github.com/shadow578/homeassistant_tvxml-epg
+https://github.com/shadow578/homeassistant_xmltv-epg
 """
 from __future__ import annotations
 
@@ -17,8 +17,8 @@ from .const import (
     DEFAULT_UPDATE_INTERVAL,
     DEFAULT_PROGRAM_LOOKAHEAD,
 )
-from .coordinator import TVXMLDataUpdateCoordinator
-from .api import TVXMLClient
+from .coordinator import XMLTVDataUpdateCoordinator
+from .api import XMLTVClient
 
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
@@ -28,9 +28,9 @@ PLATFORMS: list[Platform] = [
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up this integration using UI."""
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = coordinator = TVXMLDataUpdateCoordinator(
+    hass.data[DOMAIN][entry.entry_id] = coordinator = XMLTVDataUpdateCoordinator(
         hass=hass,
-        client=TVXMLClient(
+        client=XMLTVClient(
             session=async_get_clientsession(hass),
             url=entry.data[CONF_HOST],
         ),

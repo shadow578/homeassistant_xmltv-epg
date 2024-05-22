@@ -1,4 +1,4 @@
-"""TVXML Model Classes & Parsing."""
+"""XMLTV Model Classes & Parsing."""
 
 from datetime import datetime, timedelta
 import xml.etree.ElementTree as ET

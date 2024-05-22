@@ -2,24 +2,24 @@
     "config": {
         "step": {
             "user": {
-                "description": "Konfiguriere die Datenquelle für die TV XML EPG Integration.",
+                "description": "Configure the data source for the XMLTV EPG integration.",
                 "data": {
-                    "host": "TV XML Quell-URL"
+                    "host": "XMLTV Source URL"
                 }
             }
         },
         "error": {
-            "connection": "TV XML Daten konnten nicht abgerufen werden.",
-            "unknown": "Ein unbekannter Fehler ist aufgetreten."
+            "connection": "Unable to fetch XMLTV data.",
+            "unknown": "Unknown error occurred."
         }
     },
     "options": {
         "step": {
             "init": {
-                "description": "Ändere das Laufzeitverhalten der TV XML EPG Integration. Änderungen erfordern eventuell ein neuladen der Integration.",
+                "description": "Change runtime settings for the XMLTV EPG integration. Changes may require a reload of the integration.",
                 "data": {
-                    "update_interval_hours": "Aktualisierungsintervall (Stunden)",
-                    "program_lookahead_minutes": "Vorrausschauzeit für aktuelles Programm (Minuten)"
+                    "update_interval_hours": "Update Interval (hours)",
+                    "program_lookahead_minutes": "Current Program Lookahead (minutes)"
                 }
             }
         }
@@ -27,65 +27,65 @@
     "entity": {
         "sensor": {
             "program_current": {
-                "name": "{channel_display_name} aktuelles Programm",
+                "name": "{channel_display_name} Current Program",
                 "state_attributes": {
                     "start": {
-                        "name": "Startet um"
+                        "name": "Starts at"
                     },
                     "end": {
-                        "name": "Endet um"
+                        "name": "Ends at"
                     },
                     "duration": {
-                        "name": "Dauer"
+                        "name": "Duration"
                     },
                     "title": {
-                        "name": "Titel"
+                        "name": "Title"
                     },
                     "description": {
-                        "name": "Beschreibung"
+                        "name": "Description"
                     },
                     "episode": {
                         "name": "Episode"
                     },
                     "subtitle": {
-                        "name": "Untertitel"
+                        "name": "Subtitle"
                     }
                 }
             },
             "program_upcoming": {
-                "name": "{channel_display_name} bevorstehendes Programm",
+                "name": "{channel_display_name} Upcoming Program",
                 "state_attributes": {
                     "start": {
-                        "name": "Startet um"
+                        "name": "Starts at"
                     },
                     "end": {
-                        "name": "Endet um"
+                        "name": "Ends at"
                     },
                     "duration": {
-                        "name": "Dauer"
+                        "name": "Duration"
                     },
                     "title": {
-                        "name": "Titel"
+                        "name": "Title"
                     },
                     "description": {
-                        "name": "Beschreibung"
+                        "name": "Description"
                     },
                     "episode": {
                         "name": "Episode"
                     },
                     "subtitle": {
-                        "name": "Untertitel"
+                        "name": "Subtitle"
                     }
                 }
             },
             "last_update": {
-                "name": "Letzte Aktualisierung von {generator_name}",
+                "name": "{generator_name} Last Update",
                 "state_attributes": {
                     "generator_name": {
-                        "name": "Generator-Name"
+                        "name": "Generator Name"
                     },
                     "generator_url": {
-                        "name": "Generator-URL"
+                        "name": "Generator URL"
                     }
                 }
             }

@@ -1,4 +1,4 @@
-"""Sensor platform for TVXML."""
+"""Sensor platform for XMLTV."""
 from __future__ import annotations
 import uuid
 
@@ -9,10 +9,10 @@ from homeassistant.components.sensor import (
 )
 
 from .const import DOMAIN, LOGGER
-from .coordinator import TVXMLDataUpdateCoordinator
-from .entity import TVXMLEntity
+from .coordinator import XMLTVDataUpdateCoordinator
+from .entity import XMLTVEntity
 
-from .tvxml.model import TVGuide, TVChannel
+from .xmltv.model import TVGuide, TVChannel
 
 async def async_setup_entry(hass, entry, async_add_devices):
     """Set up the sensor platform."""
@@ -23,22 +23,22 @@ async def async_setup_entry(hass, entry, async_add_devices):
 
     async_add_devices(
         [
-            TVXMLChannelSensor(coordinator, channel, is_next)
+            XMLTVChannelSensor(coordinator, channel, is_next)
             for channel in guide.channels
             for is_next in [False, True]
         ]
     )
 
     # add sensor for coordinator status
-    async_add_devices([TVXMLStatusSensor(coordinator, guide)])
+    async_add_devices([XMLTVStatusSensor(coordinator, guide)])
 
 
-class TVXMLChannelSensor(TVXMLEntity, SensorEntity):
-    """TVXML Channel Program Sensor class."""
+class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
+    """XMLTV Channel Program Sensor class."""
 
     def __init__(
         self,
-        coordinator: TVXMLDataUpdateCoordinator,
+        coordinator: XMLTVDataUpdateCoordinator,
         channel: TVChannel,
         is_next: bool,
     ) -> None:
@@ -123,12 +123,12 @@ class TVXMLChannelSensor(TVXMLEntity, SensorEntity):
         # native value is full program title
         return self._program.full_title
 
-class TVXMLStatusSensor(TVXMLEntity, SensorEntity):
-    """TVXML Coordinator Status Sensor class."""
+class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
+    """XMLTV Coordinator Status Sensor class."""
 
     def __init__(
         self,
-        coordinator: TVXMLDataUpdateCoordinator,
+        coordinator: XMLTVDataUpdateCoordinator,
         guide: TVGuide
     ) -> None:
         """Initialize the sensor class."""
@@ -178,7 +178,7 @@ class TVXMLStatusSensor(TVXMLEntity, SensorEntity):
     @property
     def native_value(self) -> str:
         """Return the native value of the sensor."""
-        coordinator: TVXMLDataUpdateCoordinator = self.coordinator
+        coordinator: XMLTVDataUpdateCoordinator = self.coordinator
 
         # refresh guide from coordinator
         guide: TVGuide = coordinator.data

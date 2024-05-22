@@ -1,4 +1,4 @@
-"""Adds config flow for TVXML."""
+"""Adds config flow for XMLTV."""
 from __future__ import annotations
 
 import voluptuous as vol
@@ -8,9 +8,9 @@ from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from .api import (
-    TVXMLClient,
-    TVXMLClientError,
-    TVXMLClientCommunicationError,
+    XMLTVClient,
+    XMLTVClientError,
+    XMLTVClientCommunicationError,
 )
 from .const import (
     DOMAIN,
@@ -21,8 +21,8 @@ from .const import (
     DEFAULT_PROGRAM_LOOKAHEAD,
 )
 
-class TVXMLFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
-    """Config flow for TVXML."""
+class XMLTVFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
+    """Config flow for XMLTV."""
 
     VERSION = 1
 
@@ -37,10 +37,10 @@ class TVXMLFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 generator_name = await self._test_connection(
                     url=user_input[CONF_HOST],
                 )
-            except TVXMLClientCommunicationError as exception:
+            except XMLTVClientCommunicationError as exception:
                 LOGGER.error(exception)
                 _errors["base"] = "connection"
-            except TVXMLClientError as exception:
+            except XMLTVClientError as exception:
                 LOGGER.exception(exception)
                 _errors["base"] = "unknown"
             else:
@@ -68,43 +68,43 @@ class TVXMLFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def _test_connection(self, url: str) -> str:
         """Validate connection."""
-        client = TVXMLClient(
+        client = XMLTVClient(
             session=async_create_clientsession(self.hass),
             url=url,
         )
         guide = await client.async_get_data()
         if not guide:
-            raise TVXMLClientCommunicationError("No data received")
+            raise XMLTVClientCommunicationError("No data received")
 
         return guide.generator_name
 
     @staticmethod
     def async_get_options_flow(config_entry: config_entries.ConfigEntry):
         """Get options flow handler."""
-        return TVXMLOptionsFlowHandler(config_entry)
+        return XMLTVOptionsFlowHandler(config_entry)
 
 
-class TVXMLOptionsFlowHandler(config_entries.OptionsFlow):
-    """TVXML options flow."""
+class XMLTVOptionsFlowHandler(config_entries.OptionsFlow):
+    """XMLTV options flow."""
 
     VERSION = 1
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        """Initialize TVXML options flow."""
+        """Initialize XMLTV options flow."""
         self.config_entry = config_entry
 
     async def async_step_init(
         self,
         user_input: dict | None = None
     ) -> config_entries.FlowResult:
-        """TVXML Options Flow."""
+        """XMLTV Options Flow."""
         return await self.async_step_menu(user_input)
 
     async def async_step_menu(
         self,
         user_input: dict | None = None
     ) -> config_entries.FlowResult:
-        """TVXML Options Flow."""
+        """XMLTV Options Flow."""
         if user_input is not None:
             return self.async_create_entry(
                 data=user_input,

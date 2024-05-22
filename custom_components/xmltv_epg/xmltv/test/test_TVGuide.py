@@ -8,7 +8,7 @@ from ..model import TVGuide, TVChannel
 def test_from_xml():
     """Test TVGuide.from_xml method with valid input."""
     xml = ET.fromstring("""
-<tv generator-info-name="tvxml_epg" generator-info-url="http://example.com">
+<tv generator-info-name="xmltv_epg" generator-info-url="http://example.com">
   <channel id="CH1">
     <display-name>Channel 1</display-name>
     </channel>
@@ -22,7 +22,7 @@ def test_from_xml():
     guide = TVGuide.from_xml(xml)
 
     assert guide is not None
-    assert guide.generator_name == 'tvxml_epg'
+    assert guide.generator_name == 'xmltv_epg'
     assert guide.generator_url == 'http://example.com'
 
     assert len(guide.channels) == 1

@@ -1,4 +1,4 @@
-"""DataUpdateCoordinator for tvxml_epg."""
+"""DataUpdateCoordinator for xmltv_epg."""
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -11,22 +11,22 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .api import (
-    TVXMLClient,
-    TVXMLClientError,
+    XMLTVClient,
+    XMLTVClientError,
 )
 from .const import DOMAIN, LOGGER, SENSOR_REFRESH_INTERVAL
 
 
 # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
-class TVXMLDataUpdateCoordinator(DataUpdateCoordinator):
-    """Class to manage fetching data from TVXML."""
+class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
+    """Class to manage fetching data from XMLTV."""
 
     config_entry: ConfigEntry
 
     def __init__(
         self,
         hass: HomeAssistant,
-        client: TVXMLClient,
+        client: XMLTVClient,
         update_interval: int,
         lookahead: int,
     ) -> None:
@@ -48,11 +48,11 @@ class TVXMLDataUpdateCoordinator(DataUpdateCoordinator):
         """Re-fetch TV guide data."""
         try:
             guide = await self.client.async_get_data()
-            LOGGER.debug(f"Updated TVXML guide /w {len(guide.channels)} channels and {len(guide.programs)} programs.")
+            LOGGER.debug(f"Updated XMLTV guide /w {len(guide.channels)} channels and {len(guide.programs)} programs.")
 
             self._guide = guide
             self._last_refetch_time = datetime.now()
-        except TVXMLClientError as exception:
+        except XMLTVClientError as exception:
             raise UpdateFailed(exception) from exception
 
     def _should_refetch(self) -> bool:
