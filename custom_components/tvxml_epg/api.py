@@ -10,6 +10,7 @@ import async_timeout
 import xml.etree.ElementTree as ET
 
 from .tvxml.model import TVGuide
+import gzip
 
 class TVXMLClientError(Exception):
     """Exception to indicate a general API error."""
@@ -43,9 +44,24 @@ class TVXMLClient:
                 )
                 response.raise_for_status()
 
+                if response.content_type == "text/xml":
+                    # raw XML text, read as-is
+                    data = await response.text()
+
+                elif response.content_type == "application/gzip" or "xml.gz" in str(response.url):
+                    # xml.gz file, read as binary and decompress
+                    gzipped_data = await response.read()
+
+                    # decompress the gzipped data
+                    data = gzip.decompress(gzipped_data).decode()
+
+                else:
+                    raise TVXMLClientError(
+                        f"Don't know how to handle content type '{response.content_type}' (from {response.url})",
+                    )
+
                 # parse XML data
-                data = await response.text()
-                xml  = ET.fromstring(data)
+                xml = ET.fromstring(data)
 
                 guide = TVGuide.from_xml(xml)
                 if guide is None:
@@ -54,7 +70,8 @@ class TVXMLClient:
                     )
 
                 return guide
-
+        except TVXMLClientError as exception:
+            raise exception
         except asyncio.TimeoutError as exception:
             raise TVXMLClientCommunicationError(
                 "Timeout error fetching information",
