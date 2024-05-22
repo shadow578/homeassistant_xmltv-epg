@@ -2,7 +2,12 @@
 from __future__ import annotations
 import uuid
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from homeassistant.components.sensor import (
+    SensorEntity,
+    SensorEntityDescription,
+    SensorDeviceClass,
+    SensorStateClass,
+)
 
 from .const import DOMAIN, LOGGER
 from .coordinator import TVXMLDataUpdateCoordinator
@@ -24,6 +29,9 @@ async def async_setup_entry(hass, entry, async_add_devices):
             for is_next in [False, True]
         ]
     )
+
+    # add sensor for coordinator status
+    async_add_devices([TVXMLStatusSensor(coordinator)])
 
 
 class TVXMLChannelSensor(TVXMLEntity, SensorEntity):
@@ -88,3 +96,47 @@ class TVXMLChannelSensor(TVXMLEntity, SensorEntity):
 
         # native value is full program title
         return program.full_title
+
+class TVXMLStatusSensor(TVXMLEntity, SensorEntity):
+    """TVXML Coordinator Status Sensor class."""
+
+    def __init__(
+        self,
+        coordinator: TVXMLDataUpdateCoordinator,
+        guide: TVGuide
+    ) -> None:
+        """Initialize the sensor class."""
+        super().__init__(coordinator)
+
+        key = f"{guide.generator_name}_status"
+        self._attr_unique_id = str(
+            uuid.uuid5(
+                uuid.NAMESPACE_X500,
+                key
+            )
+        )
+
+        self.entity_description = SensorEntityDescription(
+            key=key,
+            name=f"{guide.generator_name} Status",
+            icon="mdi:format-quote-close",
+            device_class=SensorDeviceClass.TIMESTAMP,
+            state_class=SensorStateClass.MEASUREMENT,
+        )
+
+        LOGGER.debug(f"Setup sensor for coordinator '{guide.generator_name}' status.")
+
+    @property
+    def native_value(self) -> str:
+        """Return the native value of the sensor."""
+        coordinator: TVXMLDataUpdateCoordinator = self.coordinator
+        guide: TVGuide = coordinator.data
+
+        # entity attributes contain program details
+        self._attr_extra_state_attributes = {
+            "generator_name": guide.generator_name,
+            "generator_url": guide.generator_url,
+        }
+
+        # native value is last update time
+        return coordinator.last_update_time

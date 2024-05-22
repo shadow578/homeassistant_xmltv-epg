@@ -75,3 +75,8 @@ class TVXMLDataUpdateCoordinator(DataUpdateCoordinator):
     def get_current_time(self) -> datetime:
         """Get effective current time."""
         return datetime.now() + self._lookahead
+
+    @property
+    def last_update_time(self) -> datetime:
+        """Get last update time."""
+        return self._last_update_time
