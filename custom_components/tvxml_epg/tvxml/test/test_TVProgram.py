@@ -81,3 +81,26 @@ def test_duration():
                         'Description 1')
 
     assert program.duration.total_seconds() == (60 + 15) * 60
+
+def test_full_title():
+    """Test TVProgram.full_title property."""
+    program = TVProgram('CH1',
+                        datetime(2020, 1, 1, 1, 0),
+                        datetime(2020, 1, 1, 2, 0),
+                        'Program 1',
+                        'Description 1')
+
+    # (1)
+    assert program.full_title == 'Program 1'
+
+    # (2)
+    program.episode = 'S1 E1'
+    assert program.full_title == 'Program 1 (S1 E1)'
+
+    # (3)
+    program.subtitle = 'Subtitle 1'
+    assert program.full_title == 'Program 1 - Subtitle 1 (S1 E1)'
+
+    # (4)
+    program.episode = None
+    assert program.full_title == 'Program 1 - Subtitle 1'

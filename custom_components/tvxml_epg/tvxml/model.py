@@ -124,6 +124,47 @@ class TVProgram:
         """Get program duration."""
         return self.end - self.start
 
+    @property
+    def full_title(self) -> str:
+        """Get the full title, including episode and / or subtitle, if available.
+
+        Examples:
+        (1)
+        Title: 'Program 1'
+        Episode: None
+        Subtitle: None
+        Result: 'Program 1'
+
+        (2)
+        Title: 'Program 1'
+        Episode: 'S1 E1'
+        Subtitle: None
+        Result: 'Program 1 (S1 E1)'
+
+        (3)
+        Title: 'Program 1'
+        Episode: 'S1 E1'
+        Subtitle: 'Subtitle 1'
+        Result: 'Program 1 - Subtitle 1 (S1 E1)'
+
+        (4)
+        Title: 'Program 1'
+        Episode: None
+        Subtitle: 'Subtitle 1'
+        Result: 'Program 1 - Subtitle 1'
+
+        """
+        title = self.title
+
+        if not is_none_or_whitespace(self.subtitle):
+            title += f' - {self.subtitle}'
+
+        if not is_none_or_whitespace(self.episode):
+            title += f' ({self.episode})'
+
+        return title
+
+
     @classmethod
     def from_xml(cls, xml: ET.Element) -> 'TVProgram':
         """Initialize TV Program from XML Node, if possible.

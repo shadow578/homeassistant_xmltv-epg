@@ -86,5 +86,5 @@ class TVXMLChannelSensor(TVXMLEntity, SensorEntity):
             "subtitle": program.subtitle,
         }
 
-        # native value is program title
-        return program.title
+        # native value is full program title
+        return program.full_title
