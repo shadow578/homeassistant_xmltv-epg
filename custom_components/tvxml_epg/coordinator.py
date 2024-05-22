@@ -1,4 +1,4 @@
-"""DataUpdateCoordinator for integration_blueprint."""
+"""DataUpdateCoordinator for tvxml_epg."""
 from __future__ import annotations
 
 from datetime import datetime, timedelta

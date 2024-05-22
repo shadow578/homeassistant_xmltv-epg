@@ -1,7 +1,7 @@
-"""Custom integration to integrate integration_blueprint with Home Assistant.
+"""Custom integration to integrate TV XML EPG data with Home Assistant.
 
 For more details about this integration, please refer to
-https://github.com/ludeeus/integration_blueprint
+https://github.com/shadow578/homeassistant_tvxml-epg
 """
 from __future__ import annotations
 
