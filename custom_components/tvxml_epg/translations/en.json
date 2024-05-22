@@ -23,5 +23,72 @@
                 }
             }
         }
+    },
+    "entity": {
+        "sensor": {
+            "program_current": {
+              "name": "{channel_display_name} Current Program",
+              "state_attributes": {
+                "start": {
+                    "name": "Starts at"
+                },
+                "end": {
+                    "name": "Ends at"
+                },
+                "duration": {
+                    "name": "Duration"
+                },
+                "title": {
+                    "name": "Title"
+                },
+                "description": {
+                    "name": "Description"
+                },
+                "episode": {
+                    "name": "Episode"
+                },
+                "subtitle": {
+                    "name": "Subtitle"
+                }
+              }
+            },
+            "program_upcoming": {
+                "name": "{channel_display_name} Upcoming Program",
+                "state_attributes": {
+                  "start": {
+                      "name": "Starts at"
+                  },
+                  "end": {
+                      "name": "Ends at"
+                  },
+                  "duration": {
+                      "name": "Duration"
+                  },
+                  "title": {
+                      "name": "Title"
+                  },
+                  "description": {
+                      "name": "Description"
+                  },
+                  "episode": {
+                      "name": "Episode"
+                  },
+                  "subtitle": {
+                      "name": "Subtitle"
+                  }
+                }
+            },
+            "last_update": {
+                "name": "Last Update",
+                "state_attributes": {
+                    "generator_name": {
+                        "name": "Generator Name"
+                    },
+                    "generator_url": {
+                        "name": "Generator URL"
+                    }
+                }
+            }
+        }
     }
 }

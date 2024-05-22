@@ -19,10 +19,10 @@ class TVXMLEntity(CoordinatorEntity):
 
         guide: TVGuide = coordinator.data
 
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, guide.generator_name)},
-            name=guide.generator_name,
-            manufacturer=NAME,
-        )
+        #self._attr_device_info = DeviceInfo(
+        #    identifiers={(DOMAIN, guide.generator_name)},
+        #    name=guide.generator_name,
+        #    manufacturer=NAME,
+        #)
 
         self._attr_attribution = f"Data provided by {guide.generator_name}" # TODO localize

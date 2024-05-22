@@ -45,50 +45,53 @@ class TVXMLChannelSensor(TVXMLEntity, SensorEntity):
         """Initialize the sensor class."""
         super().__init__(coordinator)
 
-        key = f"channel_{channel.id}_{'upcoming' if is_next else 'current'}"
+        key = f"program_{'upcoming' if is_next else 'current'}"
+        channel_id_clean = channel.id.replace(" ", "_").replace("-", "_").replace(":", "").lower()
+
+        self.entity_id = f"sensor.{channel_id_clean}_{key}"
         self._attr_unique_id = str(
             uuid.uuid5(
                 uuid.NAMESPACE_X500,
-                key
+                self.entity_id
             )
         )
 
+        self._attr_has_entity_name = True
         self.entity_description = SensorEntityDescription(
             key=key,
-            name=f"{channel.name} {'Upcoming' if is_next else 'Current'} Program", # TODO localize
+            translation_key=key,
             icon="mdi:format-quote-close",
         )
 
-        # store channel id, as object instance may change
-        self._channel_id = channel.id
+        self._channel = channel
+        self._program = None
         self._is_next = is_next
 
-        LOGGER.debug(f"Setup sensor for channel '{channel.id}' {'NEXT' if is_next else 'CURRENT'} program.")
+        LOGGER.debug(f"Setup sensor '{self.entity_id}' for channel '{channel.id}'.")
 
     @property
-    def native_value(self) -> str:
-        """Return the native value of the sensor."""
-        guide: TVGuide = self.coordinator.data
-        channel = guide.get_channel(self._channel_id)
-        if channel is None:
+    def translation_placeholders(self):
+        """Return the translation placeholders."""
+        if self._channel is None:
             return None
 
-        now = self.coordinator.get_current_time()
+        return {
+            "channel_display_name": self._channel.name
+        }
 
-        # get current or next program
-        program = channel.get_next_program(now) if self._is_next else channel.get_current_program(now)
+    @property
+    def extra_state_attributes(self):
+        """Return the state attributes."""
+        program = self._program
         if program is None:
             return None
-
-        LOGGER.debug(f"Updated Channel Sensor '{self.entity_description.key}': {program.title} ({program.start} - {program.end}).")
 
         # format duration to HH:MM
         duration_seconds = program.duration.total_seconds()
         duration_hours = int(duration_seconds // 3600)
         duration_minutes = int((duration_seconds % 3600) // 60)
 
-        # entity attributes contain program details
-        self._attr_extra_state_attributes = {
+        return {
             "start": program.start,
             "end": program.end,
             "duration": f"{duration_hours:02d}:{duration_minutes:02d}",
@@ -98,8 +101,27 @@ class TVXMLChannelSensor(TVXMLEntity, SensorEntity):
             "subtitle": program.subtitle,
         }
 
+    @property
+    def native_value(self) -> str:
+        """Return the native value of the sensor."""
+        guide: TVGuide = self.coordinator.data
+
+        # refresh channel from guide
+        channel = guide.get_channel(self._channel.id)
+        if channel is None:
+            return None
+
+        self._channel = channel
+
+        now = self.coordinator.get_current_time()
+
+        # get current or next program
+        self._program = self._channel.get_next_program(now) if self._is_next else channel.get_current_program(now)
+        if self._program is None:
+            return None
+
         # native value is full program title
-        return program.full_title
+        return self._program.full_title
 
 class TVXMLStatusSensor(TVXMLEntity, SensorEntity):
     """TVXML Coordinator Status Sensor class."""
@@ -112,33 +134,58 @@ class TVXMLStatusSensor(TVXMLEntity, SensorEntity):
         """Initialize the sensor class."""
         super().__init__(coordinator)
 
-        key = f"{guide.generator_name}_last_update"
+        key = "last_update"
+        self.entity_id = f"sensor.{guide.generator_name}_{key}"
         self._attr_unique_id = str(
             uuid.uuid5(
                 uuid.NAMESPACE_X500,
-                key
+                self.entity_id
             )
         )
 
+        self._attr_has_entity_name = True
         self.entity_description = SensorEntityDescription(
             key=key,
-            name=f"{guide.generator_name} Last Update Time", # TODO localize
+            translation_key=key,
             device_class=SensorDeviceClass.TIMESTAMP,
         )
 
-        LOGGER.debug(f"Setup sensor for coordinator '{guide.generator_name}' status.")
+        self._guide = guide
+
+        LOGGER.debug(f"Setup sensor '{self.entity_id}' for coordinator '{guide.generator_name}' status.")
+
+    @property
+    def translation_placeholders(self):
+        """Return the translation placeholders."""
+        if self._guide is None:
+            return None
+
+        return {
+            "generator_name": self._guide.generator_name
+        }
+
+    @property
+    def extra_state_attributes(self):
+        """Return the state attributes."""
+        if self._guide is None:
+            return None
+
+        return {
+            "generator_name": self._guide.generator_name,
+            "generator_url": self._guide.generator_url,
+        }
 
     @property
     def native_value(self) -> str:
         """Return the native value of the sensor."""
         coordinator: TVXMLDataUpdateCoordinator = self.coordinator
-        guide: TVGuide = coordinator.data
 
-        # entity attributes contain program details
-        self._attr_extra_state_attributes = {
-            "generator_name": guide.generator_name,
-            "generator_url": guide.generator_url,
-        }
+        # refresh guide from coordinator
+        guide: TVGuide = coordinator.data
+        if guide is None:
+            return None
+
+        self._guide = guide
 
         # native value is last update time
         return coordinator.last_update_time.astimezone()
