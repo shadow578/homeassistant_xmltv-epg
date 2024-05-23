@@ -1,1 +1,1 @@
-"""xmltv_epg module unit tests."""
+"""Unit tests for the xmltv_epg integration."""
