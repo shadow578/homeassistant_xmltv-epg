@@ -1,10 +1,9 @@
 """Test xmltv_epg setup process."""
-from datetime import datetime
 import pytest
 
 from homeassistant.const import CONF_HOST
 
-from unittest.mock import patch, PropertyMock
+from unittest.mock import patch
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.xmltv_epg import (
