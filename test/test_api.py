@@ -1,26 +1,21 @@
 """Test xmltv_epg api component."""
 
-from datetime import datetime, timedelta
 
 import aiohttp
 import gzip
 
-import pytest
 
-from homeassistant.const import CONF_HOST
 
 from unittest.mock import MagicMock, AsyncMock
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.xmltv_epg.api import XMLTVClient
-from custom_components.xmltv_epg.const import DOMAIN, OPT_PROGRAM_LOOKAHEAD
 
-from custom_components.xmltv_epg.xmltv.model import TVGuide, TVChannel, TVProgram
 
 def create_mock_session_for_get():
     """Create a mock session that supports get().
 
-    :return: (mock session, mock response)"""
+    :return: (mock session, mock response)
+    """
 
     response = AsyncMock()
     response.raise_for_status = MagicMock()
@@ -80,7 +75,7 @@ async def test_xmltv_client_get_data_gzip_correct_content_type(
 
     response.content_type = "application/gzip"
     response.url = "http://example.com/epg.xml.gz"
-    response.read.return_value = gzip.compress("""
+    response.read.return_value = gzip.compress(b"""
 <tv generator-info-name="xmltv_epg" generator-info-url="http://example.com">
   <channel id="CH1">
     <display-name>Channel 1</display-name>
@@ -90,7 +85,7 @@ async def test_xmltv_client_get_data_gzip_correct_content_type(
         <desc>Description 1</desc>
     </programme>
 </tv>
-""".encode())
+""")
 
     # create client
     client = XMLTVClient(
@@ -119,7 +114,7 @@ async def test_xmltv_client_get_data_gzip_wrong_content_type(
 
     response.content_type = "application/octet-stream"
     response.url = "http://example.com/epg.xml.gz"
-    response.read.return_value = gzip.compress("""
+    response.read.return_value = gzip.compress(b"""
 <tv generator-info-name="xmltv_epg" generator-info-url="http://example.com">
   <channel id="CH1">
     <display-name>Channel 1</display-name>
@@ -129,7 +124,7 @@ async def test_xmltv_client_get_data_gzip_wrong_content_type(
         <desc>Description 1</desc>
     </programme>
 </tv>
-""".encode())
+""")
 
     # create client
     client = XMLTVClient(
