@@ -200,7 +200,7 @@ async def test_program_sensor_attributes(
         mock_coordinator_current_time,
         mock_coordinator_last_update_time
     ):
-    """Test entry setup, unload and reload."""
+    """Test program sensor state and attributes."""
     # create a mock config entry to bypass the config flow
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -229,3 +229,35 @@ async def test_program_sensor_attributes(
     assert state.attributes["description"] == "Description"
     assert state.attributes["episode"] == "S1E1"
     assert state.attributes["subtitle"] == "Subtitle"
+
+async def test_last_update_sensor_attributes(
+        anyio_backend,
+        hass,
+        mock_coordinator_data,
+        mock_coordinator_current_time,
+        mock_coordinator_last_update_time
+    ):
+    """Test last_update sensor state and attributes."""
+    # create a mock config entry to bypass the config flow
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_HOST: "http://example.com/epg.xml"
+        },
+        options={
+            OPT_PROGRAM_LOOKAHEAD: 0 # 0 Minutes lookahead
+        },
+        entry_id="MOCK",
+    )
+
+    # setup the entry
+    assert await async_setup_entry(hass, config_entry)
+    await hass.async_block_till_done()
+
+    # check sensor attributes
+    state = hass.states.get("sensor.mock_last_update")
+    assert state
+    assert state.state == TEST_NOW.astimezone().isoformat()
+
+    assert state.attributes["generator_name"] == "MOCK"
+    assert state.attributes["generator_url"] == "http://example.com/epg.xml"
