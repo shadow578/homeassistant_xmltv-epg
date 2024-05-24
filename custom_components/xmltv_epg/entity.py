@@ -5,7 +5,6 @@ from __future__ import annotations
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .coordinator import XMLTVDataUpdateCoordinator
-
 from .model import TVGuide
 
 

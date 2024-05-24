@@ -1,19 +1,19 @@
 """Sensor platform for XMLTV."""
 
 from __future__ import annotations
+
 import uuid
 
 from homeassistant.components.sensor import (
+    SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
-    SensorDeviceClass,
 )
 
 from .const import DOMAIN, LOGGER
 from .coordinator import XMLTVDataUpdateCoordinator
 from .entity import XMLTVEntity
-
-from .model import TVGuide, TVChannel
+from .model import TVChannel, TVGuide
 
 
 async def async_setup_entry(hass, entry, async_add_devices):

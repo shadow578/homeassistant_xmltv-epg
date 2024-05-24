@@ -2,21 +2,20 @@
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST
-
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.xmltv_epg.const import (
-    DOMAIN,
-    OPT_UPDATE_INTERVAL,
-    OPT_PROGRAM_LOOKAHEAD,
-)
 from custom_components.xmltv_epg.api import (
     XMLTVClientCommunicationError,
     XMLTVClientError,
 )
+from custom_components.xmltv_epg.const import (
+    DOMAIN,
+    OPT_PROGRAM_LOOKAHEAD,
+    OPT_UPDATE_INTERVAL,
+)
 
-from .const import MOCK_TV_GUIDE_URL, MOCK_TV_GUIDE_NAME
+from .const import MOCK_TV_GUIDE_NAME, MOCK_TV_GUIDE_URL
 
 
 # note: need to bypass integration setup to avoid hass actually trying to setup the entry, which would

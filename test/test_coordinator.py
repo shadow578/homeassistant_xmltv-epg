@@ -1,17 +1,15 @@
 """Test xmltv_epg coordinator component."""
 
 from datetime import timedelta
+from unittest.mock import PropertyMock, patch
 
 import pytest
-
-from unittest.mock import patch, PropertyMock
-
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from custom_components.xmltv_epg.coordinator import XMLTVDataUpdateCoordinator
 from custom_components.xmltv_epg.api import XMLTVClient
+from custom_components.xmltv_epg.coordinator import XMLTVDataUpdateCoordinator
 
-from .const import MOCK_NOW, MOCK_TV_GUIDE_URL, MOCK_TV_GUIDE
+from .const import MOCK_NOW, MOCK_TV_GUIDE, MOCK_TV_GUIDE_URL
 
 
 @pytest.fixture()

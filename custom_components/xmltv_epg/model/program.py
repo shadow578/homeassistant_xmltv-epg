@@ -1,11 +1,10 @@
 """TV Program Model."""
 
-from datetime import datetime, timedelta
 import xml.etree.ElementTree as ET
-
-from .helper import is_none_or_whitespace, get_child_as_text
-
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
+
+from .helper import get_child_as_text, is_none_or_whitespace
 
 if TYPE_CHECKING:
     from .channel import TVChannel

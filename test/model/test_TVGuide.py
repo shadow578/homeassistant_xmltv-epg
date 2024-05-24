@@ -2,7 +2,7 @@
 
 import xml.etree.ElementTree as ET
 
-from custom_components.xmltv_epg.model import TVGuide, TVChannel
+from custom_components.xmltv_epg.model import TVChannel, TVGuide
 
 
 def test_from_xml():

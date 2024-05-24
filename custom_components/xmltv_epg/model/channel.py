@@ -1,10 +1,10 @@
 """TV Channel Model."""
 
-from datetime import datetime
 import xml.etree.ElementTree as ET
+from datetime import datetime
 
+from .helper import get_child_as_text, is_none_or_whitespace
 from .program import TVProgram
-from .helper import is_none_or_whitespace, get_child_as_text
 
 
 class TVChannel:

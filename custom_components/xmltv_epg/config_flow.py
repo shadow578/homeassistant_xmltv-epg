@@ -10,16 +10,16 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from .api import (
     XMLTVClient,
-    XMLTVClientError,
     XMLTVClientCommunicationError,
+    XMLTVClientError,
 )
 from .const import (
+    DEFAULT_PROGRAM_LOOKAHEAD,
+    DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
     LOGGER,
-    OPT_UPDATE_INTERVAL,
     OPT_PROGRAM_LOOKAHEAD,
-    DEFAULT_UPDATE_INTERVAL,
-    DEFAULT_PROGRAM_LOOKAHEAD,
+    OPT_UPDATE_INTERVAL,
 )
 
 

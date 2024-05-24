@@ -1,8 +1,8 @@
 """Configure pytest for all tests."""
 
-import pytest
-
 from unittest.mock import patch
+
+import pytest
 
 from .const import MOCK_TV_GUIDE
 

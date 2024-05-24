@@ -1,10 +1,11 @@
 """Test cases for TVProgram class."""
 
-import pytest
-from datetime import datetime, timezone
 import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
 
-from custom_components.xmltv_epg.model import TVProgram, TVChannel
+import pytest
+
+from custom_components.xmltv_epg.model import TVChannel, TVProgram
 
 
 def test_from_xml():

@@ -1,13 +1,12 @@
 """Test xmltv_epg setup process."""
 
 from homeassistant.const import CONF_HOST
-
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.xmltv_epg import (
+    async_reload_entry,
     async_setup_entry,
     async_unload_entry,
-    async_reload_entry,
 )
 from custom_components.xmltv_epg.const import DOMAIN
 from custom_components.xmltv_epg.coordinator import XMLTVDataUpdateCoordinator

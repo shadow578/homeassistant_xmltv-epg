@@ -1,8 +1,8 @@
 """XMLTV Model."""
 
 from .channel import TVChannel
-from .program import TVProgram
 from .guide import TVGuide
+from .program import TVProgram
 
 __all__ = [
     "TVChannel",

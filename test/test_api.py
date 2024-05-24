@@ -1,9 +1,9 @@
 """Test xmltv_epg api component."""
 
-import aiohttp
 import gzip
+from unittest.mock import AsyncMock, MagicMock
 
-from unittest.mock import MagicMock, AsyncMock
+import aiohttp
 
 from custom_components.xmltv_epg.api import XMLTVClient
 

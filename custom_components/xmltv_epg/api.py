@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+import gzip
 import socket
+import xml.etree.ElementTree as ET
 
 import aiohttp
 
-import xml.etree.ElementTree as ET
-
 from .model import TVGuide
-import gzip
 
 
 class XMLTVClientError(Exception):

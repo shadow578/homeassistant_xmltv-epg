@@ -2,7 +2,7 @@
 
 from datetime import datetime, timedelta
 
-from custom_components.xmltv_epg.model import TVGuide, TVChannel, TVProgram
+from custom_components.xmltv_epg.model import TVChannel, TVGuide, TVProgram
 
 MOCK_NOW = datetime(2024, 5, 17, 12, 45, 0)
 
