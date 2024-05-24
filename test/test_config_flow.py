@@ -11,6 +11,7 @@ from custom_components.xmltv_epg.api import (
 )
 from custom_components.xmltv_epg.const import (
     DOMAIN,
+    OPT_ENABLE_UPCOMING_SENSOR,
     OPT_PROGRAM_LOOKAHEAD,
     OPT_UPDATE_INTERVAL,
 )
@@ -127,9 +128,17 @@ async def test_option_flow_init_step_ok(anyio_backend, hass, bypass_integration_
     # and lookahead of 10 minutes
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        user_input={OPT_UPDATE_INTERVAL: 24, OPT_PROGRAM_LOOKAHEAD: 10},
+        user_input={
+            OPT_UPDATE_INTERVAL: 24,
+            OPT_PROGRAM_LOOKAHEAD: 10,
+            OPT_ENABLE_UPCOMING_SENSOR: True,
+        },
     )
 
     # the flow should now finish and create an entry
     assert result["type"] == FlowResultType.CREATE_ENTRY
-    assert result["data"] == {OPT_UPDATE_INTERVAL: 24, OPT_PROGRAM_LOOKAHEAD: 10}
+    assert result["data"] == {
+        OPT_UPDATE_INTERVAL: 24,
+        OPT_PROGRAM_LOOKAHEAD: 10,
+        OPT_ENABLE_UPCOMING_SENSOR: True,
+    }

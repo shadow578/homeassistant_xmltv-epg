@@ -18,21 +18,23 @@ from .model import TVChannel, TVGuide
 
 async def async_setup_entry(hass, entry, async_add_devices):
     """Set up the sensor platform."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: XMLTVDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
     guide: TVGuide = coordinator.data
 
-    LOGGER.debug(f"Setting up Channel Sensors for {len(guide.channels)} channels.")
-
-    async_add_devices(
-        [
-            XMLTVChannelSensor(coordinator, channel, is_next)
-            for channel in guide.channels
-            for is_next in [False, True]
-        ]
+    LOGGER.debug(
+        f"Setting up Channel Sensors for {len(guide.channels)} channels (enable_upcoming: {coordinator.enable_upcoming_sensor})."
     )
 
-    # add sensor for coordinator status
-    async_add_devices([XMLTVStatusSensor(coordinator, guide)])
+    # setup sensor for coordinator status
+    sensors = [XMLTVStatusSensor(coordinator, guide)]
+
+    # add current / upcoming program sensors for each channel
+    for channel in guide.channels:
+        sensors.append(XMLTVChannelSensor(coordinator, channel, False))
+        if coordinator.enable_upcoming_sensor:
+            sensors.append(XMLTVChannelSensor(coordinator, channel, True))
+
+    async_add_devices(sensors)
 
 
 class XMLTVChannelSensor(XMLTVEntity, SensorEntity):

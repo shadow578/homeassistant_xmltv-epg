@@ -30,10 +30,12 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
         client: XMLTVClient,
         update_interval: int,
         lookahead: int,
+        enable_upcoming_sensor: bool,
     ) -> None:
         """Initialize."""
         self.client = client
         self._lookahead = timedelta(minutes=lookahead)
+        self._enable_upcoming_sensor = enable_upcoming_sensor
         super().__init__(
             hass=hass,
             logger=LOGGER,
@@ -89,3 +91,8 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
     def last_update_time(self) -> datetime:
         """Get last update time."""
         return self._last_refetch_time
+
+    @property
+    def enable_upcoming_sensor(self) -> bool:
+        """Get enable upcoming sensor."""
+        return self._enable_upcoming_sensor

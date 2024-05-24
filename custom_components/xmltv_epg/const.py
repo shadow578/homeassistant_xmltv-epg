@@ -13,6 +13,9 @@ DEFAULT_UPDATE_INTERVAL = 12  # hours
 OPT_PROGRAM_LOOKAHEAD = "program_lookahead_minutes"
 DEFAULT_PROGRAM_LOOKAHEAD = 15  # minutes
 
+OPT_ENABLE_UPCOMING_SENSOR = "enable_upcoming_sensor"
+DEFAULT_ENABLE_UPCOMING_SENSOR = False
+
 # Interval that sensors are updated.
 # This is only updating sensors from cached data, fetching new data interval is defined by OPT_UPDATE_INTERVAL.
 SENSOR_REFRESH_INTERVAL = 60  # seconds

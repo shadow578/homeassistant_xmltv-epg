@@ -8,7 +8,11 @@ from homeassistant.const import CONF_HOST
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.xmltv_epg import async_setup_entry
-from custom_components.xmltv_epg.const import DOMAIN, OPT_PROGRAM_LOOKAHEAD
+from custom_components.xmltv_epg.const import (
+    DOMAIN,
+    OPT_ENABLE_UPCOMING_SENSOR,
+    OPT_PROGRAM_LOOKAHEAD,
+)
 
 from .const import MOCK_NOW, MOCK_TV_GUIDE_NAME, MOCK_TV_GUIDE_URL
 
@@ -48,7 +52,8 @@ async def test_sensors_basic(
         domain=DOMAIN,
         data={CONF_HOST: MOCK_TV_GUIDE_URL},
         options={
-            OPT_PROGRAM_LOOKAHEAD: 0  # 0 Minutes lookahead
+            OPT_PROGRAM_LOOKAHEAD: 0,  # 0 Minutes lookahead
+            OPT_ENABLE_UPCOMING_SENSOR: True,  # Enable upcoming program sensor
         },
         entry_id="MOCK",
     )
