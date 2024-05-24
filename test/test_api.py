@@ -6,6 +6,8 @@ from unittest.mock import MagicMock, AsyncMock
 
 from custom_components.xmltv_epg.api import XMLTVClient
 
+from .const import MOCK_TV_GUIDE_NAME, MOCK_TV_GUIDE_URL, MOCK_TV_GUIDE_URL_GZ
+
 def create_mock_session_for_get():
     """Create a mock session that supports get().
 
@@ -30,9 +32,9 @@ async def test_xmltv_client_get_data_plain(
     session, response = create_mock_session_for_get()
 
     response.content_type = "text/xml"
-    response.url = "http://example.com/epg.xml"
-    response.text.return_value = """
-<tv generator-info-name="xmltv_epg" generator-info-url="http://example.com">
+    response.url = MOCK_TV_GUIDE_URL
+    response.text.return_value = f"""
+<tv generator-info-name="{MOCK_TV_GUIDE_NAME}" generator-info-url="{MOCK_TV_GUIDE_URL}">
   <channel id="CH1">
     <display-name>Channel 1</display-name>
     </channel>
@@ -46,7 +48,7 @@ async def test_xmltv_client_get_data_plain(
     # create client
     client = XMLTVClient(
         session=session,
-        url="http://example.com/epg.xml",
+        url=MOCK_TV_GUIDE_URL,
     )
 
     # fetch data
@@ -54,8 +56,8 @@ async def test_xmltv_client_get_data_plain(
 
     # check the guide
     assert guide
-    assert guide.generator_name == "xmltv_epg"
-    assert guide.generator_url == "http://example.com"
+    assert guide.generator_name == MOCK_TV_GUIDE_NAME
+    assert guide.generator_url == MOCK_TV_GUIDE_URL
 
     assert len(guide.channels) == 1
     assert guide.channels[0].id == "CH1"
@@ -69,9 +71,9 @@ async def test_xmltv_client_get_data_gzip_correct_content_type(
     session, response = create_mock_session_for_get()
 
     response.content_type = "application/gzip"
-    response.url = "http://example.com/epg.xml.gz"
-    response.read.return_value = gzip.compress(b"""
-<tv generator-info-name="xmltv_epg" generator-info-url="http://example.com">
+    response.url = MOCK_TV_GUIDE_URL_GZ
+    response.read.return_value = gzip.compress(f"""
+<tv generator-info-name="{MOCK_TV_GUIDE_NAME}" generator-info-url="{MOCK_TV_GUIDE_URL}">
   <channel id="CH1">
     <display-name>Channel 1</display-name>
     </channel>
@@ -80,12 +82,12 @@ async def test_xmltv_client_get_data_gzip_correct_content_type(
         <desc>Description 1</desc>
     </programme>
 </tv>
-""")
+""".encode())
 
     # create client
     client = XMLTVClient(
         session=session,
-        url="http://example.com/epg.xml.gz",
+        url=MOCK_TV_GUIDE_URL_GZ,
     )
 
     # fetch data
@@ -93,8 +95,8 @@ async def test_xmltv_client_get_data_gzip_correct_content_type(
 
     # check the guide
     assert guide
-    assert guide.generator_name == "xmltv_epg"
-    assert guide.generator_url == "http://example.com"
+    assert guide.generator_name == MOCK_TV_GUIDE_NAME
+    assert guide.generator_url == MOCK_TV_GUIDE_URL
 
     assert len(guide.channels) == 1
     assert guide.channels[0].id == "CH1"
@@ -108,9 +110,9 @@ async def test_xmltv_client_get_data_gzip_wrong_content_type(
     session, response = create_mock_session_for_get()
 
     response.content_type = "application/octet-stream"
-    response.url = "http://example.com/epg.xml.gz"
-    response.read.return_value = gzip.compress(b"""
-<tv generator-info-name="xmltv_epg" generator-info-url="http://example.com">
+    response.url = MOCK_TV_GUIDE_URL_GZ
+    response.read.return_value = gzip.compress(f"""
+<tv generator-info-name="{MOCK_TV_GUIDE_NAME}" generator-info-url="{MOCK_TV_GUIDE_URL}">
   <channel id="CH1">
     <display-name>Channel 1</display-name>
     </channel>
@@ -119,12 +121,12 @@ async def test_xmltv_client_get_data_gzip_wrong_content_type(
         <desc>Description 1</desc>
     </programme>
 </tv>
-""")
+""".encode())
 
     # create client
     client = XMLTVClient(
         session=session,
-        url="http://example.com/epg.xml.gz",
+        url=MOCK_TV_GUIDE_URL_GZ,
     )
 
     # fetch data
@@ -132,8 +134,8 @@ async def test_xmltv_client_get_data_gzip_wrong_content_type(
 
     # check the guide
     assert guide
-    assert guide.generator_name == "xmltv_epg"
-    assert guide.generator_url == "http://example.com"
+    assert guide.generator_name == MOCK_TV_GUIDE_NAME
+    assert guide.generator_url == MOCK_TV_GUIDE_URL
 
     assert len(guide.channels) == 1
     assert guide.channels[0].id == "CH1"

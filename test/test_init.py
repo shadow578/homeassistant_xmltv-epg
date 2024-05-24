@@ -1,9 +1,7 @@
 """Test xmltv_epg setup process."""
-import pytest
 
 from homeassistant.const import CONF_HOST
 
-from unittest.mock import patch
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.xmltv_epg import (
@@ -14,27 +12,16 @@ from custom_components.xmltv_epg import (
 from custom_components.xmltv_epg.const import DOMAIN
 from custom_components.xmltv_epg.coordinator import XMLTVDataUpdateCoordinator
 
-from custom_components.xmltv_epg.model import TVGuide
-
-UPDATE_COORDINATOR_DATA = TVGuide("MOCK", "http://example.com/epg.xml")
-
-@pytest.fixture()
-def mock_xmltv_client_get():
-    """Fixture to replace 'XMLTVClient.async_get_data' method with a mock."""
-    with patch(
-        "custom_components.xmltv_epg.api.XMLTVClient.async_get_data",
-        return_value=UPDATE_COORDINATOR_DATA
-    ) as mock:
-        yield mock
+from .const import MOCK_TV_GUIDE_URL
 
 async def test_setup_unload_and_reload_entry(anyio_backend,
                                              hass,
-                                             mock_xmltv_client_get):
+                                             mock_xmltv_client_get_data):
     """Test entry setup, unload and reload."""
     # create a mock config entry to bypass the config flow
     config_entry = MockConfigEntry(
         domain=DOMAIN,
-        data={ CONF_HOST: "http://example.com/epg.xml" },
+        data={ CONF_HOST: MOCK_TV_GUIDE_URL },
         entry_id="MOCK",
     )
 
@@ -52,7 +39,7 @@ async def test_setup_unload_and_reload_entry(anyio_backend,
     assert_entry()
 
     # should have called coordinator update
-    assert mock_xmltv_client_get.call_count == 1
+    assert mock_xmltv_client_get_data.call_count == 1
 
     # reload the entry and check the data is still there
     assert await async_reload_entry(hass, config_entry) is None
@@ -60,11 +47,11 @@ async def test_setup_unload_and_reload_entry(anyio_backend,
 
     # assert the coordinator was updated again.
     # since the coordinator is re-created on reload, the data will be re-fetched too
-    assert mock_xmltv_client_get.call_count == 2
+    assert mock_xmltv_client_get_data.call_count == 2
 
     # unload the entry and check the data is gone
     assert await async_unload_entry(hass, config_entry)
     assert config_entry.entry_id not in hass.data[DOMAIN]
 
     # coordinator was NOT updated again, re-fetch count did not change
-    assert mock_xmltv_client_get.call_count == 2
+    assert mock_xmltv_client_get_data.call_count == 2
