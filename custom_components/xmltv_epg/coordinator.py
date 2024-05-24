@@ -51,7 +51,7 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
             LOGGER.debug(f"Updated XMLTV guide /w {len(guide.channels)} channels and {len(guide.programs)} programs.")
 
             self._guide = guide
-            self._last_refetch_time = datetime.now()
+            self._last_refetch_time = self.actual_now
         except XMLTVClientError as exception:
             raise UpdateFailed(exception) from exception
 
@@ -63,7 +63,7 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
 
         # check if refetch interval has passed
         next_refetch_time = self._last_refetch_time + self._refetch_interval
-        return datetime.now() >= next_refetch_time
+        return self.actual_now >= next_refetch_time
 
     async def _async_update_data(self):
         """Update data from cache or re-fetch if cache is expired."""
@@ -72,9 +72,15 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
 
         return self._guide
 
+    @property
+    def actual_now(self) -> datetime:
+        """Get actual current time."""
+        return datetime.now()
+
+    # TODO: make this a property
     def get_current_time(self) -> datetime:
         """Get effective current time."""
-        return datetime.now() + self._lookahead
+        return self.actual_now + self._lookahead
 
     @property
     def last_update_time(self) -> datetime:

@@ -1,15 +1,10 @@
 """Test xmltv_epg api component."""
-
-
 import aiohttp
 import gzip
-
-
 
 from unittest.mock import MagicMock, AsyncMock
 
 from custom_components.xmltv_epg.api import XMLTVClient
-
 
 def create_mock_session_for_get():
     """Create a mock session that supports get().
