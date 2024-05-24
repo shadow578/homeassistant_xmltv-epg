@@ -1,4 +1,5 @@
 """DataUpdateCoordinator for xmltv_epg."""
+
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -48,7 +49,9 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
         """Re-fetch TV guide data."""
         try:
             guide = await self.client.async_get_data()
-            LOGGER.debug(f"Updated XMLTV guide /w {len(guide.channels)} channels and {len(guide.programs)} programs.")
+            LOGGER.debug(
+                f"Updated XMLTV guide /w {len(guide.channels)} channels and {len(guide.programs)} programs."
+            )
 
             self._guide = guide
             self._last_refetch_time = self.actual_now

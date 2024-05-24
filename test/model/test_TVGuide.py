@@ -22,15 +22,15 @@ def test_from_xml():
     guide = TVGuide.from_xml(xml)
 
     assert guide is not None
-    assert guide.generator_name == 'xmltv_epg'
-    assert guide.generator_url == 'http://example.com'
+    assert guide.generator_name == "xmltv_epg"
+    assert guide.generator_url == "http://example.com"
 
     assert len(guide.channels) == 1
     assert len(guide.programs) == 1
 
     # cross-linked ?
     assert guide.programs[0].channel is not None
-    assert guide.programs[0].channel.id == 'CH1'
+    assert guide.programs[0].channel.id == "CH1"
 
 
 def test_get_channel():
@@ -38,12 +38,12 @@ def test_get_channel():
     guide = TVGuide()
 
     # empty guide, cannot find channels
-    assert guide.get_channel('CH1') is None
+    assert guide.get_channel("CH1") is None
 
     # add channel(s)
-    guide.channels.append(TVChannel('CH1', 'Channel 1'))
-    guide.channels.append(TVChannel('CH2', 'Channel 2'))
-    assert guide.get_channel('CH1') is not None
+    guide.channels.append(TVChannel("CH1", "Channel 1"))
+    guide.channels.append(TVChannel("CH2", "Channel 2"))
+    assert guide.get_channel("CH1") is not None
 
     # non-existing channel
-    assert guide.get_channel('CH3') is None
+    assert guide.get_channel("CH3") is None

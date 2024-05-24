@@ -7,21 +7,22 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.xmltv_epg import (
     async_setup_entry,
     async_unload_entry,
-    async_reload_entry
+    async_reload_entry,
 )
 from custom_components.xmltv_epg.const import DOMAIN
 from custom_components.xmltv_epg.coordinator import XMLTVDataUpdateCoordinator
 
 from .const import MOCK_TV_GUIDE_URL
 
-async def test_setup_unload_and_reload_entry(anyio_backend,
-                                             hass,
-                                             mock_xmltv_client_get_data):
+
+async def test_setup_unload_and_reload_entry(
+    anyio_backend, hass, mock_xmltv_client_get_data
+):
     """Test entry setup, unload and reload."""
     # create a mock config entry to bypass the config flow
     config_entry = MockConfigEntry(
         domain=DOMAIN,
-        data={ CONF_HOST: MOCK_TV_GUIDE_URL },
+        data={CONF_HOST: MOCK_TV_GUIDE_URL},
         entry_id="MOCK",
     )
 
@@ -30,8 +31,7 @@ async def test_setup_unload_and_reload_entry(anyio_backend,
         assert DOMAIN in hass.data
         assert config_entry.entry_id in hass.data[DOMAIN]
         assert isinstance(
-            hass.data[DOMAIN][config_entry.entry_id],
-            XMLTVDataUpdateCoordinator
+            hass.data[DOMAIN][config_entry.entry_id], XMLTVDataUpdateCoordinator
         )
 
     # setup the entry

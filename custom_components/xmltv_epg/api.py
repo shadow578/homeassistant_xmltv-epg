@@ -1,4 +1,5 @@
 """XMLTV Client."""
+
 from __future__ import annotations
 
 import asyncio
@@ -11,12 +12,12 @@ import xml.etree.ElementTree as ET
 from .model import TVGuide
 import gzip
 
+
 class XMLTVClientError(Exception):
     """Exception to indicate a general API error."""
 
-class XMLTVClientCommunicationError(
-    XMLTVClientError
-):
+
+class XMLTVClientCommunicationError(XMLTVClientError):
     """Exception to indicate a communication error."""
 
 
@@ -36,17 +37,16 @@ class XMLTVClient:
         """Fetch XMLTV Guide data."""
         try:
             # fetch data
-            response = await self._session.get(
-                url=self._url,
-                timeout=10
-             )
+            response = await self._session.get(url=self._url, timeout=10)
             response.raise_for_status()
 
             if response.content_type == "text/xml":
                 # raw XML text, read as-is
                 data = await response.text()
 
-            elif response.content_type == "application/gzip" or "xml.gz" in str(response.url):
+            elif response.content_type == "application/gzip" or "xml.gz" in str(
+                response.url
+            ):
                 # xml.gz file, read as binary and decompress
                 gzipped_data = await response.read()
 
@@ -79,6 +79,4 @@ class XMLTVClient:
                 "Error fetching information",
             ) from exception
         except Exception as exception:  # pylint: disable=broad-except
-            raise XMLTVClientError(
-                "Something really wrong happened!"
-            ) from exception
+            raise XMLTVClientError("Something really wrong happened!") from exception

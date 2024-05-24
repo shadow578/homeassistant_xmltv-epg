@@ -5,7 +5,7 @@ from .program import TVProgram
 from .guide import TVGuide
 
 __all__ = [
-    'TVChannel',
-    'TVProgram',
-    'TVGuide',
+    "TVChannel",
+    "TVProgram",
+    "TVGuide",
 ]

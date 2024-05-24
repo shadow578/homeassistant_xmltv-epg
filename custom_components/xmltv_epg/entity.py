@@ -1,4 +1,5 @@
 """XMLTV Entity class."""
+
 from __future__ import annotations
 
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -17,10 +18,12 @@ class XMLTVEntity(CoordinatorEntity):
 
         guide: TVGuide = coordinator.data
 
-        #self._attr_device_info = DeviceInfo(
+        # self._attr_device_info = DeviceInfo(
         #    identifiers={(DOMAIN, guide.generator_name)},
         #    name=guide.generator_name,
         #    manufacturer=NAME,
-        #)
+        # )
 
-        self._attr_attribution = f"Data provided by {guide.generator_name}" # TODO localize
+        self._attr_attribution = (
+            f"Data provided by {guide.generator_name}"  # TODO localize
+        )
