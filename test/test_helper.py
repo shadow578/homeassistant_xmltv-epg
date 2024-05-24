@@ -24,3 +24,7 @@ def test_normalize_for_entity_id():
         normalize_for_entity_id("  Leading and Trailing Spaces  ")
         == "leading_and_trailing_spaces"
     )
+
+    # test special replacement rules
+    # required because both "Sport1" and "Sport1+" are channels that exists in the wild...
+    assert normalize_for_entity_id("A+B-C") == "a_plus_b_c"

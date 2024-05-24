@@ -16,14 +16,17 @@ def normalize_for_entity_id(s: str) -> str:
     # lower case
     s = s.lower()
 
-    # replace umlauts and ß with their base character (ä -> a, ß -> ss)
-    umlauts = {
+    # special replacement rules
+    replacements = {
+        # replace umlauts with their respective digraphs
         "ä": "ae",
         "ö": "oe",
         "ü": "ue",
         "ß": "ss",
+        # '+' is replaced with ' plus '.
+        "+": " plus ",
     }
-    for umlaut, replacement in umlauts.items():
+    for umlaut, replacement in replacements.items():
         s = s.replace(umlaut, replacement)
 
     # replace "delimiting characters" and spaces with underscores
