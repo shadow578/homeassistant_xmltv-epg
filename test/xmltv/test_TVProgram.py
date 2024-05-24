@@ -4,7 +4,7 @@ import pytest
 from datetime import datetime, timezone
 import xml.etree.ElementTree as ET
 
-from ..model import TVProgram, TVChannel
+from custom_components.xmltv_epg.xmltv.model import TVProgram, TVChannel
 
 def test_from_xml():
     """Test TVProgram.from_xml method with valid input."""

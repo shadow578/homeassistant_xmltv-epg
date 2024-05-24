@@ -2,9 +2,12 @@
 
 [![GitHub Release][releases-shield]][releases]
 [![GitHub Activity][commits-shield]][commits]
+[![codecov](https://codecov.io/github/shadow578/homeassistant_xmltv-epg/graph/badge.svg?token=HGS6DNA4LE)](https://codecov.io/github/shadow578/homeassistant_xmltv-epg)
 [![License][license-shield]](LICENSE)
 
 ![Project Maintenance][maintenance-shield]
+
+
 
 
 _Integration to add [XMLTV][xmltv_wiki] EPG to Home Assistant._

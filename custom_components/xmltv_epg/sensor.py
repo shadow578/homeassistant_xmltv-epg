@@ -113,7 +113,7 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
 
         self._channel = channel
 
-        now = self.coordinator.get_current_time()
+        now = self.coordinator.current_time
 
         # get current or next program
         self._program = self._channel.get_next_program(now) if self._is_next else channel.get_current_program(now)
