@@ -12,7 +12,7 @@ from .const import DOMAIN, LOGGER
 from .coordinator import XMLTVDataUpdateCoordinator
 from .entity import XMLTVEntity
 
-from .xmltv.model import TVGuide, TVChannel
+from .model import TVGuide, TVChannel
 
 async def async_setup_entry(hass, entry, async_add_devices):
     """Set up the sensor platform."""

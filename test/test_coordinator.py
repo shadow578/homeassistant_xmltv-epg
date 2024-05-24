@@ -10,7 +10,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from custom_components.xmltv_epg.coordinator import XMLTVDataUpdateCoordinator
 from custom_components.xmltv_epg.api import XMLTVClient
 
-from custom_components.xmltv_epg.xmltv.model import TVGuide
+from custom_components.xmltv_epg.model import TVGuide
 
 TEST_NOW = datetime(2024, 5, 17, 12, 45, 0)
 XMLTV_CLIENT_DATA = TVGuide("MOCK", "http://example.com/epg.xml")

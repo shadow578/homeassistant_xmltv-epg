@@ -5,7 +5,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .coordinator import XMLTVDataUpdateCoordinator
 
-from .xmltv.model import TVGuide
+from .model import TVGuide
 
 
 class XMLTVEntity(CoordinatorEntity):

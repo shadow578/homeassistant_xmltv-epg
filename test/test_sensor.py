@@ -11,7 +11,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.xmltv_epg import async_setup_entry
 from custom_components.xmltv_epg.const import DOMAIN, OPT_PROGRAM_LOOKAHEAD
 
-from custom_components.xmltv_epg.xmltv.model import TVGuide, TVChannel, TVProgram
+from custom_components.xmltv_epg.model import TVGuide, TVChannel, TVProgram
 
 TEST_NOW = datetime(2024, 5, 17, 12, 45, 0)
 
