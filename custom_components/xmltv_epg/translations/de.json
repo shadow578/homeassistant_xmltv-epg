@@ -19,7 +19,8 @@
                 "description": "Ändere das Laufzeitverhalten der XMLTV EPG Integration. Änderungen erfordern eventuell ein neuladen der Integration.",
                 "data": {
                     "update_interval_hours": "Aktualisierungsintervall (Stunden)",
-                    "program_lookahead_minutes": "Vorrausschauzeit für aktuelles Programm (Minuten)"
+                    "program_lookahead_minutes": "Vorrausschauzeit für aktuelles Programm (Minuten)",
+                    "enable_upcoming_sensor": "Sensor für bevorstehendes Programm aktivieren"
                 }
             }
         }

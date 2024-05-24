@@ -14,10 +14,12 @@ from .api import (
     XMLTVClientError,
 )
 from .const import (
+    DEFAULT_ENABLE_UPCOMING_SENSOR,
     DEFAULT_PROGRAM_LOOKAHEAD,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
     LOGGER,
+    OPT_ENABLE_UPCOMING_SENSOR,
     OPT_PROGRAM_LOOKAHEAD,
     OPT_UPDATE_INTERVAL,
 )
@@ -138,6 +140,12 @@ class XMLTVOptionsFlowHandler(config_entries.OptionsFlow):
                             mode=selector.NumberSelectorMode.BOX,
                         )
                     ),
+                    vol.Required(
+                        OPT_ENABLE_UPCOMING_SENSOR,
+                        default=self.config_entry.options.get(
+                            OPT_ENABLE_UPCOMING_SENSOR, DEFAULT_ENABLE_UPCOMING_SENSOR
+                        ),
+                    ): selector.BooleanSelector(),
                 }
             ),
         )

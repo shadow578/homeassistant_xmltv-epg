@@ -41,6 +41,7 @@ async def test_coordinator_basic(
         ),
         update_interval=1,  # every 1 hour
         lookahead=15,  # 15 minutes
+        enable_upcoming_sensor=True,
     )
 
     # current_time is used by sensors etc. to determine the current program time to show.

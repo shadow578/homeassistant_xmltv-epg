@@ -19,7 +19,8 @@
                 "description": "Change runtime settings for the XMLTV EPG integration. Changes may require a reload of the integration.",
                 "data": {
                     "update_interval_hours": "Update Interval (hours)",
-                    "program_lookahead_minutes": "Current Program Lookahead (minutes)"
+                    "program_lookahead_minutes": "Current Program Lookahead (minutes)",
+                    "enable_upcoming_sensor": "Enable Upcoming Program Sensor"
                 }
             }
         }
