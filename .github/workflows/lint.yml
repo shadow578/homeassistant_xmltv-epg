@@ -1,4 +1,4 @@
-name: "Lint"
+name: "Lint and Format"
 
 on:
   push:
@@ -25,5 +25,8 @@ jobs:
         - name: "Install requirements"
           run: python3 -m pip install -r requirements.txt
 
-        - name: "Run"
+        - name: "Run Format"
+          run: python3 -m ruff format --check .
+
+        - name: "Run Check"
           run: python3 -m ruff check .

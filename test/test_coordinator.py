@@ -1,16 +1,16 @@
 """Test xmltv_epg coordinator component."""
+
 from datetime import timedelta
+from unittest.mock import PropertyMock, patch
 
 import pytest
-
-from unittest.mock import patch, PropertyMock
-
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from custom_components.xmltv_epg.coordinator import XMLTVDataUpdateCoordinator
 from custom_components.xmltv_epg.api import XMLTVClient
+from custom_components.xmltv_epg.coordinator import XMLTVDataUpdateCoordinator
 
-from .const import MOCK_NOW, MOCK_TV_GUIDE_URL, MOCK_TV_GUIDE
+from .const import MOCK_NOW, MOCK_TV_GUIDE, MOCK_TV_GUIDE_URL
+
 
 @pytest.fixture()
 def mock_actual_now():
@@ -22,12 +22,14 @@ def mock_actual_now():
         mock.return_value = MOCK_NOW
         yield mock
 
+
 async def test_coordinator_basic(
-        anyio_backend,
-        hass,
-        bypass_integration_setup,
-        mock_xmltv_client_get_data,
-        mock_actual_now):
+    anyio_backend,
+    hass,
+    bypass_integration_setup,
+    mock_xmltv_client_get_data,
+    mock_actual_now,
+):
     """Test the basic functionality of the coordinator."""
 
     # create the coordinator
@@ -37,8 +39,8 @@ async def test_coordinator_basic(
             session=async_get_clientsession(hass),
             url=MOCK_TV_GUIDE_URL,
         ),
-        update_interval=1, # every 1 hour
-        lookahead=15, # 15 minutes
+        update_interval=1,  # every 1 hour
+        lookahead=15,  # 15 minutes
     )
 
     # current_time is used by sensors etc. to determine the current program time to show.
@@ -59,7 +61,6 @@ async def test_coordinator_basic(
     # last update time should be set
     assert coordinator._last_refetch_time == MOCK_NOW
 
-
     # fetch the data again, but this time the data should be returned from the cache
     data = await coordinator._async_update_data()
     assert data
@@ -70,7 +71,6 @@ async def test_coordinator_basic(
 
     # last update time should still be the same
     assert coordinator._last_refetch_time == MOCK_NOW
-
 
     # time-travel 2 hours into the future
     # the data is now stale and should be refetched

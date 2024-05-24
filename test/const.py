@@ -1,7 +1,8 @@
 """Constants for testing."""
+
 from datetime import datetime, timedelta
 
-from custom_components.xmltv_epg.model import TVGuide, TVChannel, TVProgram
+from custom_components.xmltv_epg.model import TVChannel, TVGuide, TVProgram
 
 MOCK_NOW = datetime(2024, 5, 17, 12, 45, 0)
 
@@ -9,6 +10,7 @@ MOCK_NOW = datetime(2024, 5, 17, 12, 45, 0)
 MOCK_TV_GUIDE_NAME = "MOCK XMLTV"
 MOCK_TV_GUIDE_URL = "http://example.com/epg.xml"
 MOCK_TV_GUIDE_URL_GZ = "http://example.com/epg.xml.gz"
+
 
 def get_mock_tv_guide() -> TVGuide:
     """Build a TV Guide object.
@@ -31,10 +33,7 @@ def get_mock_tv_guide() -> TVGuide:
     CH 3 Current has episode="S1E1" and subtitle="Subtitle" set.
     CH 3 Upcoming has episode="S1E2" and subtitle="Subtitle" set.
     """
-    guide = TVGuide(
-        generator_name=MOCK_TV_GUIDE_NAME,
-        generator_url=MOCK_TV_GUIDE_URL
-    )
+    guide = TVGuide(generator_name=MOCK_TV_GUIDE_NAME, generator_url=MOCK_TV_GUIDE_URL)
 
     channels = [
         TVChannel(id="mock 1", name="Mock Channel 1"),
@@ -104,5 +103,6 @@ def get_mock_tv_guide() -> TVGuide:
     guide.channels = channels
     guide.programs = programs
     return guide
+
 
 MOCK_TV_GUIDE = get_mock_tv_guide()

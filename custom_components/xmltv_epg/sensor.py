@@ -1,18 +1,20 @@
 """Sensor platform for XMLTV."""
+
 from __future__ import annotations
+
 import uuid
 
 from homeassistant.components.sensor import (
+    SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
-    SensorDeviceClass,
 )
 
 from .const import DOMAIN, LOGGER
 from .coordinator import XMLTVDataUpdateCoordinator
 from .entity import XMLTVEntity
+from .model import TVChannel, TVGuide
 
-from .model import TVGuide, TVChannel
 
 async def async_setup_entry(hass, entry, async_add_devices):
     """Set up the sensor platform."""
@@ -46,15 +48,12 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         super().__init__(coordinator)
 
         key = f"program_{'upcoming' if is_next else 'current'}"
-        channel_id_clean = channel.id.replace(" ", "_").replace("-", "_").replace(":", "").lower()
+        channel_id_clean = (
+            channel.id.replace(" ", "_").replace("-", "_").replace(":", "").lower()
+        )
 
         self.entity_id = f"sensor.{channel_id_clean}_{key}"
-        self._attr_unique_id = str(
-            uuid.uuid5(
-                uuid.NAMESPACE_X500,
-                self.entity_id
-            )
-        )
+        self._attr_unique_id = str(uuid.uuid5(uuid.NAMESPACE_X500, self.entity_id))
 
         self._attr_has_entity_name = True
         self.entity_description = SensorEntityDescription(
@@ -75,9 +74,7 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         if self._channel is None:
             return None
 
-        return {
-            "channel_display_name": self._channel.name
-        }
+        return {"channel_display_name": self._channel.name}
 
     @property
     def extra_state_attributes(self):
@@ -116,32 +113,28 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         now = self.coordinator.current_time
 
         # get current or next program
-        self._program = self._channel.get_next_program(now) if self._is_next else channel.get_current_program(now)
+        self._program = (
+            self._channel.get_next_program(now)
+            if self._is_next
+            else channel.get_current_program(now)
+        )
         if self._program is None:
             return None
 
         # native value is full program title
         return self._program.full_title
 
+
 class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
     """XMLTV Coordinator Status Sensor class."""
 
-    def __init__(
-        self,
-        coordinator: XMLTVDataUpdateCoordinator,
-        guide: TVGuide
-    ) -> None:
+    def __init__(self, coordinator: XMLTVDataUpdateCoordinator, guide: TVGuide) -> None:
         """Initialize the sensor class."""
         super().__init__(coordinator)
 
         key = "last_update"
         self.entity_id = f"sensor.{guide.generator_name}_{key}"
-        self._attr_unique_id = str(
-            uuid.uuid5(
-                uuid.NAMESPACE_X500,
-                self.entity_id
-            )
-        )
+        self._attr_unique_id = str(uuid.uuid5(uuid.NAMESPACE_X500, self.entity_id))
 
         self._attr_has_entity_name = True
         self.entity_description = SensorEntityDescription(
@@ -152,7 +145,9 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
 
         self._guide = guide
 
-        LOGGER.debug(f"Setup sensor '{self.entity_id}' for coordinator '{guide.generator_name}' status.")
+        LOGGER.debug(
+            f"Setup sensor '{self.entity_id}' for coordinator '{guide.generator_name}' status."
+        )
 
     @property
     def translation_placeholders(self):
@@ -160,9 +155,7 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
         if self._guide is None:
             return None
 
-        return {
-            "generator_name": self._guide.generator_name
-        }
+        return {"generator_name": self._guide.generator_name}
 
     @property
     def extra_state_attributes(self):

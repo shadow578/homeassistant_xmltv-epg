@@ -1,4 +1,5 @@
 """Adds config flow for XMLTV."""
+
 from __future__ import annotations
 
 import voluptuous as vol
@@ -9,17 +10,18 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from .api import (
     XMLTVClient,
-    XMLTVClientError,
     XMLTVClientCommunicationError,
+    XMLTVClientError,
 )
 from .const import (
+    DEFAULT_PROGRAM_LOOKAHEAD,
+    DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
     LOGGER,
-    OPT_UPDATE_INTERVAL,
     OPT_PROGRAM_LOOKAHEAD,
-    DEFAULT_UPDATE_INTERVAL,
-    DEFAULT_PROGRAM_LOOKAHEAD,
+    OPT_UPDATE_INTERVAL,
 )
+
 
 class XMLTVFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for XMLTV."""
@@ -94,15 +96,13 @@ class XMLTVOptionsFlowHandler(config_entries.OptionsFlow):
         self.config_entry = config_entry
 
     async def async_step_init(
-        self,
-        user_input: dict | None = None
+        self, user_input: dict | None = None
     ) -> config_entries.FlowResult:
         """XMLTV Options Flow."""
         return await self.async_step_menu(user_input)
 
     async def async_step_menu(
-        self,
-        user_input: dict | None = None
+        self, user_input: dict | None = None
     ) -> config_entries.FlowResult:
         """XMLTV Options Flow."""
         if user_input is not None:
@@ -127,7 +127,6 @@ class XMLTVOptionsFlowHandler(config_entries.OptionsFlow):
                             mode=selector.NumberSelectorMode.BOX,
                         )
                     ),
-
                     vol.Required(
                         OPT_PROGRAM_LOOKAHEAD,
                         default=self.config_entry.options.get(

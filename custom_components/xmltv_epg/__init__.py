@@ -3,6 +3,7 @@
 For more details about this integration, please refer to
 https://github.com/shadow578/homeassistant_xmltv-epg
 """
+
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
@@ -10,19 +11,20 @@ from homeassistant.const import CONF_HOST, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
+from .api import XMLTVClient
 from .const import (
-    DOMAIN,
-    OPT_UPDATE_INTERVAL,
-    OPT_PROGRAM_LOOKAHEAD,
-    DEFAULT_UPDATE_INTERVAL,
     DEFAULT_PROGRAM_LOOKAHEAD,
+    DEFAULT_UPDATE_INTERVAL,
+    DOMAIN,
+    OPT_PROGRAM_LOOKAHEAD,
+    OPT_UPDATE_INTERVAL,
 )
 from .coordinator import XMLTVDataUpdateCoordinator
-from .api import XMLTVClient
 
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
 ]
+
 
 # https://developers.home-assistant.io/docs/config_entries_index/#setting-up-an-entry
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

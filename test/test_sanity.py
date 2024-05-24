@@ -2,6 +2,7 @@
 
 from .const import MOCK_NOW, MOCK_TV_GUIDE
 
+
 def test_coordinator_data_sanity():
     """Quick sanity-check for the mock data."""
     channel = MOCK_TV_GUIDE.get_channel("mock 1")

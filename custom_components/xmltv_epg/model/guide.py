@@ -1,13 +1,15 @@
 """TV Guide Model."""
+
 import xml.etree.ElementTree as ET
 
 from .channel import TVChannel
 from .program import TVProgram
 
+
 class TVGuide:
     """TV Guide Class."""
 
-    TAG = 'tv'
+    TAG = "tv"
 
     def __init__(self, generator_name: str = None, generator_url: str = None):
         """Initialize TV Guide."""
@@ -22,7 +24,7 @@ class TVGuide:
         return next((c for c in self.channels if c.id == channel_id), None)
 
     @classmethod
-    def from_xml(cls, xml: ET.Element) -> 'TVGuide':
+    def from_xml(cls, xml: ET.Element) -> "TVGuide":
         """Initialize TV Guide from XML Node, if possible.
 
         :param xml: XML Node
@@ -40,8 +42,8 @@ class TVGuide:
             return None
 
         # parse generator info
-        generator_name = xml.attrib.get('generator-info-name')
-        generator_url = xml.attrib.get('generator-info-url')
+        generator_name = xml.attrib.get("generator-info-name")
+        generator_url = xml.attrib.get("generator-info-url")
 
         # create guide instance
         guide = cls(generator_name, generator_url)

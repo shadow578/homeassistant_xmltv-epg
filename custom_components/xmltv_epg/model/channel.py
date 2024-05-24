@@ -1,14 +1,16 @@
 """TV Channel Model."""
-from datetime import datetime
-import xml.etree.ElementTree as ET
 
+import xml.etree.ElementTree as ET
+from datetime import datetime
+
+from .helper import get_child_as_text, is_none_or_whitespace
 from .program import TVProgram
-from .helper import is_none_or_whitespace, get_child_as_text
+
 
 class TVChannel:
     """TV Channel Class."""
 
-    TAG = 'channel'
+    TAG = "channel"
 
     def __init__(self, id: str, name: str):
         """Initialize TV Channel."""
@@ -40,7 +42,7 @@ class TVChannel:
         return None
 
     @classmethod
-    def from_xml(cls, xml: ET.Element) -> 'TVChannel':
+    def from_xml(cls, xml: ET.Element) -> "TVChannel":
         """Initialize TV Channel from XML Node, if possible.
 
         :param xml: XML Node
@@ -57,16 +59,16 @@ class TVChannel:
             return None
 
         # get id and display name
-        id = xml.attrib.get('id')
+        id = xml.attrib.get("id")
         if is_none_or_whitespace(id):
             return None
 
-        name = get_child_as_text(xml, 'display-name')
+        name = get_child_as_text(xml, "display-name")
         if is_none_or_whitespace(name):
             return None
 
         # remove 'XX: ' prefix from name, if present
-        if len(name) > 4 and name[2] == ':' and name[3] == ' ': # 'XX: '
+        if len(name) > 4 and name[2] == ":" and name[3] == " ":  # 'XX: '
             name = name[4:]
 
         return cls(id, name)
