@@ -114,11 +114,12 @@ def mock_coordinator_data():
 
 @pytest.fixture()
 def mock_coordinator_current_time():
-    """Fixture to replace 'XMLTVDataUpdateCoordinator.get_current_time' method with a mock."""
+    """Fixture to replace 'XMLTVDataUpdateCoordinator.current_time' method with a mock."""
     with patch(
-        "custom_components.xmltv_epg.coordinator.XMLTVDataUpdateCoordinator.get_current_time",
-        return_value=TEST_NOW
+        "custom_components.xmltv_epg.coordinator.XMLTVDataUpdateCoordinator.current_time",
+        new_callable=PropertyMock,
     ) as mock:
+        mock.return_value=TEST_NOW
         yield mock
 
 @pytest.fixture()

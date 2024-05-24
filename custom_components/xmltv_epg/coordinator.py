@@ -77,8 +77,8 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
         """Get actual current time."""
         return datetime.now()
 
-    # TODO: make this a property
-    def get_current_time(self) -> datetime:
+    @property
+    def current_time(self) -> datetime:
         """Get effective current time."""
         return self.actual_now + self._lookahead
 

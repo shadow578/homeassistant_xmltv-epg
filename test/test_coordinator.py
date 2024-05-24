@@ -63,9 +63,9 @@ async def test_coordinator_basic(
         lookahead=15, # 15 minutes
     )
 
-    # get_current_time is used by sensors etc. to determine the current program time to show.
+    # current_time is used by sensors etc. to determine the current program time to show.
     # this time should include the lookahead time.
-    assert coordinator.get_current_time() == TEST_NOW + timedelta(minutes=15)
+    assert coordinator.current_time == TEST_NOW + timedelta(minutes=15)
 
     # nothing was fetched yet, so the api client was not called yet
     assert mock_xmltv_client_get.call_count == 0
