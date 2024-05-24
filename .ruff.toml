@@ -25,6 +25,7 @@ select = [
     "RUF006", # Store a reference to the return value of asyncio.create_task
     "UP",  # pyupgrade
     "W",  # pycodestyle
+    "I", # isort
 ]
 
 ignore = [
