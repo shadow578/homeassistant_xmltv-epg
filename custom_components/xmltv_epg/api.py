@@ -8,7 +8,7 @@ import aiohttp
 
 import xml.etree.ElementTree as ET
 
-from .xmltv.model import TVGuide
+from .model import TVGuide
 import gzip
 
 class XMLTVClientError(Exception):

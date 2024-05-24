@@ -14,7 +14,7 @@ from custom_components.xmltv_epg import (
 from custom_components.xmltv_epg.const import DOMAIN
 from custom_components.xmltv_epg.coordinator import XMLTVDataUpdateCoordinator
 
-from custom_components.xmltv_epg.xmltv.model import TVGuide
+from custom_components.xmltv_epg.model import TVGuide
 
 UPDATE_COORDINATOR_DATA = TVGuide("MOCK", "http://example.com/epg.xml")
 

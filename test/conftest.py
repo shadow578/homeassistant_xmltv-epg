@@ -4,10 +4,10 @@ import pytest
 
 pytest_plugins = "pytest_homeassistant_custom_component"
 
-@pytest.fixture(autouse=True)
-def auto_enable_custom_integrations(enable_custom_integrations):
-    """Enable loading custom integrations."""
-    yield
+@pytest.fixture()
+def hass(hass, enable_custom_integrations):
+    """Return a Home Assistant instance that can load custom integrations."""
+    yield hass
 
 @pytest.fixture
 def anyio_backend():

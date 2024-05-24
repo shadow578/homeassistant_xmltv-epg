@@ -3,7 +3,7 @@
 from datetime import datetime
 import xml.etree.ElementTree as ET
 
-from custom_components.xmltv_epg.xmltv.model import TVChannel, TVProgram
+from custom_components.xmltv_epg.model import TVChannel, TVProgram
 
 def test_from_xml():
     """Test TVChannel.from_xml method with valid input."""

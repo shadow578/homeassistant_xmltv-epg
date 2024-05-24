@@ -16,7 +16,7 @@ from custom_components.xmltv_epg.const import (
 )
 from custom_components.xmltv_epg.api import XMLTVClientCommunicationError, XMLTVClientError
 
-from custom_components.xmltv_epg.xmltv.model import TVGuide
+from custom_components.xmltv_epg.model import TVGuide
 
 XMLTV_CLIENT_DATA = TVGuide("MOCK", "http://example.com/epg.xml")
 
