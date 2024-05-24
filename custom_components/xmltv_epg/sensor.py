@@ -13,6 +13,7 @@ from homeassistant.components.sensor import (
 from .const import DOMAIN, LOGGER
 from .coordinator import XMLTVDataUpdateCoordinator
 from .entity import XMLTVEntity
+from .helper import normalize_for_entity_id
 from .model import TVChannel, TVGuide
 
 
@@ -40,6 +41,30 @@ async def async_setup_entry(hass, entry, async_add_devices):
 class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
     """XMLTV Channel Program Sensor class."""
 
+    @staticmethod
+    def get_normalized_identification(
+        channel: TVChannel, is_next: bool
+    ) -> tuple[str, str]:
+        """Return normalized identification information for a sensor for the given channel and upcoming status.
+
+        The identification information consists of the sensor entity_id and the translation_key.
+        For the entity_id, the channel id is normalized and cleaned up to form a valid entity_id.
+
+        Example:
+        - channel_id = 'DE: My Channel 1'
+        - is_next = True
+        => ('program_upcoming', 'sensor.de_my_channel_1_program_upcoming')
+
+        :param channel: The TV channel.
+        :param is_next: The upcoming status.
+        :return: (translation_key, entity_id) tuple.
+
+        """
+        translation_key = f"program_{'upcoming' if is_next else 'current'}"
+        entity_id = f"sensor.{normalize_for_entity_id(channel.id)}_{translation_key}"
+
+        return translation_key, entity_id
+
     def __init__(
         self,
         coordinator: XMLTVDataUpdateCoordinator,
@@ -49,18 +74,17 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         """Initialize the sensor class."""
         super().__init__(coordinator)
 
-        key = f"program_{'upcoming' if is_next else 'current'}"
-        channel_id_clean = (
-            channel.id.replace(" ", "_").replace("-", "_").replace(":", "").lower()
+        translation_key, entity_id = self.get_normalized_identification(
+            channel, is_next
         )
 
-        self.entity_id = f"sensor.{channel_id_clean}_{key}"
+        self.entity_id = entity_id
         self._attr_unique_id = str(uuid.uuid5(uuid.NAMESPACE_X500, self.entity_id))
 
         self._attr_has_entity_name = True
         self.entity_description = SensorEntityDescription(
-            key=key,
-            translation_key=key,
+            key=translation_key,
+            translation_key=translation_key,
             icon="mdi:format-quote-close",
         )
 
@@ -130,18 +154,40 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
 class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
     """XMLTV Coordinator Status Sensor class."""
 
+    @staticmethod
+    def get_normalized_identification(guide: TVGuide) -> tuple[str, str]:
+        """Return normalized identification information for a sensor for the given guide.
+
+        The identification information consists of the sensor entity_id and the translation_key.
+        For the entity_id, the guide's generator_name is normalized and cleaned up to form a valid entity_id.
+
+        Example:
+        - generator_name = 'TVXML.ORG'
+        => ('last_update', 'sensor.tvxml_org_last_update')
+
+        :param guide: The TV guide.
+        :return: (translation_key, entity_id) tuple.
+
+        """
+        translation_key = "last_update"
+        entity_id = (
+            f"sensor.{normalize_for_entity_id(guide.generator_name)}_{translation_key}"
+        )
+
+        return translation_key, entity_id
+
     def __init__(self, coordinator: XMLTVDataUpdateCoordinator, guide: TVGuide) -> None:
         """Initialize the sensor class."""
         super().__init__(coordinator)
 
-        key = "last_update"
-        self.entity_id = f"sensor.{guide.generator_name}_{key}"
+        translation_key, entity_id = self.get_normalized_identification(guide)
+        self.entity_id = entity_id
         self._attr_unique_id = str(uuid.uuid5(uuid.NAMESPACE_X500, self.entity_id))
 
         self._attr_has_entity_name = True
         self.entity_description = SensorEntityDescription(
-            key=key,
-            translation_key=key,
+            key=translation_key,
+            translation_key=translation_key,
             device_class=SensorDeviceClass.TIMESTAMP,
         )
 
