@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 import pytest
 
 from custom_components.xmltv_epg.model import TVChannel, TVProgram
+from custom_components.xmltv_epg.model.program import parse_episode_number
 
 
 def test_from_xml():
@@ -23,6 +24,36 @@ def test_from_xml():
     assert program.end == datetime(2020, 1, 1, 2, 0, tzinfo=timezone.utc)
     assert program.title == "Program 1"
     assert program.description == "Description 1"
+
+    # all these should remain None as they are not set
+    assert program.episode is None
+    assert program.subtitle is None
+
+
+def test_episode_num_system_season_episode():
+    """Test TVProgram.from_xml parses episode_num in SxxExx format, 
+    as seen in https://github.com/shadow578/homeassistant_xmltv-epg/issues/32."""
+    xml = ET.fromstring(
+        '<programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1"><title>Program 1</title><desc>Description 1</desc><episode-num system="SxxExx">S13E7</episode-num></programme>'
+    )
+
+    program = TVProgram.from_xml(xml)
+    assert program is not None
+
+    # episode number '12.6.' should be converted to 'S13E7'
+    assert program.episode == "S13E7"
+
+def test_episode_num_system_xmltv_ns():
+    """Test TVProgram.from_xml parses episode_num in xmltv_ns format."""
+    xml = ET.fromstring(
+        '<programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1"><title>Program 1</title><desc>Description 1</desc><episode-num system="xmltv_ns">12.6.</episode-num></programme>'
+    )
+
+    program = TVProgram.from_xml(xml)
+    assert program is not None
+
+    # episode number 'S13E7' should remain as-is
+    assert program.episode == "S13E7"
 
 
 def test_from_xml_invalid_tag():
@@ -131,3 +162,53 @@ def test_full_title():
     # (4)
     program.episode = None
     assert program.full_title == "Program 1 - Subtitle 1"
+
+
+def test_parse_episode_number_season_episode():
+    """Test the parse_episode_number function works for Season+Episode format."""
+    xml = ET.fromstring(
+        '<programme><episode-num system="SxxExx">S01E02</episode-num></programme>'
+    )
+
+    episode = parse_episode_number(xml)
+    assert episode == "S01E02"
+
+
+def test_parse_episode_number_xmltv_ns_full():
+    """Test the parse_episode_number function works for tvxml_ns Season+Episode format."""
+    xml = ET.fromstring(
+        '<programme><episode-num system="xmltv_ns">0.1.</episode-num></programme>'
+    )
+
+    episode = parse_episode_number(xml)
+    assert episode == "S01E02"
+
+
+def test_parse_episode_number_xmltv_ns_season_only():
+    """Test the parse_episode_number function works for tvxml_ns Season only format."""
+    xml = ET.fromstring(
+        '<programme><episode-num system="xmltv_ns">0..</episode-num></programme>'
+    )
+
+    episode = parse_episode_number(xml)
+    assert episode == "S01"
+
+def test_parse_episode_number_xmltv_ns_episode_only():
+    """Test the parse_episode_number function works for tvxml_ns Episode only format."""
+    xml = ET.fromstring(
+        '<programme><episode-num system="xmltv_ns">.1.</episode-num></programme>'
+    )
+
+    episode = parse_episode_number(xml)
+    assert episode == "E02"
+
+
+def test_parse_episode_number_order():
+    """Test the parse_episode_number function uses SxxExx format over tvxml_ns format."""
+    # note: different data for xmltv_ns and SxxExx to distinguish them
+    xml = ET.fromstring(
+        '<programme><episode-num system="xmltv_ns">1.2.</episode-num><episode-num system="SxxExx">S01E02</episode-num></programme>'
+    )
+
+    episode = parse_episode_number(xml)
+    assert episode == "S01E02"
