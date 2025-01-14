@@ -18,7 +18,7 @@ def parse_episode_number(xml: ET.Element) -> str | None:
         content = episode_num.text
         if system is not None and content is not None:
             episode_nums[system] = episode_num.text
-    
+
     # prefer Season+Episode format
     if "SxxExx" in episode_nums:
         return episode_nums["SxxExx"]
@@ -29,7 +29,7 @@ def parse_episode_number(xml: ET.Element) -> str | None:
     if "xmltv_ns" in episode_nums:
         episode = episode_nums["xmltv_ns"]
         s, e, _ = episode.split(".")
-        
+
         if s and e:
             # Season+Episode format
             s = int(s) + 1
@@ -43,12 +43,13 @@ def parse_episode_number(xml: ET.Element) -> str | None:
             # Episode only format
             e = int(e) + 1
             return f"E{e}"
-    
+
     # fallback to any other format
     for episode_num in episode_nums.values():
         return episode_num
-    
+
     return None
+
 
 class TVProgram:
     """TV Program Class."""
