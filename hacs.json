@@ -2,7 +2,7 @@
     "name": "XMLTV EPG",
     "filename": "xmltv_epg.zip",
     "hide_default_branch": true,
-    "homeassistant": "2024.2.0",
+    "homeassistant": "2025.1.3",
     "render_readme": true,
     "zip_release": true
 }
