@@ -2,6 +2,7 @@
 
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from typing import cast
 
 from .helper import get_child_as_text, is_none_or_whitespace
 from .program import TVProgram
@@ -16,7 +17,7 @@ class TVChannel:
         """Initialize TV Channel."""
         self.id = id
         self.name = name
-        self.programs = []
+        self.programs: list[TVProgram] = []
 
     def add_program(self, program: TVProgram):
         """Add a program to channel."""
@@ -25,7 +26,7 @@ class TVChannel:
         # keep programs sorted by start time
         self.programs.sort(key=lambda p: p.start)
 
-    def get_current_program(self, time: datetime) -> TVProgram:
+    def get_current_program(self, time: datetime) -> TVProgram | None:
         """Get current program at given time."""
         for program in self.programs:
             if program.start.timestamp() <= time.timestamp() < program.end.timestamp():
@@ -33,7 +34,7 @@ class TVChannel:
 
         return None
 
-    def get_next_program(self, time: datetime) -> TVProgram:
+    def get_next_program(self, time: datetime) -> TVProgram | None:
         """Get next program after given time."""
         for program in self.programs:
             if program.start.timestamp() >= time.timestamp():
@@ -42,7 +43,7 @@ class TVChannel:
         return None
 
     @classmethod
-    def from_xml(cls, xml: ET.Element) -> "TVChannel":
+    def from_xml(cls, xml: ET.Element) -> "TVChannel | None":
         """Initialize TV Channel from XML Node, if possible.
 
         :param xml: XML Node
@@ -62,10 +63,12 @@ class TVChannel:
         id = xml.attrib.get("id")
         if is_none_or_whitespace(id):
             return None
+        id = cast(str, id)
 
         name = get_child_as_text(xml, "display-name")
         if is_none_or_whitespace(name):
             return None
+        name = cast(str, name)
 
         # remove 'XX: ' prefix from name, if present
         if len(name) > 4 and name[2] == ":" and name[3] == " ":  # 'XX: '

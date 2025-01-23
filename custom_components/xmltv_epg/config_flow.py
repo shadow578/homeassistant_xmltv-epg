@@ -80,7 +80,7 @@ class XMLTVFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         if not guide:
             raise XMLTVClientCommunicationError("No data received")
 
-        return guide.generator_name
+        return guide.generator_name or ""
 
     @staticmethod
     def async_get_options_flow(config_entry: config_entries.ConfigEntry):

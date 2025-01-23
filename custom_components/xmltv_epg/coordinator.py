@@ -11,6 +11,8 @@ from homeassistant.helpers.update_coordinator import (
     UpdateFailed,
 )
 
+from custom_components.xmltv_epg.model.guide import TVGuide
+
 from .api import (
     XMLTVClient,
     XMLTVClientError,
@@ -23,6 +25,7 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from XMLTV."""
 
     config_entry: ConfigEntry
+    data: TVGuide
 
     def __init__(
         self,
@@ -90,7 +93,7 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
         return self.actual_now + self._lookahead
 
     @property
-    def last_update_time(self) -> datetime:
+    def last_update_time(self) -> datetime | None:
         """Get last update time."""
         return self._last_refetch_time
 
