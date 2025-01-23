@@ -27,6 +27,7 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(
         self,
         hass: HomeAssistant,
+        config_entry: ConfigEntry,
         client: XMLTVClient,
         update_interval: int,
         lookahead: int,
@@ -41,6 +42,7 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
             logger=LOGGER,
             name=DOMAIN,
             update_interval=timedelta(seconds=SENSOR_REFRESH_INTERVAL),
+            config_entry=config_entry,
         )
 
         self._guide = None
