@@ -5,7 +5,6 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.xmltv_epg import (
     async_reload_entry,
-    async_setup_entry,
     async_unload_entry,
 )
 from custom_components.xmltv_epg.const import DOMAIN
@@ -24,6 +23,7 @@ async def test_setup_unload_and_reload_entry(
         data={CONF_HOST: MOCK_TV_GUIDE_URL},
         entry_id="MOCK",
     )
+    config_entry.add_to_hass(hass)
 
     # helper to assert entry
     def assert_entry():
@@ -34,7 +34,8 @@ async def test_setup_unload_and_reload_entry(
         )
 
     # setup the entry
-    assert await async_setup_entry(hass, config_entry)
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
     assert_entry()
 
     # should have called coordinator update
