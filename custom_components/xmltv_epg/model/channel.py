@@ -42,6 +42,13 @@ class TVChannel:
 
         return None
 
+    def get_last_program(self) -> TVProgram | None:
+        """Get last program entry."""
+        if len(self.programs) == 0:
+            return None
+
+        return self.programs[-1]
+
     @classmethod
     def from_xml(cls, xml: ET.Element) -> "TVChannel | None":
         """Initialize TV Channel from XML Node, if possible.

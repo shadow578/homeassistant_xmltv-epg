@@ -72,3 +72,8 @@ def test_get_current_or_next_program():
     next = channel.get_next_program(datetime(2020, 1, 1, 1, 15))
     assert next is not None
     assert next.title == program_next.title
+
+    # last program entry is 'next'
+    last = channel.get_last_program()
+    assert last is not None
+    assert last.title == program_next.title

@@ -117,6 +117,13 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         duration_hours = int(duration_seconds // 3600)
         duration_minutes = int((duration_seconds % 3600) // 60)
 
+        # get last program end time
+        last_program = self._channel.get_last_program()
+        if last_program is not None:
+            channel_program_known_until = last_program.end
+        else:
+            channel_program_known_until = None
+
         return {
             "start": program.start,
             "end": program.end,
@@ -125,6 +132,7 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
             "description": program.description,
             "episode": program.episode,
             "subtitle": program.subtitle,
+            "channel_program_known_until": channel_program_known_until,
         }
 
     @property
