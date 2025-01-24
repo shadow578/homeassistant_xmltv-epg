@@ -5,8 +5,10 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.xmltv_epg.api import XMLTVClient
+from custom_components.xmltv_epg.const import DOMAIN
 from custom_components.xmltv_epg.coordinator import XMLTVDataUpdateCoordinator
 
 from .const import MOCK_NOW, MOCK_TV_GUIDE, MOCK_TV_GUIDE_URL
@@ -32,9 +34,16 @@ async def test_coordinator_basic(
 ):
     """Test the basic functionality of the coordinator."""
 
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        entry_id="test",
+        data={},
+    )
+
     # create the coordinator
     coordinator = XMLTVDataUpdateCoordinator(
         hass,
+        config_entry=entry,
         client=XMLTVClient(
             session=async_get_clientsession(hass),
             url=MOCK_TV_GUIDE_URL,

@@ -59,6 +59,9 @@ async def test_sensors_basic(
         },
         entry_id="MOCK",
     )
+    config_entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
 
     # setup the entry
     assert await async_setup_entry(hass, config_entry)
@@ -120,6 +123,9 @@ async def test_program_sensor_attributes(
         },
         entry_id="MOCK",
     )
+    config_entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
 
     # setup the entry
     assert await async_setup_entry(hass, config_entry)
@@ -156,6 +162,9 @@ async def test_last_update_sensor_attributes(
         },
         entry_id="MOCK",
     )
+    config_entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
 
     # setup the entry
     assert await async_setup_entry(hass, config_entry)
