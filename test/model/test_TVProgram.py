@@ -28,6 +28,7 @@ def test_from_xml():
     # all these should remain None as they are not set
     assert program.episode is None
     assert program.subtitle is None
+    assert program.image_url is None
 
 
 def test_episode_num_system_season_episode():
@@ -57,6 +58,19 @@ def test_episode_num_system_xmltv_ns():
 
     # episode number 'S13E7' should remain as-is
     assert program.episode == "S13E7"
+
+
+def test_parse_program_image_url():
+    """Test TVProgram.from_xml method parses image url correctly."""
+    xml = ET.fromstring(
+        '<programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1"><title>Program 1</title><desc>Description 1</desc><icon src="http://example.com/program.jpg"/></programme>'
+    )
+
+    program = TVProgram.from_xml(xml)
+    assert program is not None
+
+    # there should be a image_url set
+    assert program.image_url == "http://example.com/program.jpg"
 
 
 def test_from_xml_invalid_tag():
