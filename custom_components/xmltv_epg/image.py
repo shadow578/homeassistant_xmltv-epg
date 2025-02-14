@@ -14,7 +14,7 @@ from .const import DOMAIN, LOGGER
 from .coordinator import XMLTVDataUpdateCoordinator
 from .entity import XMLTVEntity
 from .helper import program_get_normalized_identification
-from .model import TVChannel, TVGuide
+from .model import TVChannel, TVGuide, TVProgram
 
 
 async def async_setup_entry(hass, entry, async_add_devices):
@@ -73,16 +73,8 @@ class XMLTVChannelProgramImage(XMLTVEntity, ImageEntity):
         LOGGER.debug(f"Setup image '{self.entity_id}' for channel '{channel.id}'.")
 
     @property
-    def image_last_updated(self) -> datetime | None:
-        """Time the image was last updated."""
-        if self._program is None:
-            return None
-
-        return self._program.start
-
-    @property
-    def image_url(self) -> str | None:
-        """Return URL of image."""
+    def __current_program(self) -> TVProgram | None:
+        """Refresh and return the current program object."""
         guide: TVGuide = self.coordinator.data
 
         # refresh channel from guide
@@ -100,10 +92,31 @@ class XMLTVChannelProgramImage(XMLTVEntity, ImageEntity):
             if self._is_next
             else channel.get_current_program(now)
         )
-        if self._program is None:
-            return None
+        return self._program
 
-        return self._program.image_url
+    @property
+    def image_last_updated(self) -> datetime | None:
+        """Time the image was last updated."""
+        program = self.__current_program
+        if program is None:
+            return None
+        return program.start
+
+    @property
+    def image_url(self) -> str | None:
+        """Return URL of image."""
+        program = self.__current_program
+        if program is None:
+            return None
+        return program.image_url
+
+    @property
+    def state(self) -> str | None:
+        """Get the state value of the image entity."""
+        program = self.__current_program
+        if program is None:
+            return None
+        return program.full_title
 
 
 class XMLTVChannelIconImage(XMLTVEntity, ImageEntity):
@@ -138,13 +151,8 @@ class XMLTVChannelIconImage(XMLTVEntity, ImageEntity):
         LOGGER.debug(f"Setup image '{self.entity_id}' for channel '{channel.id}'.")
 
     @property
-    def image_last_updated(self) -> datetime | None:
-        """Time the image was last updated."""
-        return self._last_updated
-
-    @property
-    def image_url(self) -> str | None:
-        """Return URL of image."""
+    def __current_channel(self) -> TVChannel | None:
+        """Refresh and return the current channel object."""
         guide: TVGuide = self.coordinator.data
 
         # refresh channel from guide
@@ -153,8 +161,21 @@ class XMLTVChannelIconImage(XMLTVEntity, ImageEntity):
             return None
 
         self._channel = channel
+        return self._channel
 
-        icon_url = self._channel.icon_url
+    @property
+    def image_last_updated(self) -> datetime | None:
+        """Time the image was last updated."""
+        return self._last_updated
+
+    @property
+    def image_url(self) -> str | None:
+        """Return URL of image."""
+        channel = self.__current_channel
+        if channel is None:
+            return None
+
+        icon_url = channel.icon_url
         if icon_url is None:
             return None
 
@@ -163,3 +184,11 @@ class XMLTVChannelIconImage(XMLTVEntity, ImageEntity):
             self._last_updated = self.coordinator.current_time
 
         return icon_url
+
+    @property
+    def state(self) -> str | None:
+        """Get the state value of the image entity."""
+        channel = self.__current_channel
+        if channel is None:
+            return None
+        return channel.name
