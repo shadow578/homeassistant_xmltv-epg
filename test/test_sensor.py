@@ -5,6 +5,7 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 from homeassistant.const import CONF_HOST
+from homeassistant.helpers import device_registry, entity_registry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.xmltv_epg import async_setup_entry
@@ -143,6 +144,44 @@ async def test_program_sensor_attributes(
     assert state.attributes["description"] == "Description"
     assert state.attributes["episode"] == "S1E1"
     assert state.attributes["subtitle"] == "Subtitle"
+
+
+async def test_program_sensor_device(
+    anyio_backend,
+    hass,
+    mock_xmltv_client_get_data,
+    mock_coordinator_current_time,
+    mock_coordinator_last_update_time,
+):
+    """Test program sensor state and attributes."""
+    # create a mock config entry to bypass the config flow
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={CONF_HOST: MOCK_TV_GUIDE_URL},
+        options={
+            OPT_PROGRAM_LOOKAHEAD: 0  # 0 Minutes lookahead
+        },
+        entry_id="MOCK",
+    )
+    config_entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    # setup the entry
+    assert await async_setup_entry(hass, config_entry)
+    await hass.async_block_till_done()
+
+    # get device entry for CH3 current sensor
+    er = entity_registry.async_get(hass)
+    dr = device_registry.async_get(hass)
+
+    entity = er.async_get("sensor.mock_3_program_current")
+    assert entity is not None
+    assert entity.device_id is not None
+
+    device = dr.async_get(entity.device_id)
+    assert device is not None
+    assert device.name == "Mock Channel 3"
 
 
 async def test_last_update_sensor_attributes(

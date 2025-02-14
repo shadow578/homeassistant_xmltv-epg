@@ -75,7 +75,7 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         is_next: bool,
     ) -> None:
         """Initialize the sensor class."""
-        super().__init__(coordinator)
+        super().__init__(coordinator, channel)
 
         translation_key, entity_id = self.get_normalized_identification(
             channel, is_next
@@ -96,14 +96,6 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         self._is_next = is_next
 
         LOGGER.debug(f"Setup sensor '{self.entity_id}' for channel '{channel.id}'.")
-
-    @property
-    def translation_placeholders(self):
-        """Return the translation placeholders."""
-        if self._channel is None:
-            return None
-
-        return {"channel_display_name": self._channel.name}
 
     @property
     def extra_state_attributes(self):
@@ -195,7 +187,7 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
 
     def __init__(self, coordinator: XMLTVDataUpdateCoordinator, guide: TVGuide) -> None:
         """Initialize the sensor class."""
-        super().__init__(coordinator)
+        super().__init__(coordinator, None)
 
         translation_key, entity_id = self.get_normalized_identification(guide)
         self.entity_id = entity_id

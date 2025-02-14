@@ -28,7 +28,7 @@
     "entity": {
         "sensor": {
             "program_current": {
-                "name": "{channel_display_name} aktuelles Programm",
+                "name": "aktuelles Programm",
                 "state_attributes": {
                     "start": {
                         "name": "Startet um"
@@ -57,7 +57,7 @@
                 }
             },
             "program_upcoming": {
-                "name": "{channel_display_name} bevorstehendes Programm",
+                "name": "bevorstehendes Programm",
                 "state_attributes": {
                     "start": {
                         "name": "Startet um"

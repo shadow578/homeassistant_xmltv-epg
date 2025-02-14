@@ -201,6 +201,8 @@ class TVProgram:
             icon = icon.attrib.get("src")
 
         try:
-            return cls(channel_id, start, end, title, description, episode, subtitle, icon)
+            return cls(
+                channel_id, start, end, title, description, episode, subtitle, icon
+            )
         except ValueError:
             return None
