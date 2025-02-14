@@ -23,17 +23,19 @@ async def async_setup_entry(hass, entry, async_add_devices):
     guide: TVGuide = coordinator.data
 
     LOGGER.debug(
-        f"Setting up image entities for {len(guide.channels)} channels (enable_upcoming: {coordinator.enable_upcoming_sensor})."
+        f"Setting up image entities for {len(guide.channels)} channels (enable_upcoming: {coordinator.enable_upcoming_sensor}, enable_channel_icon: {coordinator.enable_channel_icon}, enable_program_image: {coordinator.enable_program_image})."
     )
 
     # add current / upcoming program images for each channel
     images: list[ImageEntity] = []
     for channel in guide.channels:
-        images.append(XMLTVChannelIconImage(coordinator, channel))
+        if coordinator.enable_channel_icon:
+            images.append(XMLTVChannelIconImage(coordinator, channel))
 
-        images.append(XMLTVChannelProgramImage(coordinator, channel, False))
-        if coordinator.enable_upcoming_sensor:
-            images.append(XMLTVChannelProgramImage(coordinator, channel, True))
+        if coordinator.enable_program_image:
+            images.append(XMLTVChannelProgramImage(coordinator, channel, False))
+            if coordinator.enable_upcoming_sensor:
+                images.append(XMLTVChannelProgramImage(coordinator, channel, True))
 
     async_add_devices(images)
 
