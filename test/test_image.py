@@ -189,7 +189,7 @@ def test_sensor_entity_ids():
     )
 
     assert translation_key == "program_image_current"
-    assert entity_id == "sensor.ch_1_program_image_current"
+    assert entity_id == "image.ch_1_program_image_current"
 
     # program image, upcoming
     translation_key, entity_id = program_get_normalized_identification(
@@ -197,7 +197,7 @@ def test_sensor_entity_ids():
     )
 
     assert translation_key == "program_image_upcoming"
-    assert entity_id == "sensor.ch_1_program_image_upcoming"
+    assert entity_id == "image.ch_1_program_image_upcoming"
 
     # channel icon
     translation_key, entity_id = program_get_normalized_identification(
@@ -205,4 +205,4 @@ def test_sensor_entity_ids():
     )
 
     assert translation_key == "channel_icon"
-    assert entity_id == "sensor.ch_1_icon"
+    assert entity_id == "image.ch_1_icon"

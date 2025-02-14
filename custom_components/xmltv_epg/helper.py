@@ -71,12 +71,12 @@ def program_get_normalized_identification(
     - channel_id = "DE: My Channel 1'
     - is_next = True
     - kind = 'program_image'
-    => ('program_image_upcoming', 'sensor.de_my_channel_1_program_image_upcoming')
+    => ('program_image_upcoming', 'image.de_my_channel_1_program_image_upcoming')
 
     - channel_id = "DE: My Channel 1'
     - is_next = (don't care)
     - kind = 'channel_icon'
-    => ('channel_icon', 'sensor.de_my_channel_1_icon')
+    => ('channel_icon', 'image.de_my_channel_1_icon')
 
     :param channel: The TV channel.
     :param is_next: The upcoming status.
@@ -90,10 +90,10 @@ def program_get_normalized_identification(
         entity_id = f"sensor.{normalize_for_entity_id(channel.id)}_{translation_key}"
     elif kind == "program_image":
         translation_key = f"program_image_{'upcoming' if is_next else 'current'}"
-        entity_id = f"sensor.{normalize_for_entity_id(channel.id)}_{translation_key}"
+        entity_id = f"image.{normalize_for_entity_id(channel.id)}_{translation_key}"
     elif kind == "channel_icon":
         translation_key = "channel_icon"
-        entity_id = f"sensor.{normalize_for_entity_id(channel.id)}_icon"
+        entity_id = f"image.{normalize_for_entity_id(channel.id)}_icon"
     else:
         raise ValueError(f"invalid entity kind '{kind}'")
 
