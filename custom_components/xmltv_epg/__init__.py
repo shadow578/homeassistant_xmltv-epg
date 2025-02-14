@@ -25,6 +25,7 @@ from .coordinator import XMLTVDataUpdateCoordinator
 
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
+    Platform.IMAGE,
 ]
 
 

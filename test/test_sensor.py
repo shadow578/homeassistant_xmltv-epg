@@ -14,8 +14,9 @@ from custom_components.xmltv_epg.const import (
     OPT_ENABLE_UPCOMING_SENSOR,
     OPT_PROGRAM_LOOKAHEAD,
 )
+from custom_components.xmltv_epg.helper import program_get_normalized_identification
 from custom_components.xmltv_epg.model import TVChannel, TVGuide
-from custom_components.xmltv_epg.sensor import XMLTVChannelSensor, XMLTVStatusSensor
+from custom_components.xmltv_epg.sensor import XMLTVStatusSensor
 
 from .const import MOCK_NOW, MOCK_TV_GUIDE_NAME, MOCK_TV_GUIDE_URL
 
@@ -230,24 +231,24 @@ def test_sensor_entity_ids():
     assert entity_id == "sensor.tvxml_org_last_update"
 
     # program sensor, current
-    translation_key, entity_id = XMLTVChannelSensor.get_normalized_identification(
-        TVChannel("CH 1", "Channel 1"), False
+    translation_key, entity_id = program_get_normalized_identification(
+        TVChannel("CH 1", "Channel 1"), False, "program_sensor"
     )
 
     assert translation_key == "program_current"
     assert entity_id == "sensor.ch_1_program_current"
 
     # program sensor, upcoming
-    translation_key, entity_id = XMLTVChannelSensor.get_normalized_identification(
-        TVChannel("CH 1", "Channel 1"), True
+    translation_key, entity_id = program_get_normalized_identification(
+        TVChannel("CH 1", "Channel 1"), True, "program_sensor"
     )
 
     assert translation_key == "program_upcoming"
     assert entity_id == "sensor.ch_1_program_upcoming"
 
     # program sensor, with special characters and umlauts
-    translation_key, entity_id = XMLTVChannelSensor.get_normalized_identification(
-        TVChannel("DE: WDR (Münster)", "WDR (Münster)"), False
+    translation_key, entity_id = program_get_normalized_identification(
+        TVChannel("DE: WDR (Münster)", "WDR (Münster)"), False, "program_sensor"
     )
 
     assert translation_key == "program_current"

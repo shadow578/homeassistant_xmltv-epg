@@ -93,6 +93,14 @@
                     }
                 }
             }
+        },
+        "image": {
+            "program_image_current": {
+                "name": "Current Program Image"
+            },
+            "program_image_upcoming": {
+                "name": "Upcoming Program Image"
+            }
         }
     }
 }
