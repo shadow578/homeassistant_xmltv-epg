@@ -1,8 +1,10 @@
 """Test xmltv_epg setup process."""
 
+from http import HTTPStatus
 from unittest.mock import PropertyMock, patch
 
 import pytest
+import respx
 from homeassistant.const import CONF_HOST
 from homeassistant.helpers import device_registry, entity_registry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -43,20 +45,31 @@ def mock_coordinator_last_update_time():
         yield mock
 
 
-def has_image_entity_with_url(hass, entity_id: str, url: str) -> bool:
+async def assert_has_image_entity_with_url(hass, client, entity_id: str, url: str):
     """Test if the hass instance contains a image entity with the given url."""
     state = hass.states.get(entity_id)
-    if not state:
-        return False
+    assert state
 
-    # TODO: actually check if the correct url is loaded
-    # i didn't find any way to do this
-    return state.attributes["entity_picture"].startswith("/api/image_proxy")
+    picture_url = state.attributes["entity_picture"]
+    assert picture_url.startswith(f"/api/image_proxy/{entity_id}")
+
+    mock_content = str.encode(url)
+    respx.get(url).respond(
+        status_code=HTTPStatus.OK, content_type="image/jpg", content=mock_content
+    )
+
+    resp = await client.get(picture_url)
+    assert resp.status == HTTPStatus.OK
+
+    body = await resp.read()
+    assert body == mock_content
 
 
+@respx.mock
 async def test_images_basic(
     anyio_backend,
     hass,
+    hass_client,
     mock_xmltv_client_get_data,
     mock_coordinator_current_time,
     mock_coordinator_last_update_time,
@@ -82,6 +95,9 @@ async def test_images_basic(
     assert await async_setup_entry(hass, config_entry)
     await hass.async_block_till_done()
 
+    # create client
+    client = await hass_client()
+
     # last_update sensor should be created
     state = hass.states.get("sensor.mock_xmltv_last_update")
     assert state
@@ -95,23 +111,41 @@ async def test_images_basic(
     # - image.mock_2_program_image_upcoming  : "http://example.com/pr/ch2_upc.jpg"
     # - image.mock_3_program_image_current   : "http://example.com/pr/ch3_cur.jpg"
     # - image.mock_3_program_image_upcoming  : "http://example.com/pr/ch3_upc.jpg"
-    assert has_image_entity_with_url(
-        hass, "image.mock_1_program_image_current", "http://example.com/pr/ch1_cur.jpg"
+    await assert_has_image_entity_with_url(
+        hass,
+        client,
+        "image.mock_1_program_image_current",
+        "http://example.com/pr/ch1_cur.jpg",
     )
-    assert has_image_entity_with_url(
-        hass, "image.mock_1_program_image_upcoming", "http://example.com/pr/ch1_upc.jpg"
+    await assert_has_image_entity_with_url(
+        hass,
+        client,
+        "image.mock_1_program_image_upcoming",
+        "http://example.com/pr/ch1_upc.jpg",
     )
-    assert has_image_entity_with_url(
-        hass, "image.mock_2_program_image_current", "http://example.com/pr/ch2_cur.jpg"
+    await assert_has_image_entity_with_url(
+        hass,
+        client,
+        "image.mock_2_program_image_current",
+        "http://example.com/pr/ch2_cur.jpg",
     )
-    assert has_image_entity_with_url(
-        hass, "image.mock_2_program_image_upcoming", "http://example.com/pr/ch2_upc.jpg"
+    await assert_has_image_entity_with_url(
+        hass,
+        client,
+        "image.mock_2_program_image_upcoming",
+        "http://example.com/pr/ch2_upc.jpg",
     )
-    assert has_image_entity_with_url(
-        hass, "image.mock_3_program_image_current", "http://example.com/pr/ch3_cur.jpg"
+    await assert_has_image_entity_with_url(
+        hass,
+        client,
+        "image.mock_3_program_image_current",
+        "http://example.com/pr/ch3_cur.jpg",
     )
-    assert has_image_entity_with_url(
-        hass, "image.mock_3_program_image_upcoming", "http://example.com/pr/ch3_upc.jpg"
+    await assert_has_image_entity_with_url(
+        hass,
+        client,
+        "image.mock_3_program_image_upcoming",
+        "http://example.com/pr/ch3_upc.jpg",
     )
 
     # additionally, the following channel icon image entities are created
@@ -119,14 +153,14 @@ async def test_images_basic(
     # - image.mock_1_icon : "http://example.com/ch/mock1.jpg"
     # - image.mock_2_icon : "http://example.com/ch/mock2.jpg"
     # - image.mock_3_icon : "http://example.com/ch/mock3.jpg"
-    assert has_image_entity_with_url(
-        hass, "image.mock_1_icon", "http://example.com/ch/mock1.jpg"
+    await assert_has_image_entity_with_url(
+        hass, client, "image.mock_1_icon", "http://example.com/ch/mock1.jpg"
     )
-    assert has_image_entity_with_url(
-        hass, "image.mock_2_icon", "http://example.com/ch/mock2.jpg"
+    await assert_has_image_entity_with_url(
+        hass, client, "image.mock_2_icon", "http://example.com/ch/mock2.jpg"
     )
-    assert has_image_entity_with_url(
-        hass, "image.mock_3_icon", "http://example.com/ch/mock3.jpg"
+    await assert_has_image_entity_with_url(
+        hass, client, "image.mock_3_icon", "http://example.com/ch/mock3.jpg"
     )
 
 
