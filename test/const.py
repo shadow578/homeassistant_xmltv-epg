@@ -36,9 +36,21 @@ def get_mock_tv_guide() -> TVGuide:
     guide = TVGuide(generator_name=MOCK_TV_GUIDE_NAME, generator_url=MOCK_TV_GUIDE_URL)
 
     channels = [
-        TVChannel(id="mock 1", name="Mock Channel 1"),
-        TVChannel(id="mock 2", name="Mock Channel 2"),
-        TVChannel(id="mock 3", name="Mock Channel 3"),
+        TVChannel(
+            id="mock 1",
+            name="Mock Channel 1",
+            icon_url="http://example.com/ch/mock1.jpg",
+        ),
+        TVChannel(
+            id="mock 2",
+            name="Mock Channel 2",
+            icon_url="http://example.com/ch/mock2.jpg",
+        ),
+        TVChannel(
+            id="mock 3",
+            name="Mock Channel 3",
+            icon_url="http://example.com/ch/mock3.jpg",
+        ),
     ]
 
     current_start = MOCK_NOW - timedelta(minutes=15)
@@ -54,6 +66,7 @@ def get_mock_tv_guide() -> TVGuide:
             end=current_end,
             title="CH 1 Current",
             description="Description",
+            image_url="http://example.com/pr/ch1_cur.jpg",
         ),
         TVProgram(
             channel_id="mock 2",
@@ -61,6 +74,7 @@ def get_mock_tv_guide() -> TVGuide:
             end=current_end,
             title="CH 2 Current",
             description="Description",
+            image_url="http://example.com/pr/ch2_cur.jpg",
         ),
         TVProgram(
             channel_id="mock 3",
@@ -70,6 +84,7 @@ def get_mock_tv_guide() -> TVGuide:
             description="Description",
             episode="S1E1",
             subtitle="Subtitle",
+            image_url="http://example.com/pr/ch3_cur.jpg",
         ),
         TVProgram(
             channel_id="mock 1",
@@ -77,6 +92,7 @@ def get_mock_tv_guide() -> TVGuide:
             end=upcoming_end,
             title="CH 1 Upcoming",
             description="Description",
+            image_url="http://example.com/pr/ch1_upc.jpg",
         ),
         TVProgram(
             channel_id="mock 2",
@@ -84,6 +100,7 @@ def get_mock_tv_guide() -> TVGuide:
             end=upcoming_end,
             title="CH 2 Upcoming",
             description="Description",
+            image_url="http://example.com/pr/ch2_upc.jpg",
         ),
         TVProgram(
             channel_id="mock 3",
@@ -93,6 +110,7 @@ def get_mock_tv_guide() -> TVGuide:
             description="Description",
             episode="S1E2",
             subtitle="Subtitle",
+            image_url="http://example.com/pr/ch3_upc.jpg",
         ),
     ]
 

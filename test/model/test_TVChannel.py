@@ -20,6 +20,9 @@ def test_from_xml():
     # 'XX: ' prefix should be removed
     assert channel.name == "WDR Essen"
 
+    # there should be no icon_url
+    assert channel.icon_url is None
+
 
 def test_from_xml_invalid_tag():
     """Test TVChannel.from_xml method with invalid input."""
@@ -27,6 +30,18 @@ def test_from_xml_invalid_tag():
 
     channel = TVChannel.from_xml(xml)
     assert channel is None
+
+
+def test_parse_channel_icon_url():
+    """Test TVChannel.from_xml method with valid input."""
+    xml = ET.fromstring(
+        '<channel id="DE: WDR Essen"><display-name>DE: WDR Essen</display-name><icon src="http://example.com/channel.jpg"/></channel>'
+    )
+
+    channel = TVChannel.from_xml(xml)
+    assert channel is not None
+
+    assert channel.icon_url == "http://example.com/channel.jpg"
 
 
 def test_get_current_or_next_program():

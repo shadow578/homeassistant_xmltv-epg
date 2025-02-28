@@ -11,6 +11,8 @@ from custom_components.xmltv_epg.api import (
 )
 from custom_components.xmltv_epg.const import (
     DOMAIN,
+    OPT_ENABLE_CHANNEL_ICONS,
+    OPT_ENABLE_PROGRAM_IMAGES,
     OPT_ENABLE_UPCOMING_SENSOR,
     OPT_PROGRAM_LOOKAHEAD,
     OPT_UPDATE_INTERVAL,
@@ -132,6 +134,8 @@ async def test_option_flow_init_step_ok(anyio_backend, hass, bypass_integration_
             OPT_UPDATE_INTERVAL: 24,
             OPT_PROGRAM_LOOKAHEAD: 10,
             OPT_ENABLE_UPCOMING_SENSOR: True,
+            OPT_ENABLE_CHANNEL_ICONS: True,
+            OPT_ENABLE_PROGRAM_IMAGES: True,
         },
     )
 
@@ -141,4 +145,6 @@ async def test_option_flow_init_step_ok(anyio_backend, hass, bypass_integration_
         OPT_UPDATE_INTERVAL: 24,
         OPT_PROGRAM_LOOKAHEAD: 10,
         OPT_ENABLE_UPCOMING_SENSOR: True,
+        OPT_ENABLE_CHANNEL_ICONS: True,
+        OPT_ENABLE_PROGRAM_IMAGES: True,
     }

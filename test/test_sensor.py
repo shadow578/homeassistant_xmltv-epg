@@ -5,6 +5,7 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 from homeassistant.const import CONF_HOST
+from homeassistant.helpers import device_registry, entity_registry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.xmltv_epg import async_setup_entry
@@ -13,8 +14,9 @@ from custom_components.xmltv_epg.const import (
     OPT_ENABLE_UPCOMING_SENSOR,
     OPT_PROGRAM_LOOKAHEAD,
 )
+from custom_components.xmltv_epg.helper import program_get_normalized_identification
 from custom_components.xmltv_epg.model import TVChannel, TVGuide
-from custom_components.xmltv_epg.sensor import XMLTVChannelSensor, XMLTVStatusSensor
+from custom_components.xmltv_epg.sensor import XMLTVStatusSensor
 
 from .const import MOCK_NOW, MOCK_TV_GUIDE_NAME, MOCK_TV_GUIDE_URL
 
@@ -145,6 +147,44 @@ async def test_program_sensor_attributes(
     assert state.attributes["subtitle"] == "Subtitle"
 
 
+async def test_program_sensor_device(
+    anyio_backend,
+    hass,
+    mock_xmltv_client_get_data,
+    mock_coordinator_current_time,
+    mock_coordinator_last_update_time,
+):
+    """Test program sensor state and attributes."""
+    # create a mock config entry to bypass the config flow
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={CONF_HOST: MOCK_TV_GUIDE_URL},
+        options={
+            OPT_PROGRAM_LOOKAHEAD: 0  # 0 Minutes lookahead
+        },
+        entry_id="MOCK",
+    )
+    config_entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    # setup the entry
+    assert await async_setup_entry(hass, config_entry)
+    await hass.async_block_till_done()
+
+    # get device entry for CH3 current sensor
+    er = entity_registry.async_get(hass)
+    dr = device_registry.async_get(hass)
+
+    entity = er.async_get("sensor.mock_3_program_current")
+    assert entity is not None
+    assert entity.device_id is not None
+
+    device = dr.async_get(entity.device_id)
+    assert device is not None
+    assert device.name == "Mock Channel 3"
+
+
 async def test_last_update_sensor_attributes(
     anyio_backend,
     hass,
@@ -191,24 +231,24 @@ def test_sensor_entity_ids():
     assert entity_id == "sensor.tvxml_org_last_update"
 
     # program sensor, current
-    translation_key, entity_id = XMLTVChannelSensor.get_normalized_identification(
-        TVChannel("CH 1", "Channel 1"), False
+    translation_key, entity_id = program_get_normalized_identification(
+        TVChannel("CH 1", "Channel 1"), False, "program_sensor"
     )
 
     assert translation_key == "program_current"
     assert entity_id == "sensor.ch_1_program_current"
 
     # program sensor, upcoming
-    translation_key, entity_id = XMLTVChannelSensor.get_normalized_identification(
-        TVChannel("CH 1", "Channel 1"), True
+    translation_key, entity_id = program_get_normalized_identification(
+        TVChannel("CH 1", "Channel 1"), True, "program_sensor"
     )
 
     assert translation_key == "program_upcoming"
     assert entity_id == "sensor.ch_1_program_upcoming"
 
     # program sensor, with special characters and umlauts
-    translation_key, entity_id = XMLTVChannelSensor.get_normalized_identification(
-        TVChannel("DE: WDR (Münster)", "WDR (Münster)"), False
+    translation_key, entity_id = program_get_normalized_identification(
+        TVChannel("DE: WDR (Münster)", "WDR (Münster)"), False, "program_sensor"
     )
 
     assert translation_key == "program_current"
