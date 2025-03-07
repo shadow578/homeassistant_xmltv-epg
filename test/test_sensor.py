@@ -8,7 +8,6 @@ from homeassistant.const import CONF_HOST
 from homeassistant.helpers import device_registry, entity_registry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.xmltv_epg import async_setup_entry
 from custom_components.xmltv_epg.const import (
     DOMAIN,
     OPT_ENABLE_UPCOMING_SENSOR,
@@ -63,10 +62,6 @@ async def test_sensors_basic(
     )
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
-    await hass.async_block_till_done()
-
-    # setup the entry
-    assert await async_setup_entry(hass, config_entry)
     await hass.async_block_till_done()
 
     # last_update sensor should be created
@@ -129,10 +124,6 @@ async def test_program_sensor_attributes(
     await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
-    # setup the entry
-    assert await async_setup_entry(hass, config_entry)
-    await hass.async_block_till_done()
-
     # check CH 3 Current sensor attributes match the program
     state = hass.states.get("sensor.mock_3_program_current")
     assert state
@@ -168,10 +159,6 @@ async def test_program_sensor_device(
     await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
-    # setup the entry
-    assert await async_setup_entry(hass, config_entry)
-    await hass.async_block_till_done()
-
     # get device entry for CH3 current sensor
     er = entity_registry.async_get(hass)
     dr = device_registry.async_get(hass)
@@ -204,10 +191,6 @@ async def test_last_update_sensor_attributes(
     )
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
-    await hass.async_block_till_done()
-
-    # setup the entry
-    assert await async_setup_entry(hass, config_entry)
     await hass.async_block_till_done()
 
     # check sensor attributes

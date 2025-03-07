@@ -9,7 +9,6 @@ from homeassistant.const import CONF_HOST
 from homeassistant.helpers import device_registry, entity_registry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.xmltv_epg import async_setup_entry
 from custom_components.xmltv_epg.const import (
     DOMAIN,
     OPT_ENABLE_CHANNEL_ICONS,
@@ -89,10 +88,6 @@ async def test_images_basic(
     )
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
-    await hass.async_block_till_done()
-
-    # setup the entry
-    assert await async_setup_entry(hass, config_entry)
     await hass.async_block_till_done()
 
     # create client
@@ -186,10 +181,6 @@ async def test_program_sensor_device(
     )
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
-    await hass.async_block_till_done()
-
-    # setup the entry
-    assert await async_setup_entry(hass, config_entry)
     await hass.async_block_till_done()
 
     # get device entry for CH3 current image
