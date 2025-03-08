@@ -21,11 +21,10 @@ from .const import DOMAIN, LOGGER, SENSOR_REFRESH_INTERVAL
 
 
 # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
-class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
+class XMLTVDataUpdateCoordinator(DataUpdateCoordinator[TVGuide]):
     """Class to manage fetching data from XMLTV."""
 
     config_entry: ConfigEntry
-    data: TVGuide
 
     __client: XMLTVClient
     __lookahead: timedelta
@@ -33,7 +32,7 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
     __enable_channel_icon: bool
     __enable_program_image: bool
 
-    __guide: TVGuide | None
+    __guide: TVGuide
     __last_refetch_time: datetime | None
     __refetch_interval: timedelta
 
@@ -63,7 +62,7 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator):
             config_entry=config_entry,
         )
 
-        self.__guide = None
+        self.__guide = TVGuide()
         self.__last_refetch_time = None
         self.__refetch_interval = timedelta(hours=update_interval)
 
