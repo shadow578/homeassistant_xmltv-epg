@@ -9,6 +9,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorEntityDescription,
 )
+from homeassistant.const import EntityCategory
 from homeassistant.core import callback
 
 from custom_components.xmltv_epg.model.program import TVProgram
@@ -80,34 +81,9 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         LOGGER.debug(f"Setup sensor '{self.entity_id}' for channel '{channel.id}'.")
 
     @property
-    def extra_state_attributes(self):
-        """Return the state attributes."""
-        program = self.__program
-        if program is None:
-            return None
-
-        # format duration to HH:MM
-        duration_seconds = program.duration.total_seconds()
-        duration_hours = int(duration_seconds // 3600)
-        duration_minutes = int((duration_seconds % 3600) // 60)
-
-        # get last program end time
-        last_program = self.__channel.get_last_program()
-        if last_program is not None:
-            channel_program_known_until = last_program.end
-        else:
-            channel_program_known_until = None
-
-        return {
-            "start": program.start,
-            "end": program.end,
-            "duration": f"{duration_hours:02d}:{duration_minutes:02d}",
-            "title": program.title,
-            "description": program.description,
-            "episode": program.episode,
-            "subtitle": program.subtitle,
-            "channel_program_known_until": channel_program_known_until,
-        }
+    def available(self) -> bool:  # pyright: ignore[reportIncompatibleVariableOverride] -- Entity.available and CoordinatorEntity.available are defined incompatible
+        """Return if entity is available."""
+        return XMLTVEntity.available.__get__(self)
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -118,6 +94,7 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         channel = guide.get_channel(self.__channel.id)
         if channel is None:
             self._attr_native_value = None
+            self._attr_extra_state_attributes = {}
             super()._handle_coordinator_update()
             return
 
@@ -132,10 +109,36 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
             else channel.get_current_program(now)
         )
         if self.__program is None:
-            return None
+            self._attr_native_value = None
+            self._attr_extra_state_attributes = {}
+            return
 
         # native value is full program title
         self._attr_native_value = self.__program.full_title
+
+        # update state attributes
+        # format duration to HH:MM
+        duration_seconds = self.__program.duration.total_seconds()
+        duration_hours = int(duration_seconds // 3600)
+        duration_minutes = int((duration_seconds % 3600) // 60)
+
+        # get last program end time
+        last_program = self.__channel.get_last_program()
+        if last_program is not None:
+            channel_program_known_until = last_program.end
+        else:
+            channel_program_known_until = None
+
+        self._attr_extra_state_attributes = {
+            "start": self.__program.start,
+            "end": self.__program.end,
+            "duration": f"{duration_hours:02d}:{duration_minutes:02d}",
+            "title": self.__program.title,
+            "description": self.__program.description,
+            "episode": self.__program.episode,
+            "subtitle": self.__program.subtitle,
+            "channel_program_known_until": channel_program_known_until,
+        }
 
         super()._handle_coordinator_update()
 
@@ -186,6 +189,7 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
             key=translation_key,
             translation_key=translation_key,
             device_class=SensorDeviceClass.TIMESTAMP,
+            entity_category=EntityCategory.DIAGNOSTIC,
         )
 
         self.__guide = guide
@@ -195,23 +199,9 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
         )
 
     @property
-    def translation_placeholders(self):
-        """Return the translation placeholders."""
-        if self.__guide is None:
-            return None
-
-        return {"generator_name": self.__guide.generator_name}
-
-    @property
-    def extra_state_attributes(self):
-        """Return the state attributes."""
-        if self.__guide is None:
-            return None
-
-        return {
-            "generator_name": self.__guide.generator_name,
-            "generator_url": self.__guide.generator_url,
-        }
+    def available(self) -> bool:  # pyright: ignore[reportIncompatibleVariableOverride] -- Entity.available and CoordinatorEntity.available are defined incompatible
+        """Return if entity is available."""
+        return XMLTVEntity.available.__get__(self)
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -222,6 +212,8 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
         guide: TVGuide = coordinator.data
         if guide is None:
             self._attr_native_value = None
+            self._attr_extra_state_attributes = {}
+            self._attr_translation_placeholders = {}
             super()._handle_coordinator_update()
             return
 
@@ -230,5 +222,19 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
         # native value is last update time
         value = coordinator.last_update_time
         self._attr_native_value = value.astimezone() if value is not None else None
+
+        # set extra state attributes
+        self._attr_extra_state_attributes = {
+            "last_update": value,
+            "generator_name": self.__guide.generator_name,
+            "generator_url": self.__guide.generator_url,
+        }
+
+        # set translation placeholders
+        self._attr_translation_placeholders = (
+            {"generator_name": self.__guide.generator_name}
+            if self.__guide.generator_name is not None
+            else {}
+        )
 
         super()._handle_coordinator_update()
