@@ -118,8 +118,6 @@ class XMLTVChannelProgramImage(XMLTVEntity, ImageEntity):
             super()._handle_coordinator_update()
             return
 
-        self._attr_state = self.__program.full_title
-
         # update image
         image_url = self.__program.image_url
         if image_url is None:
@@ -187,8 +185,6 @@ class XMLTVChannelIconImage(XMLTVEntity, ImageEntity):
             return
 
         self.__channel = channel
-
-        self._attr_state = channel.name
 
         # update image
         icon_url = channel.icon_url
