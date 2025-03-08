@@ -95,6 +95,7 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         if channel is None:
             self._attr_native_value = None
             self._attr_extra_state_attributes = {}
+
             super()._handle_coordinator_update()
             return
 
@@ -111,6 +112,8 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         if self.__program is None:
             self._attr_native_value = None
             self._attr_extra_state_attributes = {}
+
+            super()._handle_coordinator_update()
             return
 
         # native value is full program title

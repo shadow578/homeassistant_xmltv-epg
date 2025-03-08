@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
 
 from homeassistant.components.image import (
     ImageEntity,
@@ -79,6 +78,11 @@ class XMLTVChannelProgramImage(XMLTVEntity, ImageEntity):
 
         LOGGER.debug(f"Setup image '{self.entity_id}' for channel '{channel.id}'.")
 
+    @property
+    def available(self) -> bool:  # pyright: ignore[reportIncompatibleVariableOverride] -- Entity.available and CoordinatorEntity.available are defined incompatible
+        """Return if entity is available."""
+        return XMLTVEntity.available.__get__(self)
+
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
@@ -88,6 +92,10 @@ class XMLTVChannelProgramImage(XMLTVEntity, ImageEntity):
         channel = guide.get_channel(self.__channel.id)
         if channel is None:
             self.__program = None
+            self._attr_state = None
+            self._attr_image_url = None
+            self._attr_image_last_updated = self.coordinator.current_time
+
             super()._handle_coordinator_update()
             return
 
@@ -102,31 +110,29 @@ class XMLTVChannelProgramImage(XMLTVEntity, ImageEntity):
             else channel.get_current_program(now)
         )
 
+        if self.__program is None:
+            self._attr_state = None
+            self._attr_image_url = None
+            self._attr_image_last_updated = self.coordinator.current_time
+
+            super()._handle_coordinator_update()
+            return
+
+        self._attr_state = self.__program.full_title
+
+        # update image
+        image_url = self.__program.image_url
+        if image_url is None:
+            self._attr_image_url = None
+            self._attr_image_last_updated = self.coordinator.current_time
+
+            super()._handle_coordinator_update()
+            return
+
+        self._attr_image_url = image_url
+        self._attr_image_last_updated = self.coordinator.current_time
+
         super()._handle_coordinator_update()
-
-    @property
-    def image_last_updated(self) -> datetime | None:
-        """Time the image was last updated."""
-        program = self.__program
-        if program is None:
-            return None
-        return program.start
-
-    @property
-    def image_url(self) -> str | None:
-        """Return URL of image."""
-        program = self.__program
-        if program is None:
-            return None
-        return program.image_url
-
-    @property
-    def state(self) -> str | None:
-        """Get the state value of the image entity."""
-        program = self.__program
-        if program is None:
-            return None
-        return program.full_title
 
 
 class XMLTVChannelIconImage(XMLTVEntity, ImageEntity):
@@ -135,8 +141,6 @@ class XMLTVChannelIconImage(XMLTVEntity, ImageEntity):
     coordinator: XMLTVDataUpdateCoordinator
 
     __channel: TVChannel
-    __last_icon_url: str | None
-    __last_updated: datetime | None
 
     def __init__(
         self, coordinator: XMLTVDataUpdateCoordinator, channel: TVChannel
@@ -159,10 +163,13 @@ class XMLTVChannelIconImage(XMLTVEntity, ImageEntity):
         )
 
         self.__channel = channel
-        self.__last_icon_url = None
-        self.__last_updated = None
 
         LOGGER.debug(f"Setup image '{self.entity_id}' for channel '{channel.id}'.")
+
+    @property
+    def available(self) -> bool:  # pyright: ignore[reportIncompatibleVariableOverride] -- Entity.available and CoordinatorEntity.available are defined incompatible
+        """Return if entity is available."""
+        return XMLTVEntity.available.__get__(self)
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -171,37 +178,28 @@ class XMLTVChannelIconImage(XMLTVEntity, ImageEntity):
 
         # refresh channel from guide
         channel = guide.get_channel(self.__channel.id)
-        if channel is not None:
-            self.__channel = channel
-
-        super()._handle_coordinator_update()
-
-    @property
-    def image_last_updated(self) -> datetime | None:
-        """Time the image was last updated."""
-        return self.__last_updated
-
-    @property
-    def image_url(self) -> str | None:
-        """Return URL of image."""
-        channel = self.__channel
         if channel is None:
-            return None
+            self._attr_state = None
+            self._attr_image_url = None
+            self._attr_image_last_updated = self.coordinator.current_time
 
+            super()._handle_coordinator_update()
+            return
+
+        self.__channel = channel
+
+        self._attr_state = channel.name
+
+        # update image
         icon_url = channel.icon_url
         if icon_url is None:
-            return None
+            self._attr_image_url = None
+            self._attr_image_last_updated = self.coordinator.current_time
 
-        if icon_url != self.__last_icon_url:
-            self.__last_icon_url = icon_url
-            self.__last_updated = self.coordinator.current_time
+            super()._handle_coordinator_update()
+            return
 
-        return icon_url
+        self._attr_image_url = icon_url
+        self._attr_image_last_updated = self.coordinator.current_time
 
-    @property
-    def state(self) -> str | None:
-        """Get the state value of the image entity."""
-        channel = self.__channel
-        if channel is None:
-            return None
-        return channel.name
+        super()._handle_coordinator_update()
