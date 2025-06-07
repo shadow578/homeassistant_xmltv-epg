@@ -1,13 +1,49 @@
 """Test xmltv_epg api component."""
 
 import gzip
+import lzma
+from collections.abc import Callable
 from unittest.mock import AsyncMock, MagicMock
 
 import aiohttp
+import pytest
 
 from custom_components.xmltv_epg.api import XMLTVClient
 
-from .const import MOCK_TV_GUIDE_NAME, MOCK_TV_GUIDE_URL, MOCK_TV_GUIDE_URL_GZ
+from .const import (
+    MOCK_TV_GUIDE_NAME,
+    MOCK_TV_GUIDE_URL,
+)
+
+# the configuration profiles to test
+# format is: "profile name": (url, content_type, compression_function)
+TEST_CONFIGURATIONS = {
+    "plain xml with application/xml": (
+        MOCK_TV_GUIDE_URL,
+        "application/xml",
+        None,
+    ),
+    "plain xml with test/xml": (
+        MOCK_TV_GUIDE_URL,
+        "text/xml",
+        None,
+    ),
+    "gzipped xml with application/gzip": (
+        MOCK_TV_GUIDE_URL + ".gz",
+        "application/gzip",
+        gzip.compress,
+    ),
+    "gzipped xml with appliation/octet-stream": (
+        MOCK_TV_GUIDE_URL + ".gz",
+        "application/octet-stream",
+        gzip.compress,
+    ),
+    "xz-compressed xml with application/x-xz": (
+        MOCK_TV_GUIDE_URL + ".xz",
+        "application/x-xz",
+        lzma.compress,
+    ),
+}
 
 
 def create_mock_session_for_get():
@@ -25,16 +61,21 @@ def create_mock_session_for_get():
     return session, response
 
 
-async def test_xmltv_client_get_data_plain(anyio_backend):
-    """Test XMLTVClient.async_get_data with plain XML response."""
+@pytest.mark.parametrize(
+    ("url", "content_type", "compression_function"),
+    TEST_CONFIGURATIONS.values(),
+    ids=TEST_CONFIGURATIONS.keys(),
+)
+async def test_xmltv_client_get_data_(
+    anyio_backend, url: str, content_type: str, compression_function: Callable | None
+):
+    """Test XMLTVClient.async_get_data with GZIP response and correct content_type."""
 
     # prepare the session and response
     session, response = create_mock_session_for_get()
 
-    response.content_type = "text/xml"
-    response.url = MOCK_TV_GUIDE_URL
-    response.text.return_value = f"""
-<tv generator-info-name="{MOCK_TV_GUIDE_NAME}" generator-info-url="{MOCK_TV_GUIDE_URL}">
+    xml = f"""
+<tv generator-info-name="{MOCK_TV_GUIDE_NAME}" generator-info-url="{url}">
   <channel id="CH1">
     <display-name>Channel 1</display-name>
     </channel>
@@ -45,90 +86,18 @@ async def test_xmltv_client_get_data_plain(anyio_backend):
 </tv>
 """
 
-    # create client
-    client = XMLTVClient(
-        session=session,
-        url=MOCK_TV_GUIDE_URL,
-    )
+    response.url = url
+    response.content_type = content_type
 
-    # fetch data
-    guide = await client.async_get_data()
-
-    # check the guide
-    assert guide
-    assert guide.generator_name == MOCK_TV_GUIDE_NAME
-    assert guide.generator_url == MOCK_TV_GUIDE_URL
-
-    assert len(guide.channels) == 1
-    assert guide.channels[0].id == "CH1"
-
-
-async def test_xmltv_client_get_data_gzip_correct_content_type(anyio_backend):
-    """Test XMLTVClient.async_get_data with GZIP response and correct content_type."""
-
-    # prepare the session and response
-    session, response = create_mock_session_for_get()
-
-    response.content_type = "application/gzip"
-    response.url = MOCK_TV_GUIDE_URL_GZ
-    response.read.return_value = gzip.compress(
-        f"""
-<tv generator-info-name="{MOCK_TV_GUIDE_NAME}" generator-info-url="{MOCK_TV_GUIDE_URL}">
-  <channel id="CH1">
-    <display-name>Channel 1</display-name>
-    </channel>
-    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1">
-        <title>Program 1</title>
-        <desc>Description 1</desc>
-    </programme>
-</tv>
-""".encode()
-    )
+    if compression_function:
+        response.read.return_value = compression_function(xml.encode())
+    else:
+        response.text.return_value = xml
 
     # create client
     client = XMLTVClient(
         session=session,
-        url=MOCK_TV_GUIDE_URL_GZ,
-    )
-
-    # fetch data
-    guide = await client.async_get_data()
-
-    # check the guide
-    assert guide
-    assert guide.generator_name == MOCK_TV_GUIDE_NAME
-    assert guide.generator_url == MOCK_TV_GUIDE_URL
-
-    assert len(guide.channels) == 1
-    assert guide.channels[0].id == "CH1"
-
-
-async def test_xmltv_client_get_data_gzip_wrong_content_type(anyio_backend):
-    """Test XMLTVClient.async_get_data with GZIP response and wrong content_type."""
-
-    # prepare the session and response
-    session, response = create_mock_session_for_get()
-
-    response.content_type = "application/octet-stream"
-    response.url = MOCK_TV_GUIDE_URL_GZ
-    response.read.return_value = gzip.compress(
-        f"""
-<tv generator-info-name="{MOCK_TV_GUIDE_NAME}" generator-info-url="{MOCK_TV_GUIDE_URL}">
-  <channel id="CH1">
-    <display-name>Channel 1</display-name>
-    </channel>
-    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1">
-        <title>Program 1</title>
-        <desc>Description 1</desc>
-    </programme>
-</tv>
-""".encode()
-    )
-
-    # create client
-    client = XMLTVClient(
-        session=session,
-        url=MOCK_TV_GUIDE_URL_GZ,
+        url=url,
     )
 
     # fetch data

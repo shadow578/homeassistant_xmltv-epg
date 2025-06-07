@@ -83,4 +83,6 @@ class XMLTVClient:
                 "Error fetching information",
             ) from exception
         except Exception as exception:  # pylint: disable=broad-except
-            raise XMLTVClientError("Unknown error fetching information: " + exception.__str__() ) from exception
+            raise XMLTVClientError(
+                "Unknown error fetching information: " + exception.__str__()
+            ) from exception
