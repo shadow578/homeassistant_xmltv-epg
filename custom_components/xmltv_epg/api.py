@@ -7,6 +7,7 @@ import gzip
 import lzma
 import socket
 import xml.etree.ElementTree as ET
+from logging import Logger
 
 import aiohttp
 
@@ -28,10 +29,12 @@ class XMLTVClient:
         self,
         session: aiohttp.ClientSession,
         url: str,
+        logger: Logger | None = None,
     ) -> None:
         """XMLTV Client."""
         self._session = session
         self._url = url
+        self.__logger = logger
 
     async def async_get_data(self) -> TVGuide:
         """Fetch XMLTV Guide data."""
@@ -40,31 +43,66 @@ class XMLTVClient:
             response = await self._session.get(url=self._url)
             response.raise_for_status()
 
-            if response.content_type in ["text/xml", "application/xml"]:
-                # raw XML text, read as-is
-                data = await response.text()
+            content_type = response.content_type
+            content_encoding = response.headers.get("Content-Encoding", None)
 
-            elif response.content_type in [
+            if self.__logger:
+                self.__logger.debug(
+                    "Got response from %s: content-type=%s, content-encoding=%s",
+                    response.url,
+                    content_type,
+                    content_encoding,
+                )
+
+            # figure out how to decode the XML data
+            decode_xml_fn = None
+            if content_type in ["text/xml", "application/xml"]:
+                # raw XML text, read as-is
+                async def decode_plain():
+                    return await response.text()
+
+                decode_xml_fn = decode_plain
+
+            elif content_type in [
                 "application/gzip",
                 "application/x-gzip",
             ] or "xml.gz" in str(response.url):
                 # xml.gz file, read as binary and decompress
-                gzipped_data = await response.read()
-                data = gzip.decompress(gzipped_data).decode()
+                async def decode_gzip():
+                    d = await response.read()
+                    return gzip.decompress(d).decode()
 
-            elif response.content_type in ["application/x-xz"]:
+                decode_xml_fn = decode_gzip
+
+            elif content_type in ["application/x-xz"] or "xml.xz" in str(response.url):
                 # xz compressed XML, read as binary and decompress
-                xz_data = await response.read()
-                data = lzma.decompress(xz_data).decode()
+                async def decode_xz():
+                    d = await response.read()
+                    return lzma.decompress(d).decode()
 
+                decode_xml_fn = decode_xz
             else:
                 raise XMLTVClientError(
                     f"Don't know how to handle content type '{response.content_type}' (from {response.url})",
                 )
 
-            # parse XML data
-            xml = ET.fromstring(data)
+            # decode and parse XML data
+            try:
+                data = await decode_xml_fn()
+            except Exception as decode_exception:
+                # workaround for elres.de [gzipped xml, gzip transfer (wrong content-type)]
+                if self.__logger:
+                    self.__logger.debug(
+                        "Failed to decode xml data using expected method, attemting to decode as text. Error: %s",
+                        decode_exception,
+                    )
 
+                try:
+                    data = await response.text()
+                except Exception as text_exception:
+                    raise text_exception from decode_exception
+
+            xml = ET.fromstring(data)
             guide = TVGuide.from_xml(xml)
             if guide is None:
                 raise XMLTVClientError(
@@ -76,13 +114,13 @@ class XMLTVClient:
             raise exception
         except asyncio.TimeoutError as exception:
             raise XMLTVClientCommunicationError(
-                "Timeout error fetching information",
+                "Timeout fetching xmltv data: " + exception.__str__(),
             ) from exception
         except (aiohttp.ClientError, socket.gaierror) as exception:
             raise XMLTVClientCommunicationError(
-                "Error fetching information",
+                "Error fetching xmltv data: " + exception.__str__(),
             ) from exception
         except Exception as exception:  # pylint: disable=broad-except
             raise XMLTVClientError(
-                "Unknown error fetching information: " + exception.__str__()
+                "Unknown error fetching xmltv data: " + exception.__str__()
             ) from exception

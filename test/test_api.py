@@ -32,7 +32,7 @@ TEST_CONFIGURATIONS = {
         None,
         None,
     ),
-    "plain xml, gzip transfer": (  # elres.de, xmltv.info, xmltvfr.fr
+    "plain xml, gzip transfer": (  # elres.de, xmltv.net, xmltvfr.fr
         MOCK_TV_GUIDE_URL,
         "application/xml",
         "gzip",
