@@ -16,32 +16,89 @@ from .const import (
 )
 
 # the configuration profiles to test
-# format is: "profile name": (url, content_type, compression_function)
+# format is: "profile name": (url, content_type, content_encoding , compression_function)
 TEST_CONFIGURATIONS = {
-    "plain xml with application/xml": (
+    # configurations for providers that can get their
+    # content-type and content-encoding right:
+    "plain xml, raw transfer": (
         MOCK_TV_GUIDE_URL,
         "application/xml",
         None,
+        None,
     ),
-    "plain xml with test/xml": (
+    "plain xml, raw transfer, alternative content type": (
         MOCK_TV_GUIDE_URL,
         "text/xml",
         None,
+        None,
     ),
-    "gzipped xml with application/gzip": (
+    "plain xml, gzip transfer": (  # elres.de, xmltv.info, xmltvfr.fr
+        MOCK_TV_GUIDE_URL,
+        "application/xml",
+        "gzip",
+        None,  # auto-decompress by aiohttp
+    ),
+    "plain xml, gzip transfer, alternative content type": (  # xmltv.info
+        MOCK_TV_GUIDE_URL,
+        "text/xml",
+        "gzip",
+        None,  # auto-decompress by aiohttp
+    ),
+    "plain xml, xz transfer": (
+        MOCK_TV_GUIDE_URL,
+        "application/xml",
+        "xz",
+        None,  # auto-decompress by aiohttp (?)
+    ),
+    "plain xml, xz transfer, alternative content type": (  # xmltvfr.fr
+        MOCK_TV_GUIDE_URL,
+        "text/xml",
+        "xz",
+        None,  # auto-decompress by aiohttp (?)
+    ),
+    "gzipped xml, raw transfer": (
         MOCK_TV_GUIDE_URL + ".gz",
         "application/gzip",
+        None,
         gzip.compress,
     ),
-    "gzipped xml with appliation/octet-stream": (
+    "gzipped xml, raw transfer, alternative content type": (  # xmltvfr.fr
         MOCK_TV_GUIDE_URL + ".gz",
-        "application/octet-stream",
+        "application/x-gzip",
+        None,
         gzip.compress,
     ),
-    "xz-compressed xml with application/x-xz": (
+    "xz-compressed xml, raw transfer": (  # elres.de, xmltvfr.fr
         MOCK_TV_GUIDE_URL + ".xz",
         "application/x-xz",
+        None,
         lzma.compress,
+    ),
+    # "zip xml, plain transfer": ( # xmltvfr.fr
+    #    MOCK_TV_GUIDE_URL + ".zip",
+    #    "application/zip",
+    #    None,
+    #    # TODO
+    # )
+    # additional configurations found in the wild, where providers
+    # did not get their content-type and content-encoding right:
+    "gzipped xml, gzip transfer (wrong content-type)": (  # elres.de
+        MOCK_TV_GUIDE_URL + ".gz",
+        "application/gzip",
+        "gzip",
+        None,  # auto-decompress by aiohttp
+    ),
+    "gzipped xml, gzip transfer (gzipped twice)": (
+        MOCK_TV_GUIDE_URL + ".gz",
+        "application/gzip",
+        "gzip",
+        gzip.compress,
+    ),
+    "gzipped xml (file download)": (  # unknown provider
+        MOCK_TV_GUIDE_URL + ".gz",
+        "application/octet-stream",
+        None,
+        gzip.compress,
     ),
 }
 
@@ -49,7 +106,7 @@ TEST_CONFIGURATIONS = {
 def create_mock_session_for_get():
     """Create a mock session that supports get().
 
-    :return: (mock session, mock response)
+    :return: (session, response object)
     """
 
     response = AsyncMock()
@@ -62,14 +119,18 @@ def create_mock_session_for_get():
 
 
 @pytest.mark.parametrize(
-    ("url", "content_type", "compression_function"),
+    ("url", "content_type", "content_encoding", "compression_function"),
     TEST_CONFIGURATIONS.values(),
     ids=TEST_CONFIGURATIONS.keys(),
 )
-async def test_xmltv_client_get_data_(
-    anyio_backend, url: str, content_type: str, compression_function: Callable | None
+async def test_xmltv_client_get_data(
+    anyio_backend,
+    url: str,
+    content_type: str,
+    content_encoding: str,
+    compression_function: Callable | None,
 ):
-    """Test XMLTVClient.async_get_data with GZIP response and correct content_type."""
+    """Test XMLTVClient.async_get_data with variable configurations."""
 
     # prepare the session and response
     session, response = create_mock_session_for_get()
@@ -89,6 +150,17 @@ async def test_xmltv_client_get_data_(
     response.url = url
     response.content_type = content_type
 
+    def get_header(name: str, default=None):
+        """Get response header value mock."""
+        if name == "Content-Encoding":
+            return content_encoding
+        elif name == "Content-Type":
+            return content_type
+        else:
+            return default
+
+    response.headers.get = get_header
+
     if compression_function:
         response.read.return_value = compression_function(xml.encode())
     else:
@@ -106,7 +178,7 @@ async def test_xmltv_client_get_data_(
     # check the guide
     assert guide
     assert guide.generator_name == MOCK_TV_GUIDE_NAME
-    assert guide.generator_url == MOCK_TV_GUIDE_URL
+    assert guide.generator_url == url
 
     assert len(guide.channels) == 1
     assert guide.channels[0].id == "CH1"
