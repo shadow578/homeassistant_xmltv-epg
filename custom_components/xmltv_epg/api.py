@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import asyncio
 import gzip
+import io
 import lzma
 import socket
 import xml.etree.ElementTree as ET
+import zipfile
 from logging import Logger
 
 import aiohttp
@@ -57,7 +59,7 @@ class XMLTVClient:
             # figure out how to decode the XML data
             decode_xml_fn = None
             if content_type in ["text/xml", "application/xml"]:
-                # raw XML text, read as-is
+                # raw XML text
                 async def decode_plain():
                     return await response.text()
 
@@ -67,7 +69,7 @@ class XMLTVClient:
                 "application/gzip",
                 "application/x-gzip",
             ] or "xml.gz" in str(response.url):
-                # xml.gz file, read as binary and decompress
+                # xml.gz, XML compressed with gzip
                 async def decode_gzip():
                     d = await response.read()
                     return gzip.decompress(d).decode()
@@ -75,12 +77,39 @@ class XMLTVClient:
                 decode_xml_fn = decode_gzip
 
             elif content_type in ["application/x-xz"] or "xml.xz" in str(response.url):
-                # xz compressed XML, read as binary and decompress
+                # xm.xz, XML compressed with xz
                 async def decode_xz():
                     d = await response.read()
                     return lzma.decompress(d).decode()
 
                 decode_xml_fn = decode_xz
+            elif content_type in ["application/zip"] or "xml.zip" in str(response.url):
+                # xml.zip, XML file inside a zip archive
+                async def decode_zip():
+                    d = await response.read()
+                    with io.BytesIO(d) as iofile, zipfile.ZipFile(iofile, "r") as zip:
+                        namelist = zip.namelist()
+                        i = 0
+
+                        if len(namelist) == 0:
+                            raise XMLTVClientError("zip archive is empty")
+                        if len(namelist) > 1:
+                            for ix, name in enumerate(namelist):
+                                if name.endswith(".xml"):
+                                    i = ix
+                                    break
+
+                            if self.__logger:
+                                self.__logger.warning(
+                                    "zip archive contains multiple files (%s), using i=%d",
+                                    namelist,
+                                    i,
+                                )
+
+                        with zip.open(namelist[i]) as xml_file:
+                            return xml_file.read().decode()
+
+                decode_xml_fn = decode_zip
             else:
                 raise XMLTVClientError(
                     f"Don't know how to handle content type '{response.content_type}' (from {response.url})",

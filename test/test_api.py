@@ -1,7 +1,10 @@
 """Test xmltv_epg api component."""
 
 import gzip
+import inspect
+import io
 import lzma
+import zipfile
 from collections.abc import Callable
 from unittest.mock import AsyncMock, MagicMock
 
@@ -14,6 +17,27 @@ from .const import (
     MOCK_TV_GUIDE_NAME,
     MOCK_TV_GUIDE_URL,
 )
+
+
+async def create_zip_file(contents: list[tuple[str, str]]) -> bytes:
+    """Create a zip file containing multiple files given in contents."""
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for file_name, content in contents:
+            zip_file.writestr(file_name, content)
+
+    return buffer.getvalue()
+
+
+async def create_xml_zip_single(xml):
+    """Prepare xml for test [xml file inside zip archive]."""
+    return await create_zip_file([("tv_guide.xml", xml.decode())])
+
+
+async def create_xml_zip_multi_file(xml):
+    """Prepare xml for test [xml file inside zip archive, with additional files]."""
+    return await create_zip_file([("license.txt", ""), ("tv_guide.xml", xml.decode())])
+
 
 # the configuration profiles to test
 # format is: "profile name": (url, content_type, content_encoding , compression_function)
@@ -74,12 +98,12 @@ TEST_CONFIGURATIONS = {
         None,
         lzma.compress,
     ),
-    # "zip xml, plain transfer": ( # xmltvfr.fr
-    #    MOCK_TV_GUIDE_URL + ".zip",
-    #    "application/zip",
-    #    None,
-    #    # TODO
-    # )
+    "xml file inside zip archive": (  # xmltvfr.fr
+        MOCK_TV_GUIDE_URL + ".zip",
+        "application/zip",
+        None,
+        create_xml_zip_single,
+    ),
     # additional configurations found in the wild, where providers
     # did not get their content-type and content-encoding right:
     "gzipped xml, gzip transfer (wrong content-type)": (  # elres.de
@@ -99,6 +123,12 @@ TEST_CONFIGURATIONS = {
         "application/octet-stream",
         None,
         gzip.compress,
+    ),
+    "xml file inside zip archive, with additional files": (
+        MOCK_TV_GUIDE_URL + ".zip",
+        "application/zip",
+        None,
+        create_xml_zip_multi_file,
     ),
 }
 
@@ -162,7 +192,12 @@ async def test_xmltv_client_get_data(
     response.headers.get = get_header
 
     if compression_function:
-        response.read.return_value = compression_function(xml.encode())
+        if inspect.iscoroutinefunction(compression_function):
+            compressed_xml = await compression_function(xml.encode())
+        else:
+            compressed_xml = compression_function(xml.encode())
+
+        response.read.return_value = compressed_xml
     else:
         response.text.return_value = xml
 
