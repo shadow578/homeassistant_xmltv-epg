@@ -9,7 +9,6 @@ MOCK_NOW = datetime(2024, 5, 17, 12, 45, 0)
 
 MOCK_TV_GUIDE_NAME = "MOCK XMLTV"
 MOCK_TV_GUIDE_URL = "http://example.com/epg.xml"
-MOCK_TV_GUIDE_URL_GZ = "http://example.com/epg.xml.gz"
 
 
 def get_mock_tv_guide() -> TVGuide:
