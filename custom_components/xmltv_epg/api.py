@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import gzip
+import lzma
 import socket
 import xml.etree.ElementTree as ET
 
@@ -49,9 +50,12 @@ class XMLTVClient:
             ] or "xml.gz" in str(response.url):
                 # xml.gz file, read as binary and decompress
                 gzipped_data = await response.read()
-
-                # decompress the gzipped data
                 data = gzip.decompress(gzipped_data).decode()
+
+            elif response.content_type in ["application/x-xz"]:
+                # xz compressed XML, read as binary and decompress
+                xz_data = await response.read()
+                data = lzma.decompress(xz_data).decode()
 
             else:
                 raise XMLTVClientError(
@@ -79,4 +83,4 @@ class XMLTVClient:
                 "Error fetching information",
             ) from exception
         except Exception as exception:  # pylint: disable=broad-except
-            raise XMLTVClientError("Something really wrong happened!") from exception
+            raise XMLTVClientError("Unknown error fetching information: " + exception.__str__() ) from exception
