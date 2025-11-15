@@ -9,7 +9,7 @@ from .image import TVImage
 from .program import TVProgram
 
 
-class TVChannel(BaseXmlModel, tag="channel"):
+class TVChannel(BaseXmlModel, tag="channel", search_mode="ordered"):
     """Represents a TV Channel with its associated programs."""
 
     id: str = attr(name="id")

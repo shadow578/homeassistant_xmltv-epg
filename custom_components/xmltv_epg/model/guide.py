@@ -8,7 +8,7 @@ from .channel import TVChannel
 from .program import TVProgram
 
 
-class TVGuide(BaseXmlModel, tag="tv"):
+class TVGuide(BaseXmlModel, tag="tv", search_mode="ordered"):
     """Represents a TV Guide containing channels and their programs."""
 
     source_name: str | None = attr(name="source-info-name", default=None)

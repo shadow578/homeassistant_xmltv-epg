@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from .channel import TVChannel
 
 
-class TVProgram(BaseXmlModel, tag="programme"):
+class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
     """Represents a TV Program at a specific time on a specific channel."""
 
     channel_id: str = attr(name="channel")

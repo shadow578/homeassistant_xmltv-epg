@@ -5,7 +5,7 @@ from typing import Any
 from pydantic_xml import BaseXmlModel, attr
 
 
-class TVProgramEpisodeNumber(BaseXmlModel, tag="episode-num"):
+class TVProgramEpisodeNumber(BaseXmlModel, tag="episode-num", search_mode="ordered"):
     """Represents an episode number in a specific numbering system."""
 
     system: str = attr(name="system")
