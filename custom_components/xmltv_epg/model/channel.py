@@ -16,7 +16,7 @@ class TVChannel(BaseXmlModel, tag="channel", search_mode="ordered"):
     """Unique ID of this channel."""
 
     name: str = element(tag="display-name")
-    """Display name of this channel."""
+    """Display name of this channel, as defined in xml data."""
 
     icon: TVImage | None = element(tag="icon", default=None)
     """Icon associated with this channel, if any.
@@ -63,3 +63,14 @@ class TVChannel(BaseXmlModel, tag="channel", search_mode="ordered"):
             return None
 
         return self.__programs[-1]
+
+    @property
+    def display_name(self) -> str:
+        """Cleaned-up display name for this channel."""
+        name = self.name
+
+        # remove 'XX: ' prefix from name, if present
+        if len(name) > 4 and name[2] == ":" and name[3] == " ":  # 'XX: '
+            name = name[4:]
+
+        return name

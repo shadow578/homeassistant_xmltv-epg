@@ -3,7 +3,7 @@
 from pydantic_xml import BaseXmlModel, attr
 
 
-class TVImage(BaseXmlModel, search_mode="ordered"):
+class TVImage(BaseXmlModel, tag="icon", search_mode="ordered"):
     """Represents an image/icon associated with a TV program or channel."""
 
     url: str = attr(name="src")

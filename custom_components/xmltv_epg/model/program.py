@@ -1,7 +1,7 @@
 """TV Program Model Definition."""
 
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pydantic import field_validator
 from pydantic_xml import BaseXmlModel, attr, element
@@ -53,7 +53,17 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
         Example value "20240517124500 +0200" shall be parsed
         to datetime object for 17th May 2024, 12:45:00 UTC+2.
         """
+        if isinstance(value, datetime):
+            return value
+
         return datetime.strptime(value, "%Y%m%d%H%M%S %z")
+
+    def model_post_init(self, __context: Any) -> None:
+        """Hooks post-initialization to validate start < end time."""
+        if self.start >= self.end:
+            raise ValueError("Program start time must be before end time")
+
+        return super().model_post_init(__context)
 
     @property
     def episode(self) -> str | None:
