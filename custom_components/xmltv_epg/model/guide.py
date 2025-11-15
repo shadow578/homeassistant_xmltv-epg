@@ -4,28 +4,29 @@ from typing import Any
 
 from pydantic_xml import BaseXmlModel, attr, element
 
-from custom_components.xmltv_epg.model.channel import TVChannel
+from .channel import TVChannel
+from .program import TVProgram
 
 
 class TVGuide(BaseXmlModel, tag="tv"):
     """Represents a TV Guide containing channels and their programs."""
 
-    source_name: str | None = attr(name="source-info-name")
+    source_name: str | None = attr(name="source-info-name", default=None)
     """Name of the source that provided the epg data, if available."""
 
-    source_url: str | None = attr(name="source-info-url")
+    source_url: str | None = attr(name="source-info-url", default=None)
     """URL of the source that provided the epg data, if available."""
 
-    generator_name: str | None = attr(name="generator-info-name")
+    generator_name: str | None = attr(name="generator-info-name", default=None)
     """Name of the program that generated the xmltv data, if available."""
 
-    generator_url: str | None = attr(name="generator-info-url")
+    generator_url: str | None = attr(name="generator-info-url", default=None)
     """URL of the program that generated the xmltv data, if available."""
 
     channels: list[TVChannel] = element(tag="channel", default_factory=list)
     """List of all TV channels defined in this guide."""
 
-    programs: list = element(tag="programme", default_factory=list)
+    programs: list[TVProgram] = element(tag="programme", default_factory=list)
     """List of all TV programs defined in this guide."""
 
     def model_post_init(self, __context: Any) -> None:

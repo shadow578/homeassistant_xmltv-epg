@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic_xml import BaseXmlModel, attr
+from pydantic_xml import BaseXmlModel, attr, element
 
 from .image import TVImage
 from .program import TVProgram
@@ -15,10 +15,10 @@ class TVChannel(BaseXmlModel, tag="channel"):
     id: str = attr(name="id")
     """Unique ID of this channel."""
 
-    name: str = attr(name="display-name")
+    name: str = element(tag="display-name")
     """Display name of this channel."""
 
-    icon: TVImage | None = attr(name="icon", default=None)
+    icon: TVImage | None = element(tag="icon", default=None)
     """Icon associated with this channel, if any.
     Generally, this will be a logo or similar image."""
 
