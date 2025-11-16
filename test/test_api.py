@@ -199,7 +199,7 @@ async def test_xmltv_client_get_data(
 
         response.read.return_value = compressed_xml
     else:
-        response.text.return_value = xml
+        response.read.return_value = xml.encode()
 
     # create client
     client = XMLTVClient(
