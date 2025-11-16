@@ -12,11 +12,9 @@ from homeassistant.components.sensor import (
 from homeassistant.const import EntityCategory
 from homeassistant.core import callback
 
-from custom_components.xmltv_epg.model.program import TVProgram
-
 from .const import DOMAIN, LOGGER, ChannelSensorMode
 from .coordinator import XMLTVDataUpdateCoordinator
-from .entity import XMLTVEntity
+from .entity import XMLTVEntity, XMLTVProgramEntity
 from .helper import normalize_for_entity_id, program_get_normalized_identification
 from .model import TVChannel, TVGuide
 
@@ -34,10 +32,12 @@ async def async_setup_entry(hass, entry, async_add_devices):
     sensors: list[SensorEntity] = [XMLTVStatusSensor(coordinator, guide)]
 
     for channel in guide.channels:
-        # current / upcoming program sensors
+        # current
         sensors.append(
             XMLTVChannelSensor(coordinator, channel, ChannelSensorMode.CURRENT)
         )
+
+        # upcoming
         if coordinator.enable_upcoming_sensor:
             sensors.append(
                 XMLTVChannelSensor(coordinator, channel, ChannelSensorMode.NEXT)
@@ -46,14 +46,8 @@ async def async_setup_entry(hass, entry, async_add_devices):
     async_add_devices(sensors)
 
 
-class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
+class XMLTVChannelSensor(XMLTVProgramEntity, SensorEntity):
     """XMLTV Channel Program Sensor class."""
-
-    coordinator: XMLTVDataUpdateCoordinator
-
-    __channel: TVChannel
-    __program: TVProgram | None
-    __mode: ChannelSensorMode
 
     def __init__(
         self,
@@ -62,7 +56,7 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         mode: ChannelSensorMode,
     ) -> None:
         """Initialize the sensor class."""
-        super().__init__(coordinator, channel)
+        super().__init__(coordinator, channel, mode)
 
         translation_key, entity_id = program_get_normalized_identification(
             channel, mode, "program_sensor"
@@ -78,44 +72,23 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
             icon="mdi:format-quote-close",
         )
 
-        self.__channel = channel
-        self.__program = None
-        self.__mode = mode
-
         LOGGER.debug(f"Setup sensor '{self.entity_id}' for channel '{channel.id}'.")
 
     @property
     def available(self) -> bool:  # pyright: ignore[reportIncompatibleVariableOverride] -- Entity.available and CoordinatorEntity.available are defined incompatible
         """Return if entity is available."""
         return (
-            self.__channel is not None
-            and self.__program is not None
+            self._channel is not None
+            and self._program is not None
             and XMLTVEntity.available.__get__(self)
         )
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        # refresh channel from guide
-        channel = self.coordinator.data.get_channel(self.__channel.id)
-        if channel is None:
-            self._attr_native_value = None
-            self._attr_extra_state_attributes = {}
+        self._update_from_coordinator()
 
-            super()._handle_coordinator_update()
-            return
-
-        self.__channel = channel
-
-        now = self.coordinator.current_time
-
-        # get current or next program
-        self.__program = (
-            self.__channel.get_next_program(now)
-            if self.__mode == ChannelSensorMode.NEXT
-            else channel.get_current_program(now)
-        )
-        if self.__program is None:
+        if self._program is None:
             self._attr_native_value = None
             self._attr_extra_state_attributes = {}
 
@@ -123,29 +96,29 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
             return
 
         # native value is full program title
-        self._attr_native_value = self.__program.full_title
+        self._attr_native_value = self._program.full_title
 
         # update state attributes
         # format duration to HH:MM
-        duration_seconds = self.__program.duration.total_seconds()
+        duration_seconds = self._program.duration.total_seconds()
         duration_hours = int(duration_seconds // 3600)
         duration_minutes = int((duration_seconds % 3600) // 60)
 
         # get last program end time
-        last_program = self.__channel.last_program
+        last_program = self._channel.last_program
         if last_program is not None:
             channel_program_known_until = last_program.end
         else:
             channel_program_known_until = None
 
         self._attr_extra_state_attributes = {
-            "start": self.__program.start,
-            "end": self.__program.end,
+            "start": self._program.start,
+            "end": self._program.end,
             "duration": f"{duration_hours:02d}:{duration_minutes:02d}",
-            "title": self.__program.title,
-            "description": self.__program.description,
-            "episode": self.__program.episode,
-            "subtitle": self.__program.subtitle,
+            "title": self._program.title,
+            "description": self._program.description,
+            "episode": self._program.episode,
+            "subtitle": self._program.subtitle,
             "channel_program_known_until": channel_program_known_until,
         }
 
