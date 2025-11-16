@@ -210,7 +210,7 @@ def test_sensor_entity_ids():
 
     # program image, current
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel("CH 1", "Channel 1"), False, "program_image"
+        TVChannel(id="CH 1", name="Channel 1"), False, "program_image"
     )
 
     assert translation_key == "program_image_current"
@@ -218,7 +218,7 @@ def test_sensor_entity_ids():
 
     # program image, upcoming
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel("CH 1", "Channel 1"), True, "program_image"
+        TVChannel(id="CH 1", name="Channel 1"), True, "program_image"
     )
 
     assert translation_key == "program_image_upcoming"
@@ -226,7 +226,7 @@ def test_sensor_entity_ids():
 
     # channel icon
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel("CH 1", "Channel 1"), False, "channel_icon"
+        TVChannel(id="CH 1", name="Channel 1"), False, "channel_icon"
     )
 
     assert translation_key == "channel_icon"

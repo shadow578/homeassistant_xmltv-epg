@@ -7,7 +7,6 @@ import gzip
 import io
 import lzma
 import socket
-import xml.etree.ElementTree as ET
 import zipfile
 from logging import Logger
 
@@ -117,7 +116,7 @@ class XMLTVClient:
 
             # decode and parse XML data
             try:
-                data = await decode_xml_fn()
+                xml = await decode_xml_fn()
             except Exception as decode_exception:
                 # workaround for elres.de [gzipped xml, gzip transfer (wrong content-type)]
                 if self.__logger:
@@ -127,11 +126,10 @@ class XMLTVClient:
                     )
 
                 try:
-                    data = await response.text()
+                    xml = await response.text()
                 except Exception as text_exception:
                     raise text_exception from decode_exception
 
-            xml = ET.fromstring(data)
             guide = TVGuide.from_xml(xml)
             if guide is None:
                 raise XMLTVClientError(

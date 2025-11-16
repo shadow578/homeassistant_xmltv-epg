@@ -119,15 +119,15 @@ class XMLTVChannelProgramImage(XMLTVEntity, ImageEntity):
             return
 
         # update image
-        image_url = self.__program.image_url
-        if image_url is None:
+        image = self.__program.image
+        if image is None:
             self._attr_image_url = None
             self._attr_image_last_updated = self.coordinator.current_time
 
             super()._handle_coordinator_update()
             return
 
-        self._attr_image_url = image_url
+        self._attr_image_url = image.url
         self._attr_image_last_updated = self.coordinator.current_time
 
         super()._handle_coordinator_update()
@@ -187,15 +187,15 @@ class XMLTVChannelIconImage(XMLTVEntity, ImageEntity):
         self.__channel = channel
 
         # update image
-        icon_url = channel.icon_url
-        if icon_url is None:
+        icon = channel.icon
+        if icon is None:
             self._attr_image_url = None
             self._attr_image_last_updated = self.coordinator.current_time
 
             super()._handle_coordinator_update()
             return
 
-        self._attr_image_url = icon_url
+        self._attr_image_url = icon.url
         self._attr_image_last_updated = self.coordinator.current_time
 
         super()._handle_coordinator_update()
