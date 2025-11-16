@@ -22,6 +22,21 @@ class TVProgramEpisodeNumber(BaseXmlModel, tag="episode-num", search_mode="order
         """
         return self.__value
 
+    @property
+    def value_onscreen(self) -> str | None:
+        """Get the episode number as SxxExx formatted string, if possible.
+
+        :return: A string in the format 'SxxExx', 'Sxx', or 'Exx', or None if neither is available.
+        """
+        (s, e) = self.value
+        parts = []
+        if s is not None:
+            parts.append(f"S{s}")
+        if e is not None:
+            parts.append(f"E{e}")
+
+        return "".join(parts) if parts else None
+
     def __parse_value(self) -> tuple[int | None, int | None]:
         """Parse the raw_value based on the system. Used once after model initialization."""
         if self.system == "SxxExx" or self.system == "onscreen":

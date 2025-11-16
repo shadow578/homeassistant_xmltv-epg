@@ -13,6 +13,7 @@ def test_parse_episode_number_season_episode():
     assert episode.system == "SxxExx"
     assert episode.raw_value == "S1E2"
     assert episode.value == (1, 2)
+    assert episode.value_onscreen == "S1E2"
 
 
 def test_parse_episode_number_xmltv_ns_full():
@@ -23,6 +24,7 @@ def test_parse_episode_number_xmltv_ns_full():
     assert episode.system == "xmltv_ns"
     assert episode.raw_value == "0.1."
     assert episode.value == (1, 2)
+    assert episode.value_onscreen == "S1E2"
 
 
 def test_parse_episode_number_xmltv_ns_season_only():
@@ -33,6 +35,7 @@ def test_parse_episode_number_xmltv_ns_season_only():
     assert episode.system == "xmltv_ns"
     assert episode.raw_value == "0.."
     assert episode.value == (1, None)
+    assert episode.value_onscreen == "S1"
 
 
 def test_parse_episode_number_xmltv_ns_episode_only():
@@ -43,3 +46,4 @@ def test_parse_episode_number_xmltv_ns_episode_only():
     assert episode.system == "xmltv_ns"
     assert episode.raw_value == ".1."
     assert episode.value == (None, 2)
+    assert episode.value_onscreen == "E2"

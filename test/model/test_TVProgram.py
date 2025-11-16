@@ -53,8 +53,8 @@ def test_episode_num_system_season_episode():
     program = TVProgram.from_xml(xml)
     assert program is not None
 
-    # episode number 'S13E7' should be converted to 'S13E07'
-    assert program.episode == "S13E07"
+    # episode number 'S13E7' should be converted to 'S13E7'
+    assert program.episode == "S13E7"
 
 
 def test_episode_num_system_xmltv_ns():
@@ -70,8 +70,8 @@ def test_episode_num_system_xmltv_ns():
     program = TVProgram.from_xml(xml)
     assert program is not None
 
-    # episode number '12.6.' should be converted to 'S13E07'
-    assert program.episode == "S13E07"
+    # episode number '12.6.' should be converted to 'S13E7'
+    assert program.episode == "S13E7"
 
 
 def test_parse_program_image_url():
@@ -173,7 +173,7 @@ def test_full_title():
         title="Program 1",
         episode_raw=[TVProgramEpisodeNumber(system="onscreen", raw_value="S1E1")],
     )
-    assert program.full_title == "Program 1 (S01E01)"
+    assert program.full_title == "Program 1 (S1E1)"
 
     # (3)
     program = TVProgram(
@@ -184,7 +184,7 @@ def test_full_title():
         subtitle="Subtitle 1",
         episode_raw=[TVProgramEpisodeNumber(system="onscreen", raw_value="S1E1")],
     )
-    assert program.full_title == "Program 1 - Subtitle 1 (S01E01)"
+    assert program.full_title == "Program 1 - Subtitle 1 (S1E1)"
 
     # (4)
     program = TVProgram(

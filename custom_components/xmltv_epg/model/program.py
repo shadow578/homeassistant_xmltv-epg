@@ -67,14 +67,8 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
 
     @property
     def episode(self) -> str | None:
-        """Get the episode number as SxxExx string.
-
-        If only either season or episode is available, returns E or S only.
-
-        :return: SxxExx string, or None if not available
-        """
-        # find most complete episode number
-        best = (None, None)
+        """Get the episode number as onscreen formatted string (via TVProgramEpisodeNumber::value_onscreen)."""
+        best = None
         best_score = 0
         for ep in self.episode_raw:
             (s, e) = ep.value
@@ -85,20 +79,16 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
                 score += 1
 
             if score > best_score:
-                best = (s, e)
+                best = ep
                 best_score = score
 
             if score == 2:
                 # best possible score reached
                 break
 
-        (s, e) = best
-        if s is None and e is None:
+        if best is None:
             return None
-
-        s = f"S{s:02d}" if s is not None else ""
-        e = f"E{e:02d}" if e is not None else ""
-        return f"{s}{e}"
+        return best.value_onscreen
 
     @property
     def duration(self) -> timedelta:
