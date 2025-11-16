@@ -24,10 +24,10 @@ from .const import MOCK_NOW, MOCK_TV_GUIDE_URL
 
 
 @pytest.fixture()
-def mock_coordinator_current_time():
-    """Fixture to replace 'XMLTVDataUpdateCoordinator.current_time' method with a mock."""
+def mock_coordinator_actual_now():
+    """Fixture to replace 'XMLTVDataUpdateCoordinator.actual_now' method with a mock."""
     with patch(
-        "custom_components.xmltv_epg.coordinator.XMLTVDataUpdateCoordinator.current_time",
+        "custom_components.xmltv_epg.coordinator.XMLTVDataUpdateCoordinator.actual_now",
         new_callable=PropertyMock,
     ) as mock:
         mock.return_value = MOCK_NOW
@@ -71,7 +71,7 @@ async def test_images_basic(
     hass,
     hass_client,
     mock_xmltv_client_get_data,
-    mock_coordinator_current_time,
+    mock_coordinator_actual_now,
     mock_coordinator_last_update_time,
 ):
     """Test basic image entity setup and function."""
@@ -103,10 +103,13 @@ async def test_images_basic(
     # with according urls values should be created:
     # - image.mock_1_program_image_current   : "http://example.com/pr/ch1_cur.jpg"
     # - image.mock_1_program_image_upcoming  : "http://example.com/pr/ch1_upc.jpg"
+    # - image.mock_1_program_image_primetime : "http://example.com/pr/ch1_prime.jpg"
     # - image.mock_2_program_image_current   : "http://example.com/pr/ch2_cur.jpg"
     # - image.mock_2_program_image_upcoming  : "http://example.com/pr/ch2_upc.jpg"
+    # - image.mock_2_program_image_primetime : "http://example.com/pr/ch2_prime.jpg"
     # - image.mock_3_program_image_current   : "http://example.com/pr/ch3_cur.jpg"
     # - image.mock_3_program_image_upcoming  : "http://example.com/pr/ch3_upc.jpg"
+    # - image.mock_3_program_image_primetime : "http://example.com/pr/ch3_prime.jpg"
     await assert_has_image_entity_with_url(
         hass,
         client,
@@ -118,6 +121,12 @@ async def test_images_basic(
         client,
         "image.mock_1_program_image_upcoming",
         "http://example.com/pr/ch1_upc.jpg",
+    )
+    await assert_has_image_entity_with_url(
+        hass,
+        client,
+        "image.mock_1_program_image_primetime",
+        "http://example.com/pr/ch1_prime.jpg",
     )
     await assert_has_image_entity_with_url(
         hass,
@@ -134,6 +143,12 @@ async def test_images_basic(
     await assert_has_image_entity_with_url(
         hass,
         client,
+        "image.mock_2_program_image_primetime",
+        "http://example.com/pr/ch2_prime.jpg",
+    )
+    await assert_has_image_entity_with_url(
+        hass,
+        client,
         "image.mock_3_program_image_current",
         "http://example.com/pr/ch3_cur.jpg",
     )
@@ -142,6 +157,12 @@ async def test_images_basic(
         client,
         "image.mock_3_program_image_upcoming",
         "http://example.com/pr/ch3_upc.jpg",
+    )
+    await assert_has_image_entity_with_url(
+        hass,
+        client,
+        "image.mock_3_program_image_primetime",
+        "http://example.com/pr/ch3_prime.jpg",
     )
 
     # additionally, the following channel icon image entities are created
@@ -164,7 +185,7 @@ async def test_program_sensor_device(
     anyio_backend,
     hass,
     mock_xmltv_client_get_data,
-    mock_coordinator_current_time,
+    mock_coordinator_actual_now,
     mock_coordinator_last_update_time,
 ):
     """Test program sensor state and attributes."""
@@ -226,6 +247,16 @@ def test_sensor_entity_ids():
 
     assert translation_key == "program_image_upcoming"
     assert entity_id == "image.ch_1_program_image_upcoming"
+
+    # program image, primetime
+    translation_key, entity_id = program_get_normalized_identification(
+        TVChannel(id="CH 1", name="Channel 1"),
+        ChannelSensorMode.PRIMETIME,
+        "program_image",
+    )
+
+    assert translation_key == "program_image_primetime"
+    assert entity_id == "image.ch_1_program_image_primetime"
 
     # channel icon
     translation_key, entity_id = program_get_normalized_identification(
