@@ -33,7 +33,7 @@ class TVGuide(BaseXmlModel, tag="tv", search_mode="ordered"):
     def name(self) -> str | None:
         """Get the name of the guide.
 
-        :return: generator_name, source_name, or empty string, depending on availability
+        :return: generator_name, source_name, or None, depending on availability
 
         :note fallback required, as seen in https://github.com/shadow578/homeassistant_xmltv-epg/issues/32
         """

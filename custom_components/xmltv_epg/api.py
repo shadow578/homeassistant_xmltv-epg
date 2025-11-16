@@ -152,7 +152,7 @@ class XMLTVClient:
             # workaround for elres.de [gzipped xml, gzip transfer (wrong content-type)]
             if self.__logger:
                 self.__logger.debug(
-                    "Failed to decode xml data using expected method, attemting to decode as text. Error: %s",
+                    "Failed to decode xml data using expected method, attempting to decode as text. Error: %s",
                     decode_exception,
                 )
 

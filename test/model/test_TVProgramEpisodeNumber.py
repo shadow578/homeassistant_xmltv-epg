@@ -6,7 +6,7 @@ from custom_components.xmltv_epg.model import (
 
 
 def test_parse_episode_number_season_episode_full():
-    """Test TVProgramEpisodeNumber class parses Season+Episode format."""
+    """Test TVProgramEpisodeNumber class parses SxxExx Season+Episode format."""
     xml = """<episode-num system="SxxExx">S1E2</episode-num>"""
 
     episode = TVProgramEpisodeNumber.from_xml(xml)
@@ -17,7 +17,7 @@ def test_parse_episode_number_season_episode_full():
 
 
 def test_parse_episode_number_season_episode_season_only():
-    """Test TVProgramEpisodeNumber class parses Season+Episode format."""
+    """Test TVProgramEpisodeNumber class parses SxxExx Season only format."""
     xml = """<episode-num system="SxxExx">S1</episode-num>"""
 
     episode = TVProgramEpisodeNumber.from_xml(xml)
@@ -28,7 +28,7 @@ def test_parse_episode_number_season_episode_season_only():
 
 
 def test_parse_episode_number_season_episode_episode_only():
-    """Test TVProgramEpisodeNumber class parses Season+Episode format."""
+    """Test TVProgramEpisodeNumber class parses SxxExx Episode only format."""
     xml = """<episode-num system="SxxExx">E2</episode-num>"""
 
     episode = TVProgramEpisodeNumber.from_xml(xml)

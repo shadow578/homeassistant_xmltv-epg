@@ -53,7 +53,7 @@ def test_episode_num_system_season_episode():
     program = TVProgram.from_xml(xml)
     assert program is not None
 
-    # episode number 'S13E7' should be converted to 'S13E7'
+    # episode number 'S13E7' should remain as 'S13E7'
     assert program.episode == "S13E7"
 
 
