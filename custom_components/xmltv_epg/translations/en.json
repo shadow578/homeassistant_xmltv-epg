@@ -21,8 +21,10 @@
                     "update_interval_hours": "Update Interval (hours)",
                     "program_lookahead_minutes": "Current Program Lookahead (minutes)",
                     "enable_upcoming_sensor": "Enable Upcoming Program Sensor",
+                    "enable_primetime_sensor": "Enable Prime-Time Program Sensor",
                     "enable_channel_icons": "Enable Image Entities for Channel Icons",
-                    "enable_program_images": "Enable Image Entities for Current and Upcoming Program"
+                    "enable_program_images": "Enable Image Entities for Current and Upcoming Program",
+                    "primetime_time": "Prime-Time Program Time"
                 }
             }
         }

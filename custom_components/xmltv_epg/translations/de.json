@@ -21,8 +21,10 @@
                     "update_interval_hours": "Aktualisierungsintervall (Stunden)",
                     "program_lookahead_minutes": "Vorrausschauzeit für aktuelles Programm (Minuten)",
                     "enable_upcoming_sensor": "Sensor für bevorstehendes Programm aktivieren",
+                    "enable_primetime_sensor": "Sensor für Prime-Time Programm aktivieren",
                     "enable_channel_icons": "Bildentitäten für Kanalbilder aktivieren",
-                    "enable_program_images": "Bildentitäten für aktuelles und bevorstehendes Program aktivieren"
+                    "enable_program_images": "Bildentitäten für aktuelles und bevorstehendes Program aktivieren",
+                    "primetime_time": "Prime-Time Programmzeit"
                 }
             }
         }

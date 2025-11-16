@@ -16,6 +16,7 @@ from .const import (
     DEFAULT_ENABLE_CHANNEL_ICONS,
     DEFAULT_ENABLE_PROGRAM_IMAGES,
     DEFAULT_ENABLE_UPCOMING_SENSOR,
+    DEFAULT_PRIMETIME_TIME,
     DEFAULT_PROGRAM_LOOKAHEAD,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
@@ -23,6 +24,7 @@ from .const import (
     OPT_ENABLE_CHANNEL_ICONS,
     OPT_ENABLE_PROGRAM_IMAGES,
     OPT_ENABLE_UPCOMING_SENSOR,
+    OPT_PRIMETIME_TIME,
     OPT_PROGRAM_LOOKAHEAD,
     OPT_UPDATE_INTERVAL,
 )
@@ -51,12 +53,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         enable_upcoming_sensor=entry.options.get(
             OPT_ENABLE_UPCOMING_SENSOR, DEFAULT_ENABLE_UPCOMING_SENSOR
         ),
+        enable_primetime_sensor=entry.options.get(
+            OPT_ENABLE_UPCOMING_SENSOR, DEFAULT_ENABLE_UPCOMING_SENSOR
+        ),
         enable_channel_icon=entry.options.get(
             OPT_ENABLE_CHANNEL_ICONS, DEFAULT_ENABLE_CHANNEL_ICONS
         ),
         enable_program_image=entry.options.get(
             OPT_ENABLE_PROGRAM_IMAGES, DEFAULT_ENABLE_PROGRAM_IMAGES
         ),
+        primetime_time=entry.options.get(OPT_PRIMETIME_TIME, DEFAULT_PRIMETIME_TIME),
     )
 
     # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities

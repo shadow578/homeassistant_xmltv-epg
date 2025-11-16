@@ -15,15 +15,19 @@ from .api import (
 )
 from .const import (
     DEFAULT_ENABLE_CHANNEL_ICONS,
+    DEFAULT_ENABLE_PRIMETIME_SENSOR,
     DEFAULT_ENABLE_PROGRAM_IMAGES,
     DEFAULT_ENABLE_UPCOMING_SENSOR,
+    DEFAULT_PRIMETIME_TIME,
     DEFAULT_PROGRAM_LOOKAHEAD,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
     LOGGER,
     OPT_ENABLE_CHANNEL_ICONS,
+    OPT_ENABLE_PRIMETIME_SENSOR,
     OPT_ENABLE_PROGRAM_IMAGES,
     OPT_ENABLE_UPCOMING_SENSOR,
+    OPT_PRIMETIME_TIME,
     OPT_PROGRAM_LOOKAHEAD,
     OPT_UPDATE_INTERVAL,
 )
@@ -112,6 +116,8 @@ class XMLTVOptionsFlowHandler(config_entries.OptionsFlow):
     ) -> config_entries.ConfigFlowResult:
         """XMLTV Options Flow."""
         if user_input is not None:
+            LOGGER.debug("Options user input: %s", user_input)
+            LOGGER.debug("date input: %s", user_input.get("aaaaaa"))
             return self.async_create_entry(
                 data=user_input,
             )
@@ -151,6 +157,12 @@ class XMLTVOptionsFlowHandler(config_entries.OptionsFlow):
                         ),
                     ): selector.BooleanSelector(),
                     vol.Required(
+                        OPT_ENABLE_PRIMETIME_SENSOR,
+                        default=self.config_entry.options.get(
+                            OPT_ENABLE_PRIMETIME_SENSOR, DEFAULT_ENABLE_PRIMETIME_SENSOR
+                        ),
+                    ): selector.BooleanSelector(),
+                    vol.Required(
                         OPT_ENABLE_CHANNEL_ICONS,
                         default=self.config_entry.options.get(
                             OPT_ENABLE_CHANNEL_ICONS, DEFAULT_ENABLE_CHANNEL_ICONS
@@ -162,6 +174,12 @@ class XMLTVOptionsFlowHandler(config_entries.OptionsFlow):
                             OPT_ENABLE_PROGRAM_IMAGES, DEFAULT_ENABLE_PROGRAM_IMAGES
                         ),
                     ): selector.BooleanSelector(),
+                    vol.Required(
+                        OPT_PRIMETIME_TIME,
+                        default=self.config_entry.options.get(
+                            OPT_PRIMETIME_TIME, DEFAULT_PRIMETIME_TIME
+                        ),
+                    ): selector.TimeSelector(),
                 }
             ),
         )

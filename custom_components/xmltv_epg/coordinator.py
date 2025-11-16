@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -29,8 +29,10 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator[TVGuide]):
     __client: XMLTVClient
     __lookahead: timedelta
     __enable_upcoming_sensor: bool
+    __enable_primetime_sensor: bool
     __enable_channel_icon: bool
     __enable_program_image: bool
+    __primetime_time: time
 
     __guide: TVGuide
     __last_refetch_time: datetime | None
@@ -44,15 +46,26 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator[TVGuide]):
         update_interval: int,
         lookahead: int,
         enable_upcoming_sensor: bool,
+        enable_primetime_sensor: bool,
         enable_channel_icon: bool,
         enable_program_image: bool,
+        primetime_time: str,  # HH:MM:SS format
     ) -> None:
         """Initialize."""
         self.__client = client
         self.__lookahead = timedelta(minutes=lookahead)
         self.__enable_upcoming_sensor = enable_upcoming_sensor
+        self.__enable_primetime_sensor = enable_primetime_sensor
         self.__enable_channel_icon = enable_channel_icon
         self.__enable_program_image = enable_program_image
+
+        try:
+            self.__primetime_time = datetime.strptime(primetime_time, "%H:%M:%S").time()
+        except ValueError:
+            LOGGER.warning(
+                f"Invalid primetime_time format: {primetime_time}, fallback to 20:00:00"
+            )
+            self.__primetime_time = time(hour=20, minute=0, second=0)
 
         super().__init__(
             hass=hass,
@@ -111,8 +124,11 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator[TVGuide]):
         """Get primetime time for today."""
         now = self.actual_now
         return now.replace(
-            hour=20, minute=0, second=0, microsecond=0
-        )  # TODO make configurable
+            hour=self.__primetime_time.hour,
+            minute=self.__primetime_time.minute,
+            second=self.__primetime_time.second,
+            microsecond=0,
+        )
 
     @property
     def last_update_time(self) -> datetime | None:
@@ -127,7 +143,7 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator[TVGuide]):
     @property
     def enable_primetime_sensor(self) -> bool:
         """Get enable primetime sensor."""
-        return True  # TODO make configurable
+        return self.__enable_primetime_sensor
 
     @property
     def enable_channel_icon(self) -> bool:
