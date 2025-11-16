@@ -82,7 +82,7 @@ class XMLTVChannelProgramImage(XMLTVEntity, ImageEntity):
     @property
     def available(self) -> bool:  # pyright: ignore[reportIncompatibleVariableOverride] -- Entity.available and CoordinatorEntity.available are defined incompatible
         """Return if entity is available."""
-        return XMLTVEntity.available.__get__(self)
+        return self._attr_image_url is not None and XMLTVEntity.available.__get__(self)
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -152,7 +152,7 @@ class XMLTVChannelIconImage(XMLTVEntity, ImageEntity):
     @property
     def available(self) -> bool:  # pyright: ignore[reportIncompatibleVariableOverride] -- Entity.available and CoordinatorEntity.available are defined incompatible
         """Return if entity is available."""
-        return XMLTVEntity.available.__get__(self)
+        return self._attr_image_url is not None and XMLTVEntity.available.__get__(self)
 
     @callback
     def _handle_coordinator_update(self) -> None:

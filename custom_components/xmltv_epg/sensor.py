@@ -83,7 +83,11 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
     @property
     def available(self) -> bool:  # pyright: ignore[reportIncompatibleVariableOverride] -- Entity.available and CoordinatorEntity.available are defined incompatible
         """Return if entity is available."""
-        return XMLTVEntity.available.__get__(self)
+        return (
+            self.__channel is not None
+            and self.__program is not None
+            and XMLTVEntity.available.__get__(self)
+        )
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -202,7 +206,7 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
     @property
     def available(self) -> bool:  # pyright: ignore[reportIncompatibleVariableOverride] -- Entity.available and CoordinatorEntity.available are defined incompatible
         """Return if entity is available."""
-        return XMLTVEntity.available.__get__(self)
+        return self.__guide is not None and XMLTVEntity.available.__get__(self)
 
     @callback
     def _handle_coordinator_update(self) -> None:
