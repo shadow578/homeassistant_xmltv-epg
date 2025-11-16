@@ -27,5 +27,5 @@ class XMLTVEntity(CoordinatorEntity[XMLTVDataUpdateCoordinator]):
 
         if channel is not None:
             self._attr_device_info = DeviceInfo(
-                identifiers={(DOMAIN, channel.id)}, name=channel.name
+                identifiers={(DOMAIN, channel.id)}, name=channel.display_name
             )
