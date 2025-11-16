@@ -201,6 +201,12 @@ async def test_last_update_sensor_attributes(
     assert state.attributes["generator_name"] == MOCK_TV_GUIDE_NAME
     assert state.attributes["generator_url"] == MOCK_TV_GUIDE_URL
 
+    # check translation placeholders
+    er = entity_registry.async_get(hass)
+    entity = er.async_get("sensor.mock_xmltv_last_update")
+    assert entity is not None
+    assert entity.original_name == f"{MOCK_TV_GUIDE_NAME} Last Update"
+
 
 def test_sensor_entity_ids():
     """Test sensor entity ids match the expected values."""

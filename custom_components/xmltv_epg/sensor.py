@@ -195,6 +195,10 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
             entity_category=EntityCategory.DIAGNOSTIC,
         )
 
+        self._attr_translation_placeholders = (
+            {"generator_name": guide.name} if guide.name is not None else {}
+        )
+
         self.__guide = guide
 
         LOGGER.debug(
@@ -214,7 +218,6 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
         if guide is None:
             self._attr_native_value = None
             self._attr_extra_state_attributes = {}
-            self._attr_translation_placeholders = {}
             super()._handle_coordinator_update()
             return
 
@@ -230,12 +233,5 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
             "generator_name": self.__guide.name,
             "generator_url": self.__guide.url,
         }
-
-        # set translation placeholders
-        self._attr_translation_placeholders = (
-            {"generator_name": self.__guide.name}
-            if self.__guide.name is not None
-            else {}
-        )
 
         super()._handle_coordinator_update()
