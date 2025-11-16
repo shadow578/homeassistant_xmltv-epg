@@ -8,9 +8,9 @@
   "documentation": "https://github.com/shadow578/homeassistant_xmltv_epg",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/shadow578/homeassistant_xmltv_epg/issues",
-  "version": "1.0.0",
   "requirements": [
     "pydantic>=2.10.6",
     "pydantic-xml>=2.18.0"
-  ]
+  ],
+  "version": "1.0.0"
 }
