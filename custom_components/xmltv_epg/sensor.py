@@ -30,11 +30,11 @@ async def async_setup_entry(hass, entry, async_add_devices):
         f"Setting up Channel Sensors for {len(guide.channels)} channels (enable_upcoming: {coordinator.enable_upcoming_sensor})."
     )
 
-    # setup sensor for coordinator status
+    # sensor for coordinator status
     sensors: list[SensorEntity] = [XMLTVStatusSensor(coordinator, guide)]
 
-    # add current / upcoming program sensors for each channel
     for channel in guide.channels:
+        # current / upcoming program sensors
         sensors.append(XMLTVChannelSensor(coordinator, channel, False))
         if coordinator.enable_upcoming_sensor:
             sensors.append(XMLTVChannelSensor(coordinator, channel, True))
@@ -88,10 +88,8 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        guide: TVGuide = self.coordinator.data
-
         # refresh channel from guide
-        channel = guide.get_channel(self.__channel.id)
+        channel = self.coordinator.data.get_channel(self.__channel.id)
         if channel is None:
             self._attr_native_value = None
             self._attr_extra_state_attributes = {}
@@ -209,10 +207,8 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        coordinator: XMLTVDataUpdateCoordinator = self.coordinator
-
         # refresh guide from coordinator
-        guide: TVGuide = coordinator.data
+        guide = self.coordinator.data
         if guide is None:
             self._attr_native_value = None
             self._attr_extra_state_attributes = {}
@@ -223,7 +219,7 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
         self.__guide = guide
 
         # native value is last update time
-        value = coordinator.last_update_time
+        value = self.coordinator.last_update_time
         self._attr_native_value = value.astimezone() if value is not None else None
 
         # set extra state attributes

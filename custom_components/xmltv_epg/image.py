@@ -26,12 +26,13 @@ async def async_setup_entry(hass, entry, async_add_devices):
         f"Setting up image entities for {len(guide.channels)} channels (enable_upcoming: {coordinator.enable_upcoming_sensor}, enable_channel_icon: {coordinator.enable_channel_icon}, enable_program_image: {coordinator.enable_program_image})."
     )
 
-    # add current / upcoming program images for each channel
     images: list[ImageEntity] = []
     for channel in guide.channels:
+        # channel icon image
         if coordinator.enable_channel_icon:
             images.append(XMLTVChannelIconImage(coordinator, channel))
 
+        # current / upcoming program images
         if coordinator.enable_program_image:
             images.append(XMLTVChannelProgramImage(coordinator, channel, False))
             if coordinator.enable_upcoming_sensor:
@@ -88,47 +89,31 @@ class XMLTVChannelProgramImage(XMLTVEntity, ImageEntity):
         """Handle updated data from the coordinator."""
         guide: TVGuide = self.coordinator.data
 
-        # refresh channel from guide
         channel = guide.get_channel(self.__channel.id)
         if channel is None:
             self.__program = None
             self._attr_state = None
             self._attr_image_url = None
             self._attr_image_last_updated = self.coordinator.current_time
+        else:
+            self.__channel = channel
 
-            super()._handle_coordinator_update()
-            return
+            # get current or next program depending on flag
+            now = self.coordinator.current_time
+            self.__program = (
+                self.__channel.get_next_program(now)
+                if self.__is_next
+                else channel.get_current_program(now)
+            )
 
-        self.__channel = channel
-
-        now = self.coordinator.current_time
-
-        # get current or next program
-        self.__program = (
-            self.__channel.get_next_program(now)
-            if self.__is_next
-            else channel.get_current_program(now)
-        )
-
-        if self.__program is None:
-            self._attr_state = None
-            self._attr_image_url = None
-            self._attr_image_last_updated = self.coordinator.current_time
-
-            super()._handle_coordinator_update()
-            return
-
-        # update image
-        image = self.__program.image
-        if image is None:
-            self._attr_image_url = None
-            self._attr_image_last_updated = self.coordinator.current_time
-
-            super()._handle_coordinator_update()
-            return
-
-        self._attr_image_url = image.url
-        self._attr_image_last_updated = self.coordinator.current_time
+            if self.__program is None:
+                self._attr_state = None
+                self._attr_image_url = None
+                self._attr_image_last_updated = self.coordinator.current_time
+            else:
+                image = self.__program.image
+                self._attr_image_url = image.url if image is not None else None
+                self._attr_image_last_updated = self.coordinator.current_time
 
         super()._handle_coordinator_update()
 
@@ -174,28 +159,16 @@ class XMLTVChannelIconImage(XMLTVEntity, ImageEntity):
         """Handle updated data from the coordinator."""
         guide: TVGuide = self.coordinator.data
 
-        # refresh channel from guide
         channel = guide.get_channel(self.__channel.id)
         if channel is None:
             self._attr_state = None
             self._attr_image_url = None
             self._attr_image_last_updated = self.coordinator.current_time
+        else:
+            self.__channel = channel
 
-            super()._handle_coordinator_update()
-            return
-
-        self.__channel = channel
-
-        # update image
-        icon = channel.icon
-        if icon is None:
-            self._attr_image_url = None
+            icon = channel.icon
+            self._attr_image_url = icon.url if icon is not None else None
             self._attr_image_last_updated = self.coordinator.current_time
-
-            super()._handle_coordinator_update()
-            return
-
-        self._attr_image_url = icon.url
-        self._attr_image_last_updated = self.coordinator.current_time
 
         super()._handle_coordinator_update()
