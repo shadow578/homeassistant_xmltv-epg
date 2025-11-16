@@ -48,3 +48,29 @@ def test_get_channel():
 
     # non-existing channel
     assert guide.get_channel("CH3") is None
+
+
+def test_name_url_properties():
+    """Test TVGuide.name and TVGuide.url properties."""
+    # no names or urls
+    guide = TVGuide()
+    assert guide.name is None
+    assert guide.url is None
+
+    # generator name/url takes precedence
+    guide = TVGuide(
+        source_name="Source Name",
+        source_url="http://source.url",
+        generator_name="Generator Name",
+        generator_url="http://generator.url",
+    )
+    assert guide.name == "Generator Name"
+    assert guide.url == "http://generator.url"
+
+    # fallback to source name/url if no generator name/url
+    guide = TVGuide(
+        source_name="Source Name",
+        source_url="http://source.url",
+    )
+    assert guide.name == "Source Name"
+    assert guide.url == "http://source.url"

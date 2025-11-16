@@ -162,13 +162,13 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
         :return: (translation_key, entity_id) tuple.
 
         """
-        assert guide.generator_name is not None, (
-            "XMLTVStatusSensor failed to create id, generator_name was None!"
+        assert guide.name is not None, (
+            "XMLTVStatusSensor failed to create id, .name was None!"
         )
 
         translation_key = "last_update"
         entity_id = (
-            f"sensor.{normalize_for_entity_id(guide.generator_name)}_{translation_key}"
+            f"sensor.{normalize_for_entity_id(guide.name)}_{translation_key}"
         )
 
         return translation_key, entity_id
@@ -196,7 +196,7 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
         self.__guide = guide
 
         LOGGER.debug(
-            f"Setup sensor '{self.entity_id}' for coordinator '{guide.generator_name}' status."
+            f"Setup sensor '{self.entity_id}' for coordinator '{guide.name}' status."
         )
 
     @property
@@ -225,14 +225,14 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
         # set extra state attributes
         self._attr_extra_state_attributes = {
             "last_update": value,
-            "generator_name": self.__guide.generator_name,
-            "generator_url": self.__guide.generator_url,
+            "generator_name": self.__guide.name,
+            "generator_url": self.__guide.url,
         }
 
         # set translation placeholders
         self._attr_translation_placeholders = (
-            {"generator_name": self.__guide.generator_name}
-            if self.__guide.generator_name is not None
+            {"generator_name": self.__guide.name}
+            if self.__guide.name is not None
             else {}
         )
 

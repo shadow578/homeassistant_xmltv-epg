@@ -29,6 +29,26 @@ class TVGuide(BaseXmlModel, tag="tv", search_mode="ordered"):
     programs: list[TVProgram] = element(tag="programme", default_factory=list)
     """List of all TV programs defined in this guide."""
 
+    @property
+    def name(self) -> str | None:
+        """Get the name of the guide.
+
+        :return: generator_name, source_name, or empty string, depending on availability
+
+        :note fallback required, as seen in https://github.com/shadow578/homeassistant_xmltv-epg/issues/32
+        """
+        return self.generator_name or self.source_name
+
+    @property
+    def url(self) -> str | None:
+        """Get the info URL for the guide.
+
+        :return: generator_url, source_url, or None, depending on availability
+
+        :note fallback required, as seen in https://github.com/shadow578/homeassistant_xmltv-epg/issues/32
+        """
+        return self.generator_url or self.source_url
+
     def model_post_init(self, __context: Any) -> None:
         """Hooks post-initialization to cross-link channels and programs."""
         for program in self.programs:
