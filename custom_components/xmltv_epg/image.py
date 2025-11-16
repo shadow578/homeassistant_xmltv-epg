@@ -28,21 +28,31 @@ async def async_setup_entry(hass, entry, async_add_devices):
 
     images: list[ImageEntity] = []
     for channel in guide.channels:
-        # channel icon image
+        # channel icon
         if coordinator.enable_channel_icon:
             images.append(XMLTVChannelIconImage(coordinator, channel))
 
-        # current / upcoming program images
         if coordinator.enable_program_image:
+            # current
             images.append(
                 XMLTVChannelProgramImage(
                     coordinator, channel, ChannelSensorMode.CURRENT
                 )
             )
+
+            # upcoming
             if coordinator.enable_upcoming_sensor:
                 images.append(
                     XMLTVChannelProgramImage(
                         coordinator, channel, ChannelSensorMode.NEXT
+                    )
+                )
+
+            # primetime
+            if coordinator.enable_primetime_sensor:
+                images.append(
+                    XMLTVChannelProgramImage(
+                        coordinator, channel, ChannelSensorMode.PRIMETIME
                     )
                 )
 

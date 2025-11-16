@@ -76,6 +76,11 @@ def program_get_normalized_identification(
     => ('program_image_upcoming', 'image.de_my_channel_1_program_image_upcoming')
 
     - channel_id = "DE: My Channel 1'
+    - mode = 'primetime'
+    - kind = 'program_image'
+    => ('program_primetime', 'image.de_my_channel_1_program_primetime')
+
+    - channel_id = "DE: My Channel 1'
     - mode = (don't care)
     - kind = 'channel_icon'
     => ('channel_icon', 'image.de_my_channel_1_icon')

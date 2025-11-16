@@ -68,10 +68,14 @@ class XMLTVProgramEntity(XMLTVEntity):
 
         self._channel = channel
 
-        # get current or next program depending on flag
-        now = self.coordinator.current_time
-        self._program = (
-            self._channel.get_next_program(now)
-            if self._mode == ChannelSensorMode.NEXT
-            else channel.get_current_program(now)
-        )
+        # get program based on mode
+        if self._mode == ChannelSensorMode.CURRENT:
+            self._program = channel.get_current_program(self.coordinator.current_time)
+        elif self._mode == ChannelSensorMode.NEXT:
+            self._program = channel.get_next_program(self.coordinator.current_time)
+        elif self._mode == ChannelSensorMode.PRIMETIME:
+            self._program = channel.get_current_program(self.coordinator.primetime_time)
+        else:
+            raise ValueError(
+                f"Unsupported mode: {self._mode}. Please report this issue."
+            )

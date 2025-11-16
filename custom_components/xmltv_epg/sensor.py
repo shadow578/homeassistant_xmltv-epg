@@ -43,6 +43,12 @@ async def async_setup_entry(hass, entry, async_add_devices):
                 XMLTVChannelSensor(coordinator, channel, ChannelSensorMode.NEXT)
             )
 
+        # primetime
+        if coordinator.enable_primetime_sensor:
+            sensors.append(
+                XMLTVChannelSensor(coordinator, channel, ChannelSensorMode.PRIMETIME)
+            )
+
     async_add_devices(sensors)
 
 

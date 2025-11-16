@@ -107,6 +107,14 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator[TVGuide]):
         return self.actual_now + self.__lookahead
 
     @property
+    def primetime_time(self) -> datetime:
+        """Get primetime time for today."""
+        now = self.actual_now
+        return now.replace(
+            hour=20, minute=0, second=0, microsecond=0
+        )  # TODO make configurable
+
+    @property
     def last_update_time(self) -> datetime | None:
         """Get last update time."""
         return self.__last_refetch_time
@@ -115,6 +123,11 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator[TVGuide]):
     def enable_upcoming_sensor(self) -> bool:
         """Get enable upcoming sensor."""
         return self.__enable_upcoming_sensor
+
+    @property
+    def enable_primetime_sensor(self) -> bool:
+        """Get enable primetime sensor."""
+        return True  # TODO make configurable
 
     @property
     def enable_channel_icon(self) -> bool:

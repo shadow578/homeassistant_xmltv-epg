@@ -33,5 +33,6 @@ class ChannelSensorMode(StrEnum):
 
     CURRENT = "current"
     NEXT = "upcoming"
+    PRIMETIME = "primetime"
 
     NONE = "none"  # fallback if no mode is applicable

@@ -84,6 +84,35 @@
                     }
                 }
             },
+            "program_primetime": {
+                "name": "Prime-Time Programm",
+                "state_attributes": {
+                    "start": {
+                        "name": "Startet um"
+                    },
+                    "end": {
+                        "name": "Endet um"
+                    },
+                    "duration": {
+                        "name": "Dauer"
+                    },
+                    "title": {
+                        "name": "Titel"
+                    },
+                    "description": {
+                        "name": "Beschreibung"
+                    },
+                    "episode": {
+                        "name": "Episode"
+                    },
+                    "subtitle": {
+                        "name": "Untertitel"
+                    },
+                    "channel_program_known_until": {
+                        "name": "EPG verfügbar bis"
+                    }
+                }
+            },
             "last_update": {
                 "name": "Letzte Aktualisierung von {generator_name}",
                 "state_attributes": {
