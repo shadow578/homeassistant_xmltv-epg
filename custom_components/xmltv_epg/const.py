@@ -1,5 +1,6 @@
 """Constants for xmltv_epg."""
 
+from enum import StrEnum
 from logging import Logger, getLogger
 
 LOGGER: Logger = getLogger(__package__)
@@ -25,3 +26,12 @@ DEFAULT_ENABLE_PROGRAM_IMAGES = False
 # Interval that sensors are updated.
 # This is only updating sensors from cached data, fetching new data interval is defined by OPT_UPDATE_INTERVAL.
 SENSOR_REFRESH_INTERVAL = 60  # seconds
+
+
+class ChannelSensorMode(StrEnum):
+    """Modes for XMLTV Channel Program Sensor to operate in."""
+
+    CURRENT = "current"
+    NEXT = "upcoming"
+
+    NONE = "none"  # fallback if no mode is applicable

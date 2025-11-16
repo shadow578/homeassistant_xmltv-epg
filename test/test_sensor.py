@@ -12,6 +12,7 @@ from custom_components.xmltv_epg.const import (
     DOMAIN,
     OPT_ENABLE_UPCOMING_SENSOR,
     OPT_PROGRAM_LOOKAHEAD,
+    ChannelSensorMode,
 )
 from custom_components.xmltv_epg.helper import program_get_normalized_identification
 from custom_components.xmltv_epg.model import TVChannel, TVGuide
@@ -221,7 +222,9 @@ def test_sensor_entity_ids():
 
     # program sensor, current
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel(id="CH 1", name="Channel 1"), False, "program_sensor"
+        TVChannel(id="CH 1", name="Channel 1"),
+        ChannelSensorMode.CURRENT,
+        "program_sensor",
     )
 
     assert translation_key == "program_current"
@@ -229,7 +232,7 @@ def test_sensor_entity_ids():
 
     # program sensor, upcoming
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel(id="CH 1", name="Channel 1"), True, "program_sensor"
+        TVChannel(id="CH 1", name="Channel 1"), ChannelSensorMode.NEXT, "program_sensor"
     )
 
     assert translation_key == "program_upcoming"
@@ -237,7 +240,9 @@ def test_sensor_entity_ids():
 
     # program sensor, with special characters and umlauts
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel(id="DE: WDR (Münster)", name="WDR (Münster)"), False, "program_sensor"
+        TVChannel(id="DE: WDR (Münster)", name="WDR (Münster)"),
+        ChannelSensorMode.CURRENT,
+        "program_sensor",
     )
 
     assert translation_key == "program_current"

@@ -15,6 +15,7 @@ from custom_components.xmltv_epg.const import (
     OPT_ENABLE_PROGRAM_IMAGES,
     OPT_ENABLE_UPCOMING_SENSOR,
     OPT_PROGRAM_LOOKAHEAD,
+    ChannelSensorMode,
 )
 from custom_components.xmltv_epg.helper import program_get_normalized_identification
 from custom_components.xmltv_epg.model import TVChannel
@@ -210,7 +211,9 @@ def test_sensor_entity_ids():
 
     # program image, current
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel(id="CH 1", name="Channel 1"), False, "program_image"
+        TVChannel(id="CH 1", name="Channel 1"),
+        ChannelSensorMode.CURRENT,
+        "program_image",
     )
 
     assert translation_key == "program_image_current"
@@ -218,7 +221,7 @@ def test_sensor_entity_ids():
 
     # program image, upcoming
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel(id="CH 1", name="Channel 1"), True, "program_image"
+        TVChannel(id="CH 1", name="Channel 1"), ChannelSensorMode.NEXT, "program_image"
     )
 
     assert translation_key == "program_image_upcoming"
@@ -226,7 +229,7 @@ def test_sensor_entity_ids():
 
     # channel icon
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel(id="CH 1", name="Channel 1"), False, "channel_icon"
+        TVChannel(id="CH 1", name="Channel 1"), ChannelSensorMode.NONE, "channel_icon"
     )
 
     assert translation_key == "channel_icon"

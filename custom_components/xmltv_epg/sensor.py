@@ -14,7 +14,7 @@ from homeassistant.core import callback
 
 from custom_components.xmltv_epg.model.program import TVProgram
 
-from .const import DOMAIN, LOGGER
+from .const import DOMAIN, LOGGER, ChannelSensorMode
 from .coordinator import XMLTVDataUpdateCoordinator
 from .entity import XMLTVEntity
 from .helper import normalize_for_entity_id, program_get_normalized_identification
@@ -35,9 +35,13 @@ async def async_setup_entry(hass, entry, async_add_devices):
 
     for channel in guide.channels:
         # current / upcoming program sensors
-        sensors.append(XMLTVChannelSensor(coordinator, channel, False))
+        sensors.append(
+            XMLTVChannelSensor(coordinator, channel, ChannelSensorMode.CURRENT)
+        )
         if coordinator.enable_upcoming_sensor:
-            sensors.append(XMLTVChannelSensor(coordinator, channel, True))
+            sensors.append(
+                XMLTVChannelSensor(coordinator, channel, ChannelSensorMode.NEXT)
+            )
 
     async_add_devices(sensors)
 
@@ -49,19 +53,19 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
 
     __channel: TVChannel
     __program: TVProgram | None
-    __is_next: bool
+    __mode: ChannelSensorMode
 
     def __init__(
         self,
         coordinator: XMLTVDataUpdateCoordinator,
         channel: TVChannel,
-        is_next: bool,
+        mode: ChannelSensorMode,
     ) -> None:
         """Initialize the sensor class."""
         super().__init__(coordinator, channel)
 
         translation_key, entity_id = program_get_normalized_identification(
-            channel, is_next, "program_sensor"
+            channel, mode, "program_sensor"
         )
 
         self.entity_id = entity_id
@@ -76,7 +80,7 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
 
         self.__channel = channel
         self.__program = None
-        self.__is_next = is_next
+        self.__mode = mode
 
         LOGGER.debug(f"Setup sensor '{self.entity_id}' for channel '{channel.id}'.")
 
@@ -108,7 +112,7 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         # get current or next program
         self.__program = (
             self.__channel.get_next_program(now)
-            if self.__is_next
+            if self.__mode == ChannelSensorMode.NEXT
             else channel.get_current_program(now)
         )
         if self.__program is None:
