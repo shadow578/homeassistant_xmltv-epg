@@ -2,7 +2,13 @@
 
 from datetime import datetime, timedelta
 
-from custom_components.xmltv_epg.model import TVChannel, TVGuide, TVProgram
+from custom_components.xmltv_epg.model import (
+    TVChannel,
+    TVGuide,
+    TVImage,
+    TVProgram,
+    TVProgramEpisodeNumber,
+)
 
 MOCK_NOW = datetime(2024, 5, 17, 12, 45, 0)
 
@@ -32,23 +38,21 @@ def get_mock_tv_guide() -> TVGuide:
     CH 3 Current has episode="S1E1" and subtitle="Subtitle" set.
     CH 3 Upcoming has episode="S1E2" and subtitle="Subtitle" set.
     """
-    guide = TVGuide(generator_name=MOCK_TV_GUIDE_NAME, generator_url=MOCK_TV_GUIDE_URL)
-
     channels = [
         TVChannel(
             id="mock 1",
             name="Mock Channel 1",
-            icon_url="http://example.com/ch/mock1.jpg",
+            icon=TVImage(url="http://example.com/ch/mock1.jpg"),
         ),
         TVChannel(
             id="mock 2",
             name="Mock Channel 2",
-            icon_url="http://example.com/ch/mock2.jpg",
+            icon=TVImage(url="http://example.com/ch/mock2.jpg"),
         ),
         TVChannel(
             id="mock 3",
             name="Mock Channel 3",
-            icon_url="http://example.com/ch/mock3.jpg",
+            icon=TVImage(url="http://example.com/ch/mock3.jpg"),
         ),
     ]
 
@@ -65,7 +69,7 @@ def get_mock_tv_guide() -> TVGuide:
             end=current_end,
             title="CH 1 Current",
             description="Description",
-            image_url="http://example.com/pr/ch1_cur.jpg",
+            image=TVImage(url="http://example.com/pr/ch1_cur.jpg"),
         ),
         TVProgram(
             channel_id="mock 2",
@@ -73,7 +77,7 @@ def get_mock_tv_guide() -> TVGuide:
             end=current_end,
             title="CH 2 Current",
             description="Description",
-            image_url="http://example.com/pr/ch2_cur.jpg",
+            image=TVImage(url="http://example.com/pr/ch2_cur.jpg"),
         ),
         TVProgram(
             channel_id="mock 3",
@@ -81,9 +85,11 @@ def get_mock_tv_guide() -> TVGuide:
             end=current_end,
             title="CH 3 Current",
             description="Description",
-            episode="S1E1",
+            episode_raw=[
+                TVProgramEpisodeNumber(system="onscreen", raw_value="S1E1"),
+            ],
             subtitle="Subtitle",
-            image_url="http://example.com/pr/ch3_cur.jpg",
+            image=TVImage(url="http://example.com/pr/ch3_cur.jpg"),
         ),
         TVProgram(
             channel_id="mock 1",
@@ -91,7 +97,7 @@ def get_mock_tv_guide() -> TVGuide:
             end=upcoming_end,
             title="CH 1 Upcoming",
             description="Description",
-            image_url="http://example.com/pr/ch1_upc.jpg",
+            image=TVImage(url="http://example.com/pr/ch1_upc.jpg"),
         ),
         TVProgram(
             channel_id="mock 2",
@@ -99,7 +105,7 @@ def get_mock_tv_guide() -> TVGuide:
             end=upcoming_end,
             title="CH 2 Upcoming",
             description="Description",
-            image_url="http://example.com/pr/ch2_upc.jpg",
+            image=TVImage(url="http://example.com/pr/ch2_upc.jpg"),
         ),
         TVProgram(
             channel_id="mock 3",
@@ -107,19 +113,20 @@ def get_mock_tv_guide() -> TVGuide:
             end=upcoming_end,
             title="CH 3 Upcoming",
             description="Description",
-            episode="S1E2",
+            episode_raw=[
+                TVProgramEpisodeNumber(system="onscreen", raw_value="S1E2"),
+            ],
             subtitle="Subtitle",
-            image_url="http://example.com/pr/ch3_upc.jpg",
+            image=TVImage(url="http://example.com/pr/ch3_upc.jpg"),
         ),
     ]
 
-    # cross-link programs with channels
-    for program in programs:
-        program.cross_link_channel(channels)
-
-    guide.channels = channels
-    guide.programs = programs
-    return guide
+    return TVGuide(
+        generator_name=MOCK_TV_GUIDE_NAME,
+        generator_url=MOCK_TV_GUIDE_URL,
+        channels=channels,
+        programs=programs,
+    )
 
 
 MOCK_TV_GUIDE = get_mock_tv_guide()

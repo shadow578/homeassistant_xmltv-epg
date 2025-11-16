@@ -1,80 +1,62 @@
-"""TV Guide Model."""
+"""Module defining the TVGuide model for XMLTV EPG data."""
 
-import xml.etree.ElementTree as ET
+from typing import Any
+
+from pydantic_xml import BaseXmlModel, attr, element
 
 from .channel import TVChannel
 from .program import TVProgram
 
 
-class TVGuide:
-    """TV Guide Class."""
+class TVGuide(BaseXmlModel, tag="tv", search_mode="ordered"):
+    """Represents a TV Guide containing channels and their programs."""
 
-    TAG = "tv"
+    source_name: str | None = attr(name="source-info-name", default=None)
+    """Name of the source that provided the epg data, if available."""
 
-    def __init__(
-        self, generator_name: str | None = None, generator_url: str | None = None
-    ):
-        """Initialize TV Guide."""
-        self.generator_name = generator_name
-        self.generator_url = generator_url
+    source_url: str | None = attr(name="source-info-url", default=None)
+    """URL of the source that provided the epg data, if available."""
 
-        self.channels: list[TVChannel] = []
-        self.programs: list[TVProgram] = []
+    generator_name: str | None = attr(name="generator-info-name", default=None)
+    """Name of the program that generated the xmltv data, if available."""
+
+    generator_url: str | None = attr(name="generator-info-url", default=None)
+    """URL of the program that generated the xmltv data, if available."""
+
+    channels: list[TVChannel] = element(tag="channel", default_factory=list)
+    """List of all TV channels defined in this guide."""
+
+    programs: list[TVProgram] = element(tag="programme", default_factory=list)
+    """List of all TV programs defined in this guide."""
+
+    @property
+    def name(self) -> str | None:
+        """Get the name of the guide.
+
+        :return: generator_name, source_name, or None, depending on availability
+
+        :note fallback required, as seen in https://github.com/shadow578/homeassistant_xmltv-epg/issues/32
+        """
+        return self.generator_name or self.source_name
+
+    @property
+    def url(self) -> str | None:
+        """Get the info URL for the guide.
+
+        :return: generator_url, source_url, or None, depending on availability
+
+        :note fallback required, as seen in https://github.com/shadow578/homeassistant_xmltv-epg/issues/32
+        """
+        return self.generator_url or self.source_url
+
+    def model_post_init(self, __context: Any) -> None:
+        """Hooks post-initialization to cross-link channels and programs."""
+        for program in self.programs:
+            channel = self.get_channel(program.channel_id)
+            if channel is not None:
+                channel._link_program(program)
+                program._link_channel(channel)
 
     def get_channel(self, channel_id: str) -> TVChannel | None:
         """Get channel by ID."""
         return next((c for c in self.channels if c.id == channel_id), None)
-
-    @classmethod
-    def from_xml(cls, xml: ET.Element) -> "TVGuide | None":
-        """Initialize TV Guide from XML Node, if possible.
-
-        :param xml: XML Node
-        :return: TV Guide object, or None
-
-        XML node format is:
-        <tv generator-info-name="Example" generator-info-url="https://example.com">
-          <channel ... />
-          <programme ... />
-        </tv>
-        """
-
-        # node must be a TV guide
-        if xml.tag != cls.TAG:
-            return None
-
-        # parse generator info
-        generator_name = xml.attrib.get("generator-info-name")
-        generator_url = xml.attrib.get("generator-info-url")
-
-        # seen in https://github.com/shadow578/homeassistant_xmltv-epg/issues/32
-        if generator_name is None:
-            generator_name = xml.attrib.get("source-info-name")
-
-        # create guide instance
-        guide = cls(generator_name, generator_url)
-
-        # parse channels and programs
-        for child in xml:
-            if child.tag == TVChannel.TAG:
-                channel = TVChannel.from_xml(child)
-                if channel is not None:
-                    # ensure no duplicate channel ids
-                    if guide.get_channel(channel.id) is None:
-                        guide.channels.append(channel)
-                    else:
-                        # ?!
-                        continue
-            elif child.tag == TVProgram.TAG:
-                program = TVProgram.from_xml(child)
-                if program is not None:
-                    guide.programs.append(program)
-            else:
-                # ?!
-                continue
-
-        # cross-link programs with channels
-        for program in guide.programs:
-            program.cross_link_channel(guide.channels)
-
-        return guide

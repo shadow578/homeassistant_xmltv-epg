@@ -30,11 +30,11 @@ async def async_setup_entry(hass, entry, async_add_devices):
         f"Setting up Channel Sensors for {len(guide.channels)} channels (enable_upcoming: {coordinator.enable_upcoming_sensor})."
     )
 
-    # setup sensor for coordinator status
+    # sensor for coordinator status
     sensors: list[SensorEntity] = [XMLTVStatusSensor(coordinator, guide)]
 
-    # add current / upcoming program sensors for each channel
     for channel in guide.channels:
+        # current / upcoming program sensors
         sensors.append(XMLTVChannelSensor(coordinator, channel, False))
         if coordinator.enable_upcoming_sensor:
             sensors.append(XMLTVChannelSensor(coordinator, channel, True))
@@ -83,15 +83,17 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
     @property
     def available(self) -> bool:  # pyright: ignore[reportIncompatibleVariableOverride] -- Entity.available and CoordinatorEntity.available are defined incompatible
         """Return if entity is available."""
-        return XMLTVEntity.available.__get__(self)
+        return (
+            self.__channel is not None
+            and self.__program is not None
+            and XMLTVEntity.available.__get__(self)
+        )
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        guide: TVGuide = self.coordinator.data
-
         # refresh channel from guide
-        channel = guide.get_channel(self.__channel.id)
+        channel = self.coordinator.data.get_channel(self.__channel.id)
         if channel is None:
             self._attr_native_value = None
             self._attr_extra_state_attributes = {}
@@ -126,7 +128,7 @@ class XMLTVChannelSensor(XMLTVEntity, SensorEntity):
         duration_minutes = int((duration_seconds % 3600) // 60)
 
         # get last program end time
-        last_program = self.__channel.get_last_program()
+        last_program = self.__channel.last_program
         if last_program is not None:
             channel_program_known_until = last_program.end
         else:
@@ -164,14 +166,12 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
         :return: (translation_key, entity_id) tuple.
 
         """
-        assert guide.generator_name is not None, (
-            "XMLTVStatusSensor failed to create id, generator_name was None!"
+        assert guide.name is not None, (
+            "XMLTVStatusSensor failed to create id, .name was None!"
         )
 
         translation_key = "last_update"
-        entity_id = (
-            f"sensor.{normalize_for_entity_id(guide.generator_name)}_{translation_key}"
-        )
+        entity_id = f"sensor.{normalize_for_entity_id(guide.name)}_{translation_key}"
 
         return translation_key, entity_id
 
@@ -195,49 +195,43 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
             entity_category=EntityCategory.DIAGNOSTIC,
         )
 
+        self._attr_translation_placeholders = (
+            {"generator_name": guide.name} if guide.name is not None else {}
+        )
+
         self.__guide = guide
 
         LOGGER.debug(
-            f"Setup sensor '{self.entity_id}' for coordinator '{guide.generator_name}' status."
+            f"Setup sensor '{self.entity_id}' for coordinator '{guide.name}' status."
         )
 
     @property
     def available(self) -> bool:  # pyright: ignore[reportIncompatibleVariableOverride] -- Entity.available and CoordinatorEntity.available are defined incompatible
         """Return if entity is available."""
-        return XMLTVEntity.available.__get__(self)
+        return self.__guide is not None and XMLTVEntity.available.__get__(self)
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        coordinator: XMLTVDataUpdateCoordinator = self.coordinator
-
         # refresh guide from coordinator
-        guide: TVGuide = coordinator.data
+        guide = self.coordinator.data
         if guide is None:
             self._attr_native_value = None
             self._attr_extra_state_attributes = {}
-            self._attr_translation_placeholders = {}
             super()._handle_coordinator_update()
             return
 
         self.__guide = guide
 
         # native value is last update time
-        value = coordinator.last_update_time
+        value = self.coordinator.last_update_time
         self._attr_native_value = value.astimezone() if value is not None else None
 
         # set extra state attributes
         self._attr_extra_state_attributes = {
             "last_update": value,
-            "generator_name": self.__guide.generator_name,
-            "generator_url": self.__guide.generator_url,
+            "generator_name": self.__guide.name,
+            "generator_url": self.__guide.url,
         }
-
-        # set translation placeholders
-        self._attr_translation_placeholders = (
-            {"generator_name": self.__guide.generator_name}
-            if self.__guide.generator_name is not None
-            else {}
-        )
 
         super()._handle_coordinator_update()
