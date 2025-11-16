@@ -49,7 +49,10 @@ class TVProgramEpisodeNumber(BaseXmlModel, tag="episode-num", search_mode="order
                 return (None, episode)
 
             # season+episode format S##E## or season only format S##
-            (season, episode) = val.split("E")
+            parts = val.split("E")
+            season = parts[0]
+            episode = parts[1] if len(parts) > 1 else None
+
             season = int(season[1:])
             episode = int(episode) if episode else None
             return (season, episode)
@@ -57,10 +60,10 @@ class TVProgramEpisodeNumber(BaseXmlModel, tag="episode-num", search_mode="order
         if self.system == "xmltv_ns":
             # xmltv_ns format is '0.0.' for 'S1E1'
             # alternative format is '.0.' for episode only
-            s, e, _ = self.raw_value.split(".")
+            season, episode, _ = self.raw_value.split(".")
 
-            season = int(s) + 1 if s else None
-            episode = int(e) + 1 if e else None
+            season = int(season) + 1 if season else None
+            episode = int(episode) + 1 if episode else None
             return (season, episode)
 
         # cannot parse
