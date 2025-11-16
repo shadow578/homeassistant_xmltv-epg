@@ -171,9 +171,7 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
         )
 
         translation_key = "last_update"
-        entity_id = (
-            f"sensor.{normalize_for_entity_id(guide.name)}_{translation_key}"
-        )
+        entity_id = f"sensor.{normalize_for_entity_id(guide.name)}_{translation_key}"
 
         return translation_key, entity_id
 

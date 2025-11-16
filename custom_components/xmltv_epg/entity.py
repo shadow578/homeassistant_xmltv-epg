@@ -21,9 +21,7 @@ class XMLTVEntity(CoordinatorEntity[XMLTVDataUpdateCoordinator]):
 
         guide: TVGuide = coordinator.data
 
-        self._attr_attribution = (
-            f"Data provided by {guide.name}"  # TODO localize
-        )
+        self._attr_attribution = f"Data provided by {guide.name}"  # TODO localize
 
         if channel is not None:
             self._attr_device_info = DeviceInfo(
