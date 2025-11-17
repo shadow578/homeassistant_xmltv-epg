@@ -116,8 +116,6 @@ class XMLTVOptionsFlowHandler(config_entries.OptionsFlow):
     ) -> config_entries.ConfigFlowResult:
         """XMLTV Options Flow."""
         if user_input is not None:
-            LOGGER.debug("Options user input: %s", user_input)
-            LOGGER.debug("date input: %s", user_input.get("aaaaaa"))
             return self.async_create_entry(
                 data=user_input,
             )
