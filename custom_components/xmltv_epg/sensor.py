@@ -93,9 +93,7 @@ class XMLTVChannelSensor(XMLTVProgramEntity, SensorEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._update_from_coordinator()
-
-        if self._program is None:
+        if not self._update_from_coordinator() or self._program is None:
             self._attr_native_value = None
             self._attr_extra_state_attributes = {}
 

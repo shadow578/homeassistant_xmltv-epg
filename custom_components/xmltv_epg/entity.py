@@ -53,18 +53,17 @@ class XMLTVProgramEntity(XMLTVEntity):
         self._program = None
         self._mode = mode
 
-    def _update_from_coordinator(self) -> None:
+    def _update_from_coordinator(self) -> bool:
         """Update channel and program data from the coordinator.
 
         Note: To be called from _handle_coordinator_update.
+
+        :return: True if program data was updated, False if channel could not be found.
         """
         channel = self.coordinator.data.get_channel(self._channel.id)
         if channel is None:
             self._program = None
-            self._attr_state = None
-            self._attr_image_url = None
-            self._attr_image_last_updated = self.coordinator.current_time
-            return
+            return False
 
         self._channel = channel
 
@@ -79,3 +78,5 @@ class XMLTVProgramEntity(XMLTVEntity):
             raise ValueError(
                 f"Unsupported mode: {self._mode}. Please report this issue."
             )
+
+        return True

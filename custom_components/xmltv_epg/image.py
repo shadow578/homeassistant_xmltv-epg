@@ -96,9 +96,7 @@ class XMLTVChannelProgramImage(XMLTVProgramEntity, ImageEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._update_from_coordinator()
-
-        if self._program is None:
+        if not self._update_from_coordinator() or self._program is None:
             self._attr_state = None
             self._attr_image_url = None
             self._attr_image_last_updated = self.coordinator.current_time
