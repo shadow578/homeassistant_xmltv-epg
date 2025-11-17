@@ -56,7 +56,7 @@ class XMLTVProgramEntity(XMLTVEntity):
     def _update_from_coordinator(self) -> None:
         """Update channel and program data from the coordinator.
 
-        :note To be called from _handle_coordinator_update.
+        Note: To be called from _handle_coordinator_update.
         """
         channel = self.coordinator.data.get_channel(self._channel.id)
         if channel is None:

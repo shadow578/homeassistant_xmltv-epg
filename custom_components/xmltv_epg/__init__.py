@@ -15,6 +15,7 @@ from .api import XMLTVClient
 from .const import (
     DEFAULT_ENABLE_CHANNEL_ICONS,
     DEFAULT_ENABLE_CURRENT_SENSOR,
+    DEFAULT_ENABLE_PRIMETIME_SENSOR,
     DEFAULT_ENABLE_PROGRAM_IMAGES,
     DEFAULT_ENABLE_UPCOMING_SENSOR,
     DEFAULT_PRIMETIME_TIME,
@@ -24,6 +25,7 @@ from .const import (
     LOGGER,
     OPT_ENABLE_CHANNEL_ICONS,
     OPT_ENABLE_CURRENT_SENSOR,
+    OPT_ENABLE_PRIMETIME_SENSOR,
     OPT_ENABLE_PROGRAM_IMAGES,
     OPT_ENABLE_UPCOMING_SENSOR,
     OPT_PRIMETIME_TIME,
@@ -59,7 +61,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             OPT_ENABLE_UPCOMING_SENSOR, DEFAULT_ENABLE_UPCOMING_SENSOR
         ),
         enable_primetime_sensor=entry.options.get(
-            OPT_ENABLE_UPCOMING_SENSOR, DEFAULT_ENABLE_UPCOMING_SENSOR
+            OPT_ENABLE_PRIMETIME_SENSOR, DEFAULT_ENABLE_PRIMETIME_SENSOR
         ),
         enable_channel_icon=entry.options.get(
             OPT_ENABLE_CHANNEL_ICONS, DEFAULT_ENABLE_CHANNEL_ICONS
