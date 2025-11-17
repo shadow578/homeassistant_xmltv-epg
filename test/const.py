@@ -11,6 +11,7 @@ from custom_components.xmltv_epg.model import (
 )
 
 MOCK_NOW = datetime(2024, 5, 17, 12, 45, 0)
+MOCK_PRIMETIME = MOCK_NOW.replace(hour=20, minute=15, second=0)
 
 
 MOCK_TV_GUIDE_NAME = "MOCK XMLTV"
@@ -22,21 +23,25 @@ def get_mock_tv_guide() -> TVGuide:
 
     :return: TV Guide object with the following data:
 
-    The TV Guide contains 3 channels with 2 programs each:
+    The TV Guide contains 3 channels with 3 programs each:
     - 'mock 1' (name='Mock Channel 1'):
       * 'CH 1 Current' from (MOCK_NOW - 15 minutes) to (MOCK_NOW + 15 minutes)
       * 'CH 1 Upcoming' from (MOCK_NOW + 15 minutes) to (MOCK_NOW + 45 minutes)
+      * 'CH 1 Primetime' from (MOCK_PRIMETIME - 15 minutes) to (MOCK_PRIMETIME + 45 minutes)
     - 'mock 2' (name='Mock Channel 2'):
       * 'CH 2 Current' from (MOCK_NOW - 15 minutes) to (MOCK_NOW + 15 minutes)
       * 'CH 2 Upcoming' from (MOCK_NOW + 15 minutes) to (MOCK_NOW + 45 minutes)
+      * 'CH 2 Primetime' from (MOCK_PRIMETIME - 15 minutes) to (MOCK_PRIMETIME + 45 minutes)
     - 'mock 3' (name='Mock Channel 3'):
       * 'CH 3 Current' from (MOCK_NOW - 15 minutes) to (MOCK_NOW + 15 minutes)
       * 'CH 3 Upcoming' from (MOCK_NOW + 15 minutes) to (MOCK_NOW + 45 minutes)
+      * 'CH 3 Primetime' from (MOCK_PRIMETIME - 15 minutes) to (MOCK_PRIMETIME + 45 minutes)
 
     All Programs have description="Description" set.
 
     CH 3 Current has episode="S1E1" and subtitle="Subtitle" set.
     CH 3 Upcoming has episode="S1E2" and subtitle="Subtitle" set.
+    CH 3 Primetime has episode="S1E3" and subtitle="Subtitle" set.
     """
     channels = [
         TVChannel(
@@ -61,6 +66,9 @@ def get_mock_tv_guide() -> TVGuide:
 
     upcoming_start = MOCK_NOW + timedelta(minutes=15)
     upcoming_end = MOCK_NOW + timedelta(minutes=45)
+
+    primetime_start = MOCK_PRIMETIME - timedelta(minutes=15)
+    primetime_end = MOCK_PRIMETIME + timedelta(minutes=45)
 
     programs = [
         TVProgram(
@@ -118,6 +126,34 @@ def get_mock_tv_guide() -> TVGuide:
             ],
             subtitle="Subtitle",
             image=TVImage(url="http://example.com/pr/ch3_upc.jpg"),
+        ),
+        TVProgram(
+            channel_id="mock 1",
+            start=primetime_start,
+            end=primetime_end,
+            title="CH 1 Primetime",
+            description="Description",
+            image=TVImage(url="http://example.com/pr/ch1_prime.jpg"),
+        ),
+        TVProgram(
+            channel_id="mock 2",
+            start=primetime_start,
+            end=primetime_end,
+            title="CH 2 Primetime",
+            description="Description",
+            image=TVImage(url="http://example.com/pr/ch2_prime.jpg"),
+        ),
+        TVProgram(
+            channel_id="mock 3",
+            start=primetime_start,
+            end=primetime_end,
+            title="CH 3 Primetime",
+            description="Description",
+            episode_raw=[
+                TVProgramEpisodeNumber(system="onscreen", raw_value="S1E3"),
+            ],
+            subtitle="Subtitle",
+            image=TVImage(url="http://example.com/pr/ch3_prime.jpg"),
         ),
     ]
 

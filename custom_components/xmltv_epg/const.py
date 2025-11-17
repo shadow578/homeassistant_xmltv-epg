@@ -1,5 +1,6 @@
 """Constants for xmltv_epg."""
 
+from enum import StrEnum
 from logging import Logger, getLogger
 
 LOGGER: Logger = getLogger(__package__)
@@ -13,8 +14,17 @@ DEFAULT_UPDATE_INTERVAL = 12  # hours
 OPT_PROGRAM_LOOKAHEAD = "program_lookahead_minutes"
 DEFAULT_PROGRAM_LOOKAHEAD = 15  # minutes
 
+OPT_ENABLE_CURRENT_SENSOR = "enable_current_sensor"
+DEFAULT_ENABLE_CURRENT_SENSOR = True
+
 OPT_ENABLE_UPCOMING_SENSOR = "enable_upcoming_sensor"
 DEFAULT_ENABLE_UPCOMING_SENSOR = False
+
+OPT_ENABLE_PRIMETIME_SENSOR = "enable_primetime_sensor"
+DEFAULT_ENABLE_PRIMETIME_SENSOR = False
+
+OPT_PRIMETIME_TIME = "primetime_time"
+DEFAULT_PRIMETIME_TIME = "20:00:00"
 
 OPT_ENABLE_CHANNEL_ICONS = "enable_channel_icons"
 DEFAULT_ENABLE_CHANNEL_ICONS = False
@@ -25,3 +35,13 @@ DEFAULT_ENABLE_PROGRAM_IMAGES = False
 # Interval that sensors are updated.
 # This is only updating sensors from cached data, fetching new data interval is defined by OPT_UPDATE_INTERVAL.
 SENSOR_REFRESH_INTERVAL = 60  # seconds
+
+
+class ChannelSensorMode(StrEnum):
+    """Modes for XMLTV Channel Program Sensor to operate in."""
+
+    CURRENT = "current"
+    NEXT = "upcoming"
+    PRIMETIME = "primetime"
+
+    NONE = "none"  # fallback if no mode is applicable

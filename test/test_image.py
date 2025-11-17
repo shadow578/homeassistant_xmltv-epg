@@ -12,9 +12,12 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.xmltv_epg.const import (
     DOMAIN,
     OPT_ENABLE_CHANNEL_ICONS,
+    OPT_ENABLE_CURRENT_SENSOR,
+    OPT_ENABLE_PRIMETIME_SENSOR,
     OPT_ENABLE_PROGRAM_IMAGES,
     OPT_ENABLE_UPCOMING_SENSOR,
     OPT_PROGRAM_LOOKAHEAD,
+    ChannelSensorMode,
 )
 from custom_components.xmltv_epg.helper import program_get_normalized_identification
 from custom_components.xmltv_epg.model import TVChannel
@@ -23,10 +26,10 @@ from .const import MOCK_NOW, MOCK_TV_GUIDE_URL
 
 
 @pytest.fixture()
-def mock_coordinator_current_time():
-    """Fixture to replace 'XMLTVDataUpdateCoordinator.current_time' method with a mock."""
+def mock_coordinator_actual_now():
+    """Fixture to replace 'XMLTVDataUpdateCoordinator.actual_now' method with a mock."""
     with patch(
-        "custom_components.xmltv_epg.coordinator.XMLTVDataUpdateCoordinator.current_time",
+        "custom_components.xmltv_epg.coordinator.XMLTVDataUpdateCoordinator.actual_now",
         new_callable=PropertyMock,
     ) as mock:
         mock.return_value = MOCK_NOW
@@ -70,7 +73,7 @@ async def test_images_basic(
     hass,
     hass_client,
     mock_xmltv_client_get_data,
-    mock_coordinator_current_time,
+    mock_coordinator_actual_now,
     mock_coordinator_last_update_time,
 ):
     """Test basic image entity setup and function."""
@@ -80,7 +83,9 @@ async def test_images_basic(
         data={CONF_HOST: MOCK_TV_GUIDE_URL},
         options={
             OPT_PROGRAM_LOOKAHEAD: 0,  # 0 Minutes lookahead
+            OPT_ENABLE_CURRENT_SENSOR: True,  # Enable current program sensor
             OPT_ENABLE_UPCOMING_SENSOR: True,  # Enable upcoming program sensor
+            OPT_ENABLE_PRIMETIME_SENSOR: True,  # Enable primetime program sensor
             OPT_ENABLE_CHANNEL_ICONS: True,  # Enable channel icon entities
             OPT_ENABLE_PROGRAM_IMAGES: True,  # Enable program image entities
         },
@@ -102,10 +107,13 @@ async def test_images_basic(
     # with according urls values should be created:
     # - image.mock_1_program_image_current   : "http://example.com/pr/ch1_cur.jpg"
     # - image.mock_1_program_image_upcoming  : "http://example.com/pr/ch1_upc.jpg"
+    # - image.mock_1_program_image_primetime : "http://example.com/pr/ch1_prime.jpg"
     # - image.mock_2_program_image_current   : "http://example.com/pr/ch2_cur.jpg"
     # - image.mock_2_program_image_upcoming  : "http://example.com/pr/ch2_upc.jpg"
+    # - image.mock_2_program_image_primetime : "http://example.com/pr/ch2_prime.jpg"
     # - image.mock_3_program_image_current   : "http://example.com/pr/ch3_cur.jpg"
     # - image.mock_3_program_image_upcoming  : "http://example.com/pr/ch3_upc.jpg"
+    # - image.mock_3_program_image_primetime : "http://example.com/pr/ch3_prime.jpg"
     await assert_has_image_entity_with_url(
         hass,
         client,
@@ -117,6 +125,12 @@ async def test_images_basic(
         client,
         "image.mock_1_program_image_upcoming",
         "http://example.com/pr/ch1_upc.jpg",
+    )
+    await assert_has_image_entity_with_url(
+        hass,
+        client,
+        "image.mock_1_program_image_primetime",
+        "http://example.com/pr/ch1_prime.jpg",
     )
     await assert_has_image_entity_with_url(
         hass,
@@ -133,6 +147,12 @@ async def test_images_basic(
     await assert_has_image_entity_with_url(
         hass,
         client,
+        "image.mock_2_program_image_primetime",
+        "http://example.com/pr/ch2_prime.jpg",
+    )
+    await assert_has_image_entity_with_url(
+        hass,
+        client,
         "image.mock_3_program_image_current",
         "http://example.com/pr/ch3_cur.jpg",
     )
@@ -141,6 +161,12 @@ async def test_images_basic(
         client,
         "image.mock_3_program_image_upcoming",
         "http://example.com/pr/ch3_upc.jpg",
+    )
+    await assert_has_image_entity_with_url(
+        hass,
+        client,
+        "image.mock_3_program_image_primetime",
+        "http://example.com/pr/ch3_prime.jpg",
     )
 
     # additionally, the following channel icon image entities are created
@@ -163,7 +189,7 @@ async def test_program_sensor_device(
     anyio_backend,
     hass,
     mock_xmltv_client_get_data,
-    mock_coordinator_current_time,
+    mock_coordinator_actual_now,
     mock_coordinator_last_update_time,
 ):
     """Test program sensor state and attributes."""
@@ -173,6 +199,7 @@ async def test_program_sensor_device(
         data={CONF_HOST: MOCK_TV_GUIDE_URL},
         options={
             OPT_PROGRAM_LOOKAHEAD: 0,  # 0 Minutes lookahead
+            OPT_ENABLE_CURRENT_SENSOR: True,  # Enable current program sensor
             OPT_ENABLE_UPCOMING_SENSOR: True,  # Enable upcoming program sensor
             OPT_ENABLE_CHANNEL_ICONS: True,  # Enable channel icon entities
             OPT_ENABLE_PROGRAM_IMAGES: True,  # Enable program image entities
@@ -210,7 +237,9 @@ def test_sensor_entity_ids():
 
     # program image, current
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel(id="CH 1", name="Channel 1"), False, "program_image"
+        TVChannel(id="CH 1", name="Channel 1"),
+        ChannelSensorMode.CURRENT,
+        "program_image",
     )
 
     assert translation_key == "program_image_current"
@@ -218,15 +247,25 @@ def test_sensor_entity_ids():
 
     # program image, upcoming
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel(id="CH 1", name="Channel 1"), True, "program_image"
+        TVChannel(id="CH 1", name="Channel 1"), ChannelSensorMode.NEXT, "program_image"
     )
 
     assert translation_key == "program_image_upcoming"
     assert entity_id == "image.ch_1_program_image_upcoming"
 
+    # program image, primetime
+    translation_key, entity_id = program_get_normalized_identification(
+        TVChannel(id="CH 1", name="Channel 1"),
+        ChannelSensorMode.PRIMETIME,
+        "program_image",
+    )
+
+    assert translation_key == "program_image_primetime"
+    assert entity_id == "image.ch_1_program_image_primetime"
+
     # channel icon
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel(id="CH 1", name="Channel 1"), False, "channel_icon"
+        TVChannel(id="CH 1", name="Channel 1"), ChannelSensorMode.NONE, "channel_icon"
     )
 
     assert translation_key == "channel_icon"

@@ -2,6 +2,8 @@
 
 from typing import Literal
 
+from custom_components.xmltv_epg.const import ChannelSensorMode
+
 from .model import TVChannel
 
 
@@ -52,7 +54,7 @@ def normalize_for_entity_id(s: str) -> str:
 
 def program_get_normalized_identification(
     channel: TVChannel,
-    is_next: bool,
+    mode: ChannelSensorMode,
     kind: Literal["program_sensor"]
     | Literal["program_image"]
     | Literal["channel_icon"],
@@ -64,32 +66,37 @@ def program_get_normalized_identification(
 
     Example:
     - channel_id = 'DE: My Channel 1'
-    - is_next = False
+    - mode = 'current'
     - kind = 'program_sensor'
     => ('program_current', 'sensor.de_my_channel_1_program_current')
 
     - channel_id = "DE: My Channel 1'
-    - is_next = True
+    - mode = 'upcoming'
     - kind = 'program_image'
     => ('program_image_upcoming', 'image.de_my_channel_1_program_image_upcoming')
 
     - channel_id = "DE: My Channel 1'
-    - is_next = (don't care)
+    - mode = 'primetime'
+    - kind = 'program_image'
+    => ('program_primetime', 'image.de_my_channel_1_program_primetime')
+
+    - channel_id = "DE: My Channel 1'
+    - mode = (don't care)
     - kind = 'channel_icon'
     => ('channel_icon', 'image.de_my_channel_1_icon')
 
     :param channel: The TV channel.
-    :param is_next: The upcoming status.
+    :param mode: The sensor operating mode.
     :param kind: entity type to create id for
     :return: (translation_key, entity_id) tuple.
 
     """
 
     if kind == "program_sensor":
-        translation_key = f"program_{'upcoming' if is_next else 'current'}"
+        translation_key = f"program_{mode}"
         entity_id = f"sensor.{normalize_for_entity_id(channel.id)}_{translation_key}"
     elif kind == "program_image":
-        translation_key = f"program_image_{'upcoming' if is_next else 'current'}"
+        translation_key = f"program_image_{mode}"
         entity_id = f"image.{normalize_for_entity_id(channel.id)}_{translation_key}"
     elif kind == "channel_icon":
         translation_key = "channel_icon"

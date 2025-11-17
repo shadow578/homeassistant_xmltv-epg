@@ -10,8 +10,11 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.xmltv_epg.const import (
     DOMAIN,
+    OPT_ENABLE_CURRENT_SENSOR,
+    OPT_ENABLE_PRIMETIME_SENSOR,
     OPT_ENABLE_UPCOMING_SENSOR,
     OPT_PROGRAM_LOOKAHEAD,
+    ChannelSensorMode,
 )
 from custom_components.xmltv_epg.helper import program_get_normalized_identification
 from custom_components.xmltv_epg.model import TVChannel, TVGuide
@@ -21,10 +24,10 @@ from .const import MOCK_NOW, MOCK_TV_GUIDE_NAME, MOCK_TV_GUIDE_URL
 
 
 @pytest.fixture()
-def mock_coordinator_current_time():
-    """Fixture to replace 'XMLTVDataUpdateCoordinator.current_time' method with a mock."""
+def mock_coordinator_actual_now():
+    """Fixture to replace 'XMLTVDataUpdateCoordinator.actual_now' method with a mock."""
     with patch(
-        "custom_components.xmltv_epg.coordinator.XMLTVDataUpdateCoordinator.current_time",
+        "custom_components.xmltv_epg.coordinator.XMLTVDataUpdateCoordinator.actual_now",
         new_callable=PropertyMock,
     ) as mock:
         mock.return_value = MOCK_NOW
@@ -46,7 +49,7 @@ async def test_sensors_basic(
     anyio_backend,
     hass,
     mock_xmltv_client_get_data,
-    mock_coordinator_current_time,
+    mock_coordinator_actual_now,
     mock_coordinator_last_update_time,
 ):
     """Test basic sensor setup and function."""
@@ -56,7 +59,9 @@ async def test_sensors_basic(
         data={CONF_HOST: MOCK_TV_GUIDE_URL},
         options={
             OPT_PROGRAM_LOOKAHEAD: 0,  # 0 Minutes lookahead
+            OPT_ENABLE_CURRENT_SENSOR: True,  # Enable current program sensor
             OPT_ENABLE_UPCOMING_SENSOR: True,  # Enable upcoming program sensor
+            OPT_ENABLE_PRIMETIME_SENSOR: True,  # Enable primetime program sensor
         },
         entry_id="MOCK",
     )
@@ -73,10 +78,13 @@ async def test_sensors_basic(
     # with according native values should be created:
     # - sensor.mock_1_program_current   : "CH 1 Current"
     # - sensor.mock_1_program_upcoming  : "CH 1 Upcoming"
+    # - sensor.mock_1_program_primetime : "CH 1 Primetime"
     # - sensor.mock_2_program_current   : "CH 2 Current"
     # - sensor.mock_2_program_upcoming  : "CH 2 Upcoming"
+    # - sensor.mock_2_program_primetime : "CH 2 Primetime"
     # - sensor.mock_3_program_current   : "CH 3 Current"
     # - sensor.mock_3_program_upcoming  : "CH 3 Upcoming"
+    # - sensor.mock_3_program_primetime : "CH 3 Primetime"
 
     state = hass.states.get("sensor.mock_1_program_current")
     assert state
@@ -86,6 +94,10 @@ async def test_sensors_basic(
     assert state
     assert state.state == "CH 1 Upcoming"
 
+    state = hass.states.get("sensor.mock_1_program_primetime")
+    assert state
+    assert state.state == "CH 1 Primetime"
+
     state = hass.states.get("sensor.mock_2_program_current")
     assert state
     assert state.state == "CH 2 Current"
@@ -93,6 +105,10 @@ async def test_sensors_basic(
     state = hass.states.get("sensor.mock_2_program_upcoming")
     assert state
     assert state.state == "CH 2 Upcoming"
+
+    state = hass.states.get("sensor.mock_2_program_primetime")
+    assert state
+    assert state.state == "CH 2 Primetime"
 
     state = hass.states.get("sensor.mock_3_program_current")
     assert state
@@ -102,12 +118,16 @@ async def test_sensors_basic(
     assert state
     assert state.state == "CH 3 Upcoming - Subtitle (S1E2)"
 
+    state = hass.states.get("sensor.mock_3_program_primetime")
+    assert state
+    assert state.state == "CH 3 Primetime - Subtitle (S1E3)"
+
 
 async def test_program_sensor_attributes(
     anyio_backend,
     hass,
     mock_xmltv_client_get_data,
-    mock_coordinator_current_time,
+    mock_coordinator_actual_now,
     mock_coordinator_last_update_time,
 ):
     """Test program sensor state and attributes."""
@@ -116,7 +136,8 @@ async def test_program_sensor_attributes(
         domain=DOMAIN,
         data={CONF_HOST: MOCK_TV_GUIDE_URL},
         options={
-            OPT_PROGRAM_LOOKAHEAD: 0  # 0 Minutes lookahead
+            OPT_PROGRAM_LOOKAHEAD: 0,  # 0 Minutes lookahead
+            OPT_ENABLE_CURRENT_SENSOR: True,  # Enable current program sensor
         },
         entry_id="MOCK",
     )
@@ -142,7 +163,7 @@ async def test_program_sensor_device(
     anyio_backend,
     hass,
     mock_xmltv_client_get_data,
-    mock_coordinator_current_time,
+    mock_coordinator_actual_now,
     mock_coordinator_last_update_time,
 ):
     """Test program sensor state and attributes."""
@@ -151,7 +172,8 @@ async def test_program_sensor_device(
         domain=DOMAIN,
         data={CONF_HOST: MOCK_TV_GUIDE_URL},
         options={
-            OPT_PROGRAM_LOOKAHEAD: 0  # 0 Minutes lookahead
+            OPT_PROGRAM_LOOKAHEAD: 0,  # 0 Minutes lookahead
+            OPT_ENABLE_CURRENT_SENSOR: True,  # Enable current program sensor
         },
         entry_id="MOCK",
     )
@@ -176,7 +198,7 @@ async def test_last_update_sensor_attributes(
     anyio_backend,
     hass,
     mock_xmltv_client_get_data,
-    mock_coordinator_current_time,
+    mock_coordinator_actual_now,
     mock_coordinator_last_update_time,
 ):
     """Test last_update sensor state and attributes."""
@@ -185,7 +207,8 @@ async def test_last_update_sensor_attributes(
         domain=DOMAIN,
         data={CONF_HOST: MOCK_TV_GUIDE_URL},
         options={
-            OPT_PROGRAM_LOOKAHEAD: 0  # 0 Minutes lookahead
+            OPT_PROGRAM_LOOKAHEAD: 0,  # 0 Minutes lookahead
+            OPT_ENABLE_CURRENT_SENSOR: True,  # Enable current program sensor
         },
         entry_id="MOCK",
     )
@@ -221,7 +244,9 @@ def test_sensor_entity_ids():
 
     # program sensor, current
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel(id="CH 1", name="Channel 1"), False, "program_sensor"
+        TVChannel(id="CH 1", name="Channel 1"),
+        ChannelSensorMode.CURRENT,
+        "program_sensor",
     )
 
     assert translation_key == "program_current"
@@ -229,15 +254,27 @@ def test_sensor_entity_ids():
 
     # program sensor, upcoming
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel(id="CH 1", name="Channel 1"), True, "program_sensor"
+        TVChannel(id="CH 1", name="Channel 1"), ChannelSensorMode.NEXT, "program_sensor"
     )
 
     assert translation_key == "program_upcoming"
     assert entity_id == "sensor.ch_1_program_upcoming"
 
+    # program sensor, primetime
+    translation_key, entity_id = program_get_normalized_identification(
+        TVChannel(id="CH 1", name="Channel 1"),
+        ChannelSensorMode.PRIMETIME,
+        "program_sensor",
+    )
+
+    assert translation_key == "program_primetime"
+    assert entity_id == "sensor.ch_1_program_primetime"
+
     # program sensor, with special characters and umlauts
     translation_key, entity_id = program_get_normalized_identification(
-        TVChannel(id="DE: WDR (Münster)", name="WDR (Münster)"), False, "program_sensor"
+        TVChannel(id="DE: WDR (Münster)", name="WDR (Münster)"),
+        ChannelSensorMode.CURRENT,
+        "program_sensor",
     )
 
     assert translation_key == "program_current"

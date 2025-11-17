@@ -20,9 +20,12 @@
                 "data": {
                     "update_interval_hours": "Aktualisierungsintervall (Stunden)",
                     "program_lookahead_minutes": "Vorrausschauzeit für aktuelles Programm (Minuten)",
+                    "enable_current_sensor": "Sensor für aktuelles Programm aktivieren",
                     "enable_upcoming_sensor": "Sensor für bevorstehendes Programm aktivieren",
+                    "enable_primetime_sensor": "Sensor für Prime-Time Programm aktivieren",
                     "enable_channel_icons": "Bildentitäten für Kanalbilder aktivieren",
-                    "enable_program_images": "Bildentitäten für aktuelles und bevorstehendes Program aktivieren"
+                    "enable_program_images": "Bildentitäten für aktuelles und bevorstehendes Program aktivieren",
+                    "primetime_time": "Prime-Time Programmzeit"
                 }
             }
         }
@@ -81,6 +84,35 @@
                     },
                     "subtitle": {
                         "name": "Untertitel"
+                    }
+                }
+            },
+            "program_primetime": {
+                "name": "Prime-Time Programm",
+                "state_attributes": {
+                    "start": {
+                        "name": "Startet um"
+                    },
+                    "end": {
+                        "name": "Endet um"
+                    },
+                    "duration": {
+                        "name": "Dauer"
+                    },
+                    "title": {
+                        "name": "Titel"
+                    },
+                    "description": {
+                        "name": "Beschreibung"
+                    },
+                    "episode": {
+                        "name": "Episode"
+                    },
+                    "subtitle": {
+                        "name": "Untertitel"
+                    },
+                    "channel_program_known_until": {
+                        "name": "EPG verfügbar bis"
                     }
                 }
             },

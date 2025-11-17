@@ -10,11 +10,11 @@ from homeassistant.components.image import (
 )
 from homeassistant.core import callback
 
-from .const import DOMAIN, LOGGER
+from .const import DOMAIN, LOGGER, ChannelSensorMode
 from .coordinator import XMLTVDataUpdateCoordinator
-from .entity import XMLTVEntity
+from .entity import XMLTVEntity, XMLTVProgramEntity
 from .helper import program_get_normalized_identification
-from .model import TVChannel, TVGuide, TVProgram
+from .model import TVChannel, TVGuide
 
 
 async def async_setup_entry(hass, entry, async_add_devices):
@@ -28,40 +28,53 @@ async def async_setup_entry(hass, entry, async_add_devices):
 
     images: list[ImageEntity] = []
     for channel in guide.channels:
-        # channel icon image
+        # channel icon
         if coordinator.enable_channel_icon:
             images.append(XMLTVChannelIconImage(coordinator, channel))
 
-        # current / upcoming program images
         if coordinator.enable_program_image:
-            images.append(XMLTVChannelProgramImage(coordinator, channel, False))
+            # current
+            if coordinator.enable_current_sensor:
+                images.append(
+                    XMLTVChannelProgramImage(
+                        coordinator, channel, ChannelSensorMode.CURRENT
+                    )
+                )
+
+            # upcoming
             if coordinator.enable_upcoming_sensor:
-                images.append(XMLTVChannelProgramImage(coordinator, channel, True))
+                images.append(
+                    XMLTVChannelProgramImage(
+                        coordinator, channel, ChannelSensorMode.NEXT
+                    )
+                )
+
+            # primetime
+            if coordinator.enable_primetime_sensor:
+                images.append(
+                    XMLTVChannelProgramImage(
+                        coordinator, channel, ChannelSensorMode.PRIMETIME
+                    )
+                )
 
     async_add_devices(images)
 
 
-class XMLTVChannelProgramImage(XMLTVEntity, ImageEntity):
+class XMLTVChannelProgramImage(XMLTVProgramEntity, ImageEntity):
     """XMLTV Channel Program Image class."""
-
-    coordinator: XMLTVDataUpdateCoordinator
-
-    __channel: TVChannel
-    __program: TVProgram | None
-    __is_next: bool
 
     def __init__(
         self,
         coordinator: XMLTVDataUpdateCoordinator,
         channel: TVChannel,
-        is_next: bool,
+        mode: ChannelSensorMode,
     ) -> None:
         """Initialize the image class."""
-        XMLTVEntity.__init__(self, coordinator, channel)
+        XMLTVProgramEntity.__init__(self, coordinator, channel, mode)
         ImageEntity.__init__(self, coordinator.hass)
 
         translation_key, entity_id = program_get_normalized_identification(
-            channel, is_next, "program_image"
+            channel, mode, "program_image"
         )
 
         self.entity_id = entity_id
@@ -73,10 +86,6 @@ class XMLTVChannelProgramImage(XMLTVEntity, ImageEntity):
             translation_key=translation_key,
         )
 
-        self.__channel = channel
-        self.__program = None
-        self.__is_next = is_next
-
         LOGGER.debug(f"Setup image '{self.entity_id}' for channel '{channel.id}'.")
 
     @property
@@ -87,33 +96,17 @@ class XMLTVChannelProgramImage(XMLTVEntity, ImageEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        guide: TVGuide = self.coordinator.data
-
-        channel = guide.get_channel(self.__channel.id)
-        if channel is None:
-            self.__program = None
+        if not self._update_from_coordinator() or self._program is None:
             self._attr_state = None
             self._attr_image_url = None
             self._attr_image_last_updated = self.coordinator.current_time
-        else:
-            self.__channel = channel
 
-            # get current or next program depending on flag
-            now = self.coordinator.current_time
-            self.__program = (
-                self.__channel.get_next_program(now)
-                if self.__is_next
-                else channel.get_current_program(now)
-            )
+            super()._handle_coordinator_update()
+            return
 
-            if self.__program is None:
-                self._attr_state = None
-                self._attr_image_url = None
-                self._attr_image_last_updated = self.coordinator.current_time
-            else:
-                image = self.__program.image
-                self._attr_image_url = image.url if image is not None else None
-                self._attr_image_last_updated = self.coordinator.current_time
+        image = self._program.image
+        self._attr_image_url = image.url if image is not None else None
+        self._attr_image_last_updated = self.coordinator.current_time
 
         super()._handle_coordinator_update()
 
@@ -133,7 +126,7 @@ class XMLTVChannelIconImage(XMLTVEntity, ImageEntity):
         ImageEntity.__init__(self, coordinator.hass)
 
         translation_key, entity_id = program_get_normalized_identification(
-            channel, False, "channel_icon"
+            channel, ChannelSensorMode.NONE, "channel_icon"
         )
 
         self.entity_id = entity_id
