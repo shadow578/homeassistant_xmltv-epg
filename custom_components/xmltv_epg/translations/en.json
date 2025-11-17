@@ -20,6 +20,7 @@
                 "data": {
                     "update_interval_hours": "Update Interval (hours)",
                     "program_lookahead_minutes": "Current Program Lookahead (minutes)",
+                    "enable_current_sensor": "Enable Current Program Sensor",
                     "enable_upcoming_sensor": "Enable Upcoming Program Sensor",
                     "enable_primetime_sensor": "Enable Prime-Time Program Sensor",
                     "enable_channel_icons": "Enable Image Entities for Channel Icons",

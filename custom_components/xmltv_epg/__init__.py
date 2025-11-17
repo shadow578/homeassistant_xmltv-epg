@@ -14,6 +14,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .api import XMLTVClient
 from .const import (
     DEFAULT_ENABLE_CHANNEL_ICONS,
+    DEFAULT_ENABLE_CURRENT_SENSOR,
     DEFAULT_ENABLE_PROGRAM_IMAGES,
     DEFAULT_ENABLE_UPCOMING_SENSOR,
     DEFAULT_PRIMETIME_TIME,
@@ -22,6 +23,7 @@ from .const import (
     DOMAIN,
     LOGGER,
     OPT_ENABLE_CHANNEL_ICONS,
+    OPT_ENABLE_CURRENT_SENSOR,
     OPT_ENABLE_PROGRAM_IMAGES,
     OPT_ENABLE_UPCOMING_SENSOR,
     OPT_PRIMETIME_TIME,
@@ -50,6 +52,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         ),
         update_interval=entry.options.get(OPT_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
         lookahead=entry.options.get(OPT_PROGRAM_LOOKAHEAD, DEFAULT_PROGRAM_LOOKAHEAD),
+        enable_current_sensor=entry.options.get(
+            OPT_ENABLE_CURRENT_SENSOR, DEFAULT_ENABLE_CURRENT_SENSOR
+        ),
         enable_upcoming_sensor=entry.options.get(
             OPT_ENABLE_UPCOMING_SENSOR, DEFAULT_ENABLE_UPCOMING_SENSOR
         ),

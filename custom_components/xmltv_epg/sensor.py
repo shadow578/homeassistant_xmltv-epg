@@ -33,9 +33,10 @@ async def async_setup_entry(hass, entry, async_add_devices):
 
     for channel in guide.channels:
         # current
-        sensors.append(
-            XMLTVChannelSensor(coordinator, channel, ChannelSensorMode.CURRENT)
-        )
+        if coordinator.enable_current_sensor:
+            sensors.append(
+                XMLTVChannelSensor(coordinator, channel, ChannelSensorMode.CURRENT)
+            )
 
         # upcoming
         if coordinator.enable_upcoming_sensor:

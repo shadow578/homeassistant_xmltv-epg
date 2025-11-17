@@ -20,6 +20,7 @@
                 "data": {
                     "update_interval_hours": "Aktualisierungsintervall (Stunden)",
                     "program_lookahead_minutes": "Vorrausschauzeit für aktuelles Programm (Minuten)",
+                    "enable_current_sensor": "Sensor für aktuelles Programm aktivieren",
                     "enable_upcoming_sensor": "Sensor für bevorstehendes Programm aktivieren",
                     "enable_primetime_sensor": "Sensor für Prime-Time Programm aktivieren",
                     "enable_channel_icons": "Bildentitäten für Kanalbilder aktivieren",

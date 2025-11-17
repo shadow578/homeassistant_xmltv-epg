@@ -28,6 +28,7 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator[TVGuide]):
 
     __client: XMLTVClient
     __lookahead: timedelta
+    __enable_current_sensor: bool
     __enable_upcoming_sensor: bool
     __enable_primetime_sensor: bool
     __enable_channel_icon: bool
@@ -45,6 +46,7 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator[TVGuide]):
         client: XMLTVClient,
         update_interval: int,
         lookahead: int,
+        enable_current_sensor: bool,
         enable_upcoming_sensor: bool,
         enable_primetime_sensor: bool,
         enable_channel_icon: bool,
@@ -54,6 +56,7 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator[TVGuide]):
         """Initialize."""
         self.__client = client
         self.__lookahead = timedelta(minutes=lookahead)
+        self.__enable_current_sensor = enable_current_sensor
         self.__enable_upcoming_sensor = enable_upcoming_sensor
         self.__enable_primetime_sensor = enable_primetime_sensor
         self.__enable_channel_icon = enable_channel_icon
@@ -144,6 +147,11 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator[TVGuide]):
     def last_update_time(self) -> datetime | None:
         """Get last update time."""
         return self.__last_refetch_time
+
+    @property
+    def enable_current_sensor(self) -> bool:
+        """Get enable current sensor."""
+        return self.__enable_current_sensor
 
     @property
     def enable_upcoming_sensor(self) -> bool:

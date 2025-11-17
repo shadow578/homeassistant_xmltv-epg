@@ -50,6 +50,7 @@ async def test_coordinator_basic(
         ),
         update_interval=1,  # every 1 hour
         lookahead=15,  # 15 minutes
+        enable_current_sensor=True,
         enable_upcoming_sensor=True,
         enable_primetime_sensor=True,
         enable_channel_icon=True,
@@ -125,6 +126,7 @@ async def test_coordinator_primetime_parsing(
         ),
         update_interval=1,
         lookahead=15,
+        enable_current_sensor=True,
         enable_upcoming_sensor=True,
         enable_primetime_sensor=True,
         enable_channel_icon=True,
@@ -146,6 +148,7 @@ async def test_coordinator_primetime_parsing(
         ),
         update_interval=1,
         lookahead=15,
+        enable_current_sensor=True,
         enable_upcoming_sensor=True,
         enable_primetime_sensor=True,
         enable_channel_icon=True,
@@ -167,6 +170,7 @@ async def test_coordinator_primetime_parsing(
         ),
         update_interval=1,
         lookahead=15,
+        enable_current_sensor=True,
         enable_upcoming_sensor=True,
         enable_primetime_sensor=True,
         enable_channel_icon=True,

@@ -34,11 +34,12 @@ async def async_setup_entry(hass, entry, async_add_devices):
 
         if coordinator.enable_program_image:
             # current
-            images.append(
-                XMLTVChannelProgramImage(
-                    coordinator, channel, ChannelSensorMode.CURRENT
+            if coordinator.enable_current_sensor:
+                images.append(
+                    XMLTVChannelProgramImage(
+                        coordinator, channel, ChannelSensorMode.CURRENT
+                    )
                 )
-            )
 
             # upcoming
             if coordinator.enable_upcoming_sensor:

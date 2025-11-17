@@ -12,6 +12,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.xmltv_epg.const import (
     DOMAIN,
     OPT_ENABLE_CHANNEL_ICONS,
+    OPT_ENABLE_CURRENT_SENSOR,
     OPT_ENABLE_PROGRAM_IMAGES,
     OPT_ENABLE_UPCOMING_SENSOR,
     OPT_PROGRAM_LOOKAHEAD,
@@ -81,6 +82,7 @@ async def test_images_basic(
         data={CONF_HOST: MOCK_TV_GUIDE_URL},
         options={
             OPT_PROGRAM_LOOKAHEAD: 0,  # 0 Minutes lookahead
+            OPT_ENABLE_CURRENT_SENSOR: True,  # Enable current program sensor
             OPT_ENABLE_UPCOMING_SENSOR: True,  # Enable upcoming program sensor
             OPT_ENABLE_CHANNEL_ICONS: True,  # Enable channel icon entities
             OPT_ENABLE_PROGRAM_IMAGES: True,  # Enable program image entities
@@ -195,6 +197,7 @@ async def test_program_sensor_device(
         data={CONF_HOST: MOCK_TV_GUIDE_URL},
         options={
             OPT_PROGRAM_LOOKAHEAD: 0,  # 0 Minutes lookahead
+            OPT_ENABLE_CURRENT_SENSOR: True,  # Enable current program sensor
             OPT_ENABLE_UPCOMING_SENSOR: True,  # Enable upcoming program sensor
             OPT_ENABLE_CHANNEL_ICONS: True,  # Enable channel icon entities
             OPT_ENABLE_PROGRAM_IMAGES: True,  # Enable program image entities
