@@ -51,8 +51,10 @@ async def test_coordinator_basic(
         update_interval=1,  # every 1 hour
         lookahead=15,  # 15 minutes
         enable_upcoming_sensor=True,
+        enable_primetime_sensor=True,
         enable_channel_icon=True,
         enable_program_image=True,
+        primetime_time="20:00:00",
     )
 
     # current_time is used by sensors etc. to determine the current program time to show.
@@ -98,3 +100,80 @@ async def test_coordinator_basic(
 
     # last update time should be updated
     assert coordinator._last_refetch_time == TWO_HOURS_FROM_NOW
+
+
+async def test_coordinator_primetime_parsing(
+    anyio_backend,
+    hass,
+    bypass_integration_setup,
+):
+    """Test Coordinator correctly parses primetime argument."""
+
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        entry_id="test",
+        data={},
+    )
+
+    # fully specified time (hh:mm:ss)
+    coordinator = XMLTVDataUpdateCoordinator(
+        hass,
+        config_entry=entry,
+        client=XMLTVClient(
+            session=async_get_clientsession(hass),
+            url=MOCK_TV_GUIDE_URL,
+        ),
+        update_interval=1,
+        lookahead=15,
+        enable_upcoming_sensor=True,
+        enable_primetime_sensor=True,
+        enable_channel_icon=True,
+        enable_program_image=True,
+        primetime_time="15:16:17",
+    )
+
+    assert coordinator.primetime_time.hour == 15
+    assert coordinator.primetime_time.minute == 16
+    assert coordinator.primetime_time.second == 17
+
+    # only hh:mm, fill seconds as 0
+    coordinator = XMLTVDataUpdateCoordinator(
+        hass,
+        config_entry=entry,
+        client=XMLTVClient(
+            session=async_get_clientsession(hass),
+            url=MOCK_TV_GUIDE_URL,
+        ),
+        update_interval=1,
+        lookahead=15,
+        enable_upcoming_sensor=True,
+        enable_primetime_sensor=True,
+        enable_channel_icon=True,
+        enable_program_image=True,
+        primetime_time="15:16",
+    )
+
+    assert coordinator.primetime_time.hour == 15
+    assert coordinator.primetime_time.minute == 16
+    assert coordinator.primetime_time.second == 0
+
+    # invalid time, fallback to 20:00:00
+    coordinator = XMLTVDataUpdateCoordinator(
+        hass,
+        config_entry=entry,
+        client=XMLTVClient(
+            session=async_get_clientsession(hass),
+            url=MOCK_TV_GUIDE_URL,
+        ),
+        update_interval=1,
+        lookahead=15,
+        enable_upcoming_sensor=True,
+        enable_primetime_sensor=True,
+        enable_channel_icon=True,
+        enable_program_image=True,
+        primetime_time="OUTATIME",
+    )
+
+    assert coordinator.primetime_time.hour == 20
+    assert coordinator.primetime_time.minute == 0
+    assert coordinator.primetime_time.second == 0

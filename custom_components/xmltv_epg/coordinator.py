@@ -60,8 +60,18 @@ class XMLTVDataUpdateCoordinator(DataUpdateCoordinator[TVGuide]):
         self.__enable_program_image = enable_program_image
 
         try:
-            self.__primetime_time = datetime.strptime(primetime_time, "%H:%M:%S").time()
+            try:
+                # attempt hh:mm:ss format first
+                self.__primetime_time = datetime.strptime(
+                    primetime_time, "%H:%M:%S"
+                ).time()
+            except ValueError:
+                # fallback to hh:mm format
+                self.__primetime_time = datetime.strptime(
+                    primetime_time, "%H:%M"
+                ).time()
         except ValueError:
+            # fallback to fixed time
             LOGGER.warning(
                 f"Invalid primetime_time format: {primetime_time}, fallback to 20:00:00"
             )
