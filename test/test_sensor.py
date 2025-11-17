@@ -1,6 +1,6 @@
 """Test xmltv_epg setup process."""
 
-from datetime import timedelta
+from datetime import date, timedelta
 from unittest.mock import PropertyMock, patch
 
 import pytest
@@ -157,6 +157,9 @@ async def test_program_sensor_attributes(
     assert state.attributes["description"] == "Description"
     assert state.attributes["episode"] == "S1E1"
     assert state.attributes["subtitle"] == "Subtitle"
+    assert state.attributes["category"] == ["Drama", "Action"]
+    assert state.attributes["release_date"] == date(2020, 1, 1)
+    assert state.attributes["language"] == "English"
 
 
 async def test_program_sensor_device(

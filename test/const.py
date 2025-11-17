@@ -1,12 +1,13 @@
 """Constants for testing."""
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from custom_components.xmltv_epg.model import (
     TVChannel,
     TVGuide,
     TVImage,
     TVProgram,
+    TVProgramCategory,
     TVProgramEpisodeNumber,
 )
 
@@ -39,7 +40,13 @@ def get_mock_tv_guide() -> TVGuide:
 
     All Programs have description="Description" set.
 
-    CH 3 Current has episode="S1E1" and subtitle="Subtitle" set.
+    CH 3 Current has the following properties set:
+    - episode="S1E1"
+    - subtitle="Subtitle"
+    - release_date=date(2020, 1, 1)
+    - language="English"
+    - categories=[{ lang="en", name="Drama" }, { lang="en", name="Action" }]
+
     CH 3 Upcoming has episode="S1E2" and subtitle="Subtitle" set.
     CH 3 Primetime has episode="S1E3" and subtitle="Subtitle" set.
     """
@@ -93,8 +100,14 @@ def get_mock_tv_guide() -> TVGuide:
             end=current_end,
             title="CH 3 Current",
             description="Description",
+            release_date=date(2020, 1, 1),
+            language="English",
             episode_raw=[
                 TVProgramEpisodeNumber(system="onscreen", raw_value="S1E1"),
+            ],
+            categories=[
+                TVProgramCategory(language="en", name="Drama"),
+                TVProgramCategory(language="en", name="Action"),
             ],
             subtitle="Subtitle",
             image=TVImage(url="http://example.com/pr/ch3_cur.jpg"),
