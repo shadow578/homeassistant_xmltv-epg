@@ -99,7 +99,7 @@ def test_parse_program_category():
         <title>Program 1</title>
         <desc>Description 1</desc>
         <icon src="http://example.com/program.jpg"/>
-        <category lang="en">Thiller</category>
+        <category lang="en">Thriller</category>
         <category lang="en">Comedy</category>
         <category lang="de">Krimi</category>
         <category lang="de">Komoedie</category>
@@ -110,7 +110,7 @@ def test_parse_program_category():
     assert program is not None
 
     # there should be all four categories
-    assert program.categories[0].name == "Thiller"
+    assert program.categories[0].name == "Thriller"
     assert program.categories[0].language == "en"
 
     assert program.categories[1].name == "Comedy"
