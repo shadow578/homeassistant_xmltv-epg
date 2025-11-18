@@ -80,7 +80,16 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
         if isinstance(value, date):
             return value
 
-        return datetime.strptime(value, "%Y%m%d").date()
+        value = value.strip()
+
+        if len(value) == 8:  # YYYYMMDD
+            return datetime.strptime(value, "%Y%m%d").date()
+        elif len(value) == 6:  # YYYYMM
+            return datetime.strptime(value, "%Y%m").date()
+        elif len(value) == 4:  # YYYY
+            return datetime.strptime(value, "%Y").date()
+        else:
+            raise ValueError(f"Invalid date format: {value}")
 
     def model_post_init(self, __context: Any) -> None:
         """Hooks post-initialization to validate start < end time."""
