@@ -122,7 +122,10 @@ class XMLTVChannelSensor(XMLTVProgramEntity, SensorEntity):
             "duration": f"{duration_hours:02d}:{duration_minutes:02d}",
             "title": self._program.title,
             "description": self._program.description,
+            "release_date": self._program.release_date,
+            "language": self._program.language,
             "episode": self._program.episode,
+            "category": [c.name for c in self._program.categories],
             "subtitle": self._program.subtitle,
             "channel_program_known_until": channel_program_known_until,
         }

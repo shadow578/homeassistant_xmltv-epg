@@ -1,6 +1,6 @@
 """Test cases for TVProgram class."""
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 import pytest
 from pydantic import ValidationError
@@ -90,6 +90,104 @@ def test_parse_program_image_url():
     # there should be a image_url set
     assert program.image is not None
     assert program.image.url == "http://example.com/program.jpg"
+
+
+def test_parse_program_category():
+    """Test TVProgram.from_xml method parses categories correctly."""
+    xml = """
+    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1">
+        <title>Program 1</title>
+        <desc>Description 1</desc>
+        <icon src="http://example.com/program.jpg"/>
+        <category lang="en">Thriller</category>
+        <category lang="en">Comedy</category>
+        <category lang="de">Krimi</category>
+        <category lang="de">Komoedie</category>
+    </programme>
+    """
+
+    program = TVProgram.from_xml(xml)
+    assert program is not None
+
+    # there should be all four categories
+    assert program.categories[0].name == "Thriller"
+    assert program.categories[0].language == "en"
+
+    assert program.categories[1].name == "Comedy"
+    assert program.categories[1].language == "en"
+
+    assert program.categories[2].name == "Krimi"
+    assert program.categories[2].language == "de"
+
+    assert program.categories[3].name == "Komoedie"
+    assert program.categories[3].language == "de"
+
+
+def test_parse_program_release_date():
+    """Test TVProgram.from_xml method parses date attribute correctly."""
+    xml = """
+    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1">
+        <title>Program 1</title>
+        <desc>Description 1</desc>
+        <icon src="http://example.com/program.jpg"/>
+        <date>19901011</date>
+    </programme>
+    """
+
+    program = TVProgram.from_xml(xml)
+    assert program is not None
+
+    assert program.release_date == date(1990, 10, 11)
+
+
+def test_parse_program_release_date_partial_dates():
+    """Test TVProgram.from_xml method parses date attribute with partial dates correctly."""
+    # Year + Month
+    xml = """
+    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1">
+        <title>Program 1</title>
+        <desc>Description 1</desc>
+        <icon src="http://example.com/program.jpg"/>
+        <date>199010</date>
+    </programme>
+    """
+
+    program = TVProgram.from_xml(xml)
+    assert program is not None
+
+    assert program.release_date == date(1990, 10, 1)
+
+    # Year only
+    xml = """
+    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1">
+        <title>Program 1</title>
+        <desc>Description 1</desc>
+        <icon src="http://example.com/program.jpg"/>
+        <date>1990</date>
+    </programme>
+    """
+
+    program = TVProgram.from_xml(xml)
+    assert program is not None
+
+    assert program.release_date == date(1990, 1, 1)
+
+
+def test_parse_program_language():
+    """Test TVProgram.from_xml method parses language attribute correctly."""
+    xml = """
+    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1">
+        <title>Program 1</title>
+        <desc>Description 1</desc>
+        <icon src="http://example.com/program.jpg"/>
+        <language>English</language>
+    </programme>
+    """
+
+    program = TVProgram.from_xml(xml)
+    assert program is not None
+
+    assert program.language == "English"
 
 
 def test_from_xml_invalid_tag():
