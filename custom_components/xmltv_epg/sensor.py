@@ -116,6 +116,10 @@ class XMLTVChannelSensor(XMLTVProgramEntity, SensorEntity):
         else:
             channel_program_known_until = None
 
+        categories = [c.name for c in self._program.categories]
+        if not categories:
+            categories = None
+
         self._attr_extra_state_attributes = {
             "start": self._program.start,
             "end": self._program.end,
@@ -125,7 +129,7 @@ class XMLTVChannelSensor(XMLTVProgramEntity, SensorEntity):
             "release_date": self._program.release_date,
             "language": self._program.language,
             "episode": self._program.episode,
-            "category": [c.name for c in self._program.categories],
+            "category": categories,
             "subtitle": self._program.subtitle,
             "channel_program_known_until": channel_program_known_until,
         }
