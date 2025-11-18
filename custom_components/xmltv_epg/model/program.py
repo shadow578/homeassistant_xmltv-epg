@@ -1,11 +1,12 @@
 """TV Program Model Definition."""
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
 from pydantic import field_validator
 from pydantic_xml import BaseXmlModel, attr, element
 
+from .category import TVProgramCategory
 from .episode_number import TVProgramEpisodeNumber
 from .image import TVImage
 
@@ -34,12 +35,23 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
     description: str | None = element(tag="desc", default=None)
     """A description of the program's contents (e.g. synopsis), if any."""
 
+    release_date: date | None = element(tag="date", default=None)
+    """The release date of the program, if any."""
+
+    language: str | None = element(tag="language", default=None)
+    """The language of the program, if specified.
+    Note that this is the display name of the language, not a language code."""
+
     episode_raw: list[TVProgramEpisodeNumber] = element(
         tag="episode-num", default_factory=list
     )
     """List of episode numbers describing what episode of a series this program is.
     Multiple entries are likely to describe the same episode in different numbering systems.
     For normal use, the `episode` property should be used instead."""
+
+    categories: list[TVProgramCategory] = element(tag="category", default_factory=list)
+    """List of categories / genres assigned to this program.
+    Each category entry may specify a language."""
 
     image: TVImage | None = element(tag="icon", default=None)
     """A Image / Icon associated with the program, if any.
@@ -57,6 +69,18 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
             return value
 
         return datetime.strptime(value, "%Y%m%d%H%M%S %z")
+
+    @field_validator("release_date", mode="before")
+    @classmethod
+    def parse_date(cls, value: str) -> date:
+        """Parse date from XMLTV format.
+
+        Example value "20200101" shall be parsed to date object for 1st Jan 2020.
+        """
+        if isinstance(value, date):
+            return value
+
+        return datetime.strptime(value, "%Y%m%d").date()
 
     def model_post_init(self, __context: Any) -> None:
         """Hooks post-initialization to validate start < end time."""

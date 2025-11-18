@@ -50,8 +50,17 @@
                     "description": {
                         "name": "Description"
                     },
+                    "release_date": {
+                        "name": "Release Date"
+                    },
+                    "language": {
+                        "name": "Language"
+                    },
                     "episode": {
                         "name": "Episode"
+                    },
+                    "category": {
+                        "name": "Category"
                     },
                     "subtitle": {
                         "name": "Subtitle"
@@ -79,8 +88,17 @@
                     "description": {
                         "name": "Description"
                     },
+                    "release_date": {
+                        "name": "Release Date"
+                    },
+                    "language": {
+                        "name": "Language"
+                    },
                     "episode": {
                         "name": "Episode"
+                    },
+                    "category": {
+                        "name": "Category"
                     },
                     "subtitle": {
                         "name": "Subtitle"
@@ -105,8 +123,17 @@
                     "description": {
                         "name": "Description"
                     },
+                    "release_date": {
+                        "name": "Release Date"
+                    },
+                    "language": {
+                        "name": "Language"
+                    },
                     "episode": {
                         "name": "Episode"
+                    },
+                    "category": {
+                        "name": "Category"
                     },
                     "subtitle": {
                         "name": "Subtitle"

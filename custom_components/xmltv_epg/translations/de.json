@@ -50,8 +50,17 @@
                     "description": {
                         "name": "Beschreibung"
                     },
+                    "release_date": {
+                        "name": "Veröffentlichungsdatum"
+                    },
+                    "language": {
+                        "name": "Sprache"
+                    },
                     "episode": {
                         "name": "Episode"
+                    },
+                    "category": {
+                        "name": "Genre"
                     },
                     "subtitle": {
                         "name": "Untertitel"
@@ -79,8 +88,17 @@
                     "description": {
                         "name": "Beschreibung"
                     },
+                    "release_date": {
+                        "name": "Veröffentlichungsdatum"
+                    },
+                    "language": {
+                        "name": "Sprache"
+                    },
                     "episode": {
                         "name": "Episode"
+                    },
+                    "category": {
+                        "name": "Genre"
                     },
                     "subtitle": {
                         "name": "Untertitel"
@@ -105,8 +123,17 @@
                     "description": {
                         "name": "Beschreibung"
                     },
+                    "release_date": {
+                        "name": "Veröffentlichungsdatum"
+                    },
+                    "language": {
+                        "name": "Sprache"
+                    },
                     "episode": {
                         "name": "Episode"
+                    },
+                    "category": {
+                        "name": "Genre"
                     },
                     "subtitle": {
                         "name": "Untertitel"
