@@ -36,12 +36,12 @@ def parse_list_omit_on_error(
     # this could cause other validators to miss elements
     element = element.create_snapshot()
 
-    # use model tag
+    # validate model tag is set
     tag = model.__xml_tag__
     if tag is None:
         raise ValueError("Tag must be provided if model has no xml tag defined.")
 
-    # Iterate over all channel elements, collecting only valid ones
+    # Iterate over all elements, collecting only valid ones
     items = []
     while True:
         child = element.pop_element(tag=tag, search_mode=search_mode)

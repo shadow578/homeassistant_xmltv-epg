@@ -95,6 +95,7 @@ def test_episode_num_partial_invalid():
     # episode number '12.6.' should be converted to 'S13E7'
     assert program.episode == "S13E7"
 
+
 def test_parse_program_image_url():
     """Test TVProgram.from_xml method parses image url correctly."""
     xml = """
