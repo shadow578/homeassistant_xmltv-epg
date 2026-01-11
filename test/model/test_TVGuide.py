@@ -74,3 +74,70 @@ def test_name_url_properties():
     )
     assert guide.name == "Source Name"
     assert guide.url == "http://source.url"
+
+
+def test_from_xml_partially_invalid():
+    """Test TVGuide.from_xml method with partially invalid input.
+
+    Invalid program and channel entries should be omitted, instead of failing to parse.
+    """
+    # scenario:
+    # - CH1 and Program1 are valid
+    # - CH2 and Program2 missing mandatory elements
+    # - CH3 and Program3 missing mandatory attributes
+    xml = """
+<tv generator-info-name="xmltv_epg" generator-info-url="http://example.com">
+    <channel id="CH1">
+        <display-name>Channel 1</display-name>
+    </channel>
+    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1">
+        <title>Program 1</title>
+        <desc>Description 1</desc>
+    </programme>
+    <channel id="CH2">
+    </channel>
+    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH2">
+    </programme>
+    <channel>
+        <display-name>Channel 3</display-name>
+    </channel>
+    <programme start="20200101010000 +0000" stop="20200101020000 +0000">
+        <title>Program 3</title>
+        <desc>Description 3</desc>
+    </programme>
+</tv>
+"""
+
+    guide = TVGuide.from_xml(xml)
+
+    assert guide is not None
+    assert len(guide.channels) == 1
+    assert len(guide.programs) == 1
+
+
+def test_from_xml_program_invalid_start_after_end():
+    """Test TVGuide.from_xml method with a program entry where start time is after end time.
+
+    Invalid program and channel entries should be omitted, instead of failing to parse.
+    """
+    xml = """
+<tv generator-info-name="xmltv_epg" generator-info-url="http://example.com">
+    <channel id="CH1">
+        <display-name>Channel 1</display-name>
+    </channel>
+    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1">
+        <title>Program 1</title>
+        <desc>Description 1</desc>
+    </programme>
+    <programme start="20200101030000 +0000" stop="20200101020000 +0000" channel="CH1">
+        <title>Program 2</title>
+        <desc>Description 2</desc>
+    </programme>
+</tv>
+"""
+
+    guide = TVGuide.from_xml(xml)
+
+    assert guide is not None
+    assert len(guide.channels) == 1
+    assert len(guide.programs) == 1

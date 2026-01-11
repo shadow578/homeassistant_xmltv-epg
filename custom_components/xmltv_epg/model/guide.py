@@ -2,7 +2,11 @@
 
 from typing import Any
 
-from pydantic_xml import BaseXmlModel, attr, element
+from pydantic_xml import BaseXmlModel, attr, element, xml_field_validator
+
+from custom_components.xmltv_epg.model.omit_on_error_validator import (
+    parse_list_omit_on_error,
+)
 
 from .channel import TVChannel
 from .program import TVProgram
@@ -28,6 +32,18 @@ class TVGuide(BaseXmlModel, tag="tv", search_mode="ordered"):
 
     programs: list[TVProgram] = element(tag="programme", default_factory=list)
     """List of all TV programs defined in this guide."""
+
+    @xml_field_validator("channels")
+    @classmethod
+    def _omit_invalid_channels(cls, element, field_name) -> list:
+        """Omit invalid items from channels lists while parsing."""
+        return parse_list_omit_on_error(element, TVChannel, cls.__xml_search_mode__)
+
+    @xml_field_validator("programs")
+    @classmethod
+    def _omit_invalid_programs(cls, element, field_name) -> list:
+        """Omit invalid items from programs lists while parsing."""
+        return parse_list_omit_on_error(element, TVProgram, cls.__xml_search_mode__)
 
     @property
     def name(self) -> str | None:

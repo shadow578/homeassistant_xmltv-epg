@@ -74,6 +74,28 @@ def test_episode_num_system_xmltv_ns():
     assert program.episode == "S13E7"
 
 
+def test_episode_num_partial_invalid():
+    """Test TVProgram.from_xml parses correctly, even if some episode_num are invalid."""
+    xml = """
+    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1">
+        <title>Program 1</title>
+        <desc>Description 1</desc>
+        <episode-num system="xmltv_ns">12.6.</episode-num>
+        <episode-num system="xmltv_ns"></episode-num>
+        <episode-num></episode-num>
+    </programme>
+    """
+
+    program = TVProgram.from_xml(xml)
+    assert program is not None
+
+    # only one valid
+    assert len(program.episode_raw) == 1
+
+    # episode number '12.6.' should be converted to 'S13E7'
+    assert program.episode == "S13E7"
+
+
 def test_parse_program_image_url():
     """Test TVProgram.from_xml method parses image url correctly."""
     xml = """
@@ -102,7 +124,7 @@ def test_parse_program_category():
         <category lang="en">Thriller</category>
         <category lang="en">Comedy</category>
         <category lang="de">Krimi</category>
-        <category lang="de">Komoedie</category>
+        <category>Komoedie</category>
     </programme>
     """
 
@@ -110,6 +132,8 @@ def test_parse_program_category():
     assert program is not None
 
     # there should be all four categories
+    assert len(program.categories) == 4
+
     assert program.categories[0].name == "Thriller"
     assert program.categories[0].language == "en"
 
@@ -120,7 +144,30 @@ def test_parse_program_category():
     assert program.categories[2].language == "de"
 
     assert program.categories[3].name == "Komoedie"
-    assert program.categories[3].language == "de"
+    assert program.categories[3].language is None
+
+
+def test_parse_program_category_partial_invalid():
+    """Test TVProgram.from_xml method parses categories correctly, even if some are invalid."""
+    xml = """
+    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1">
+        <title>Program 1</title>
+        <desc>Description 1</desc>
+        <icon src="http://example.com/program.jpg"/>
+        <category lang="en">Thriller</category>
+        <category lang="en"></category>
+        <category></category>
+    </programme>
+    """
+
+    program = TVProgram.from_xml(xml)
+    assert program is not None
+
+    # there should be only one categories
+    assert len(program.categories) == 1
+
+    assert program.categories[0].name == "Thriller"
+    assert program.categories[0].language == "en"
 
 
 def test_parse_program_release_date():
