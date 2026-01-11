@@ -4,7 +4,11 @@ from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
 from pydantic import field_validator
-from pydantic_xml import BaseXmlModel, attr, element
+from pydantic_xml import BaseXmlModel, attr, element, xml_field_validator
+
+from custom_components.xmltv_epg.model.omit_on_error_validator import (
+    parse_list_omit_on_error,
+)
 
 from .category import TVProgramCategory
 from .episode_number import TVProgramEpisodeNumber
@@ -56,6 +60,22 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
     image: TVImage | None = element(tag="icon", default=None)
     """A Image / Icon associated with the program, if any.
     Generally, this will be a thumbnail or poster image."""
+
+    @xml_field_validator("episode_raw")
+    @classmethod
+    def _omit_invalid_episodes(cls, element, field_name) -> list:
+        """Omit invalid items from episodes while parsing."""
+        return parse_list_omit_on_error(
+            element, TVProgramEpisodeNumber, cls.__xml_search_mode__
+        )
+
+    @xml_field_validator("categories")
+    @classmethod
+    def _omit_invalid_categories(cls, element, field_name) -> list:
+        """Omit invalid items from categories while parsing."""
+        return parse_list_omit_on_error(
+            element, TVProgramCategory, cls.__xml_search_mode__
+        )
 
     @field_validator("start", "end", mode="before")
     @classmethod
