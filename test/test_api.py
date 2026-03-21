@@ -154,7 +154,6 @@ def create_mock_session_for_get():
     ids=TEST_CONFIGURATIONS.keys(),
 )
 async def test_xmltv_client_get_data(
-    anyio_backend,
     url: str,
     content_type: str,
     content_encoding: str,

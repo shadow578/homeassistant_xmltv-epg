@@ -26,7 +26,6 @@ def mock_actual_now():
 
 
 async def test_coordinator_basic(
-    anyio_backend,
     hass,
     bypass_integration_setup,
     mock_xmltv_client_get_data,
@@ -104,7 +103,6 @@ async def test_coordinator_basic(
 
 
 async def test_coordinator_primetime_parsing(
-    anyio_backend,
     hass,
     bypass_integration_setup,
 ):

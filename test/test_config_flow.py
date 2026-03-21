@@ -27,7 +27,7 @@ from .const import MOCK_TV_GUIDE_NAME, MOCK_TV_GUIDE_URL
 # note: need to bypass integration setup to avoid hass actually trying to setup the entry, which would
 # interfere with counters on xmltv_client_get_data
 async def test_config_flow_user_step_ok(
-    anyio_backend, hass, bypass_integration_setup, mock_xmltv_client_get_data
+    hass, bypass_integration_setup, mock_xmltv_client_get_data
 ):
     """Test that the 'user' config step correctly creates a config entry."""
 
@@ -63,7 +63,7 @@ async def test_config_flow_user_step_ok(
 
 
 async def test_config_flow_user_step_handles_error(
-    anyio_backend, hass, bypass_integration_setup, mock_xmltv_client_get_data
+    hass, bypass_integration_setup, mock_xmltv_client_get_data
 ):
     """Test that the 'user' config step correctly handles errors in _test_connection."""
 
@@ -112,7 +112,7 @@ async def test_config_flow_user_step_handles_error(
     assert result["errors"] == {"base": "unknown"}
 
 
-async def test_option_flow_init_step_ok(anyio_backend, hass, bypass_integration_setup):
+async def test_option_flow_init_step_ok(hass, bypass_integration_setup):
     """Test that the 'init' options step correctly creates a config entry."""
 
     # create a new MockConfigEntry and add to HASS, bypassing the config flow

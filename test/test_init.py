@@ -14,7 +14,7 @@ from .const import MOCK_TV_GUIDE_URL
 
 
 async def test_setup_unload_and_reload_entry(
-    anyio_backend, hass, mock_xmltv_client_get_data
+    hass, mock_xmltv_client_get_data
 ):
     """Test entry setup, unload and reload."""
     # create a mock config entry to bypass the config flow
