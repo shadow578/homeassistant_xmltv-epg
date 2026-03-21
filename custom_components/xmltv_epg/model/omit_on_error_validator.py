@@ -15,7 +15,8 @@ def parse_list_omit_on_error(
     model: type[TModel],
     search_mode: SearchMode,
 ) -> list[TModel]:
-    """Parse a homogeneous list of items, omitting all items that fail validation.
+    """
+    Parse a homogeneous list of items, omitting all items that fail validation.
 
     Example usage:
     .. code-block:: python

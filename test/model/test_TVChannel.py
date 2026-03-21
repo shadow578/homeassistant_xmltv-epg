@@ -57,7 +57,6 @@ def test_parse_channel_icon_url():
 
 def test_get_current_or_next_program():
     """Test TVChannel.get_current_program and TVChannel.get_next_program methods."""
-
     # prepare channel with programs
     # prev @ 00:00 - 01:00
     # current @ 01:00 - 02:00

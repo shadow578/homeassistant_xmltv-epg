@@ -16,7 +16,8 @@ class TVProgramEpisodeNumber(BaseXmlModel, tag="episode-num", search_mode="order
 
     @property
     def value(self) -> tuple[int | None, int | None]:
-        """Parse the raw episode number into a (season, episode) tuple.
+        """
+        Parse the raw episode number into a (season, episode) tuple.
 
         :return: A tuple of (season, episode), where either (or both) can be None if not available.
         """
@@ -24,7 +25,8 @@ class TVProgramEpisodeNumber(BaseXmlModel, tag="episode-num", search_mode="order
 
     @property
     def value_onscreen(self) -> str | None:
-        """Get the episode number as SxxExx formatted string, if possible.
+        """
+        Get the episode number as SxxExx formatted string, if possible.
 
         :return: A string in the format 'SxxExx', 'Sxx', or 'Exx', or None if neither is available.
         """

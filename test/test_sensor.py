@@ -232,7 +232,6 @@ async def test_last_update_sensor_attributes(
 
 def test_sensor_entity_ids():
     """Test sensor entity ids match the expected values."""
-
     # status sensor
     translation_key, entity_id = XMLTVStatusSensor.get_normalized_identification(
         TVGuide(generator_name="TVXML.ORG")

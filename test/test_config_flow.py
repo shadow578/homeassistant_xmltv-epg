@@ -30,7 +30,6 @@ async def test_config_flow_user_step_ok(
     hass, bypass_integration_setup, mock_xmltv_client_get_data
 ):
     """Test that the 'user' config step correctly creates a config entry."""
-
     # initialize the config flow
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -66,7 +65,6 @@ async def test_config_flow_user_step_handles_error(
     hass, bypass_integration_setup, mock_xmltv_client_get_data
 ):
     """Test that the 'user' config step correctly handles errors in _test_connection."""
-
     # initialize the config flow
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -114,7 +112,6 @@ async def test_config_flow_user_step_handles_error(
 
 async def test_option_flow_init_step_ok(hass, bypass_integration_setup):
     """Test that the 'init' options step correctly creates a config entry."""
-
     # create a new MockConfigEntry and add to HASS, bypassing the config flow
     entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: MOCK_TV_GUIDE_URL}, entry_id="MOCK"

@@ -142,7 +142,8 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
 
     @staticmethod
     def get_normalized_identification(guide: TVGuide) -> tuple[str, str]:
-        """Return normalized identification information for a sensor for the given guide.
+        """
+        Return normalized identification information for a sensor for the given guide.
 
         The identification information consists of the sensor entity_id and the translation_key.
         For the entity_id, the guide's generator_name is normalized and cleaned up to form a valid entity_id.

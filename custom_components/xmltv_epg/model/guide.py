@@ -47,7 +47,8 @@ class TVGuide(BaseXmlModel, tag="tv", search_mode="ordered"):
 
     @property
     def name(self) -> str | None:
-        """Get the name of the guide.
+        """
+        Get the name of the guide.
 
         :return: generator_name, source_name, or None, depending on availability
 
@@ -57,7 +58,8 @@ class TVGuide(BaseXmlModel, tag="tv", search_mode="ordered"):
 
     @property
     def url(self) -> str | None:
-        """Get the info URL for the guide.
+        """
+        Get the info URL for the guide.
 
         :return: generator_url, source_url, or None, depending on availability
 

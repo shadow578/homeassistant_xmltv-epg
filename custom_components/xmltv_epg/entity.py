@@ -54,7 +54,8 @@ class XMLTVProgramEntity(XMLTVEntity):
         self._mode = mode
 
     def _update_from_coordinator(self) -> bool:
-        """Update channel and program data from the coordinator.
+        """
+        Update channel and program data from the coordinator.
 
         Note: To be called from _handle_coordinator_update.
 

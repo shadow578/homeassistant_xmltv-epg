@@ -20,7 +20,8 @@ MOCK_TV_GUIDE_URL = "http://example.com/epg.xml"
 
 
 def get_mock_tv_guide() -> TVGuide:
-    """Build a TV Guide object.
+    """
+    Build a TV Guide object.
 
     :return: TV Guide object with the following data:
 

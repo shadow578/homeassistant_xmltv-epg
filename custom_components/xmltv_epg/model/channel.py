@@ -28,7 +28,8 @@ class TVChannel(BaseXmlModel, tag="channel", search_mode="ordered"):
         return super().model_post_init(__context)
 
     def _link_program(self, program: TVProgram):
-        """Link a program to this channel.
+        """
+        Link a program to this channel.
 
         This method is internal and should not be called under normal circumstances.
         Cross-linking is handled by TVGuide.

@@ -232,7 +232,6 @@ async def test_program_sensor_device(
 
 def test_sensor_entity_ids():
     """Test sensor entity ids match the expected values."""
-
     # program image, current
     translation_key, entity_id = program_get_normalized_identification(
         TVChannel(id="CH 1", name="Channel 1"),
