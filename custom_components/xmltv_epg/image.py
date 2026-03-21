@@ -22,8 +22,8 @@ from .model import TVChannel, TVGuide
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback
-    ):
+    async_add_entities: AddEntitiesCallback,
+):
     """Set up the image platform."""
     coordinator: XMLTVDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]
     guide: TVGuide = coordinator.data

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import field_validator
 from pydantic_xml import BaseXmlModel, attr, element, xml_field_validator
+from pydantic_xml.element.element import XmlElementReader
 
 from custom_components.xmltv_epg.model.omit_on_error_validator import (
     parse_list_omit_on_error,
@@ -63,7 +64,9 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
 
     @xml_field_validator("episode_raw")
     @classmethod
-    def _omit_invalid_episodes(cls, element, field_name) -> list:
+    def _omit_invalid_episodes(
+        cls, element: XmlElementReader, field_name: str
+    ) -> list[TVProgramEpisodeNumber]:
         """Omit invalid items from episodes while parsing."""
         return parse_list_omit_on_error(
             element, TVProgramEpisodeNumber, cls.__xml_search_mode__
@@ -71,7 +74,9 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
 
     @xml_field_validator("categories")
     @classmethod
-    def _omit_invalid_categories(cls, element, field_name) -> list:
+    def _omit_invalid_categories(
+        cls, element: XmlElementReader, field_name: str
+    ) -> list[TVProgramCategory]:
         """Omit invalid items from categories while parsing."""
         return parse_list_omit_on_error(
             element, TVProgramCategory, cls.__xml_search_mode__
