@@ -77,7 +77,8 @@ def test_name_url_properties():
 
 
 def test_from_xml_partially_invalid():
-    """Test TVGuide.from_xml method with partially invalid input.
+    """
+    Test TVGuide.from_xml method with partially invalid input.
 
     Invalid program and channel entries should be omitted, instead of failing to parse.
     """
@@ -116,7 +117,8 @@ def test_from_xml_partially_invalid():
 
 
 def test_from_xml_program_invalid_start_after_end():
-    """Test TVGuide.from_xml method with a program entry where start time is after end time.
+    """
+    Test TVGuide.from_xml method with a program entry where start time is after end time.
 
     Invalid program and channel entries should be omitted, instead of failing to parse.
     """

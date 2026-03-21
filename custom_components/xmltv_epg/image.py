@@ -8,7 +8,9 @@ from homeassistant.components.image import (
     ImageEntity,
     ImageEntityDescription,
 )
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.config_entries import ConfigEntry
 
 from .const import DOMAIN, LOGGER, ChannelSensorMode
 from .coordinator import XMLTVDataUpdateCoordinator
@@ -17,9 +19,13 @@ from .helper import program_get_normalized_identification
 from .model import TVChannel, TVGuide
 
 
-async def async_setup_entry(hass, entry, async_add_devices):
-    """Set up the sensor platform."""
-    coordinator: XMLTVDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+):
+    """Set up the image platform."""
+    coordinator: XMLTVDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]
     guide: TVGuide = coordinator.data
 
     LOGGER.debug(
@@ -57,7 +63,7 @@ async def async_setup_entry(hass, entry, async_add_devices):
                     )
                 )
 
-    async_add_devices(images)
+    async_add_entities(images)
 
 
 class XMLTVChannelProgramImage(XMLTVProgramEntity, ImageEntity):

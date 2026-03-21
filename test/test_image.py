@@ -69,7 +69,6 @@ async def assert_has_image_entity_with_url(hass, client, entity_id: str, url: st
 
 @respx.mock
 async def test_images_basic(
-    anyio_backend,
     hass,
     hass_client,
     mock_xmltv_client_get_data,
@@ -186,7 +185,6 @@ async def test_images_basic(
 
 
 async def test_program_sensor_device(
-    anyio_backend,
     hass,
     mock_xmltv_client_get_data,
     mock_coordinator_actual_now,
@@ -234,7 +232,6 @@ async def test_program_sensor_device(
 
 def test_sensor_entity_ids():
     """Test sensor entity ids match the expected values."""
-
     # program image, current
     translation_key, entity_id = program_get_normalized_identification(
         TVChannel(id="CH 1", name="Channel 1"),

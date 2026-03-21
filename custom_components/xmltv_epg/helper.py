@@ -8,7 +8,8 @@ from .model import TVChannel
 
 
 def normalize_for_entity_id(s: str) -> str:
-    """Normalize a string for usage in an entity_id.
+    """
+    Normalize a string for usage in an entity_id.
 
     Example:
     - s = 'DE: WDR (Münster)'
@@ -18,7 +19,6 @@ def normalize_for_entity_id(s: str) -> str:
     :return: The normalized string.
 
     """
-
     # lower case
     s = s.lower()
 
@@ -59,7 +59,8 @@ def program_get_normalized_identification(
     | Literal["program_image"]
     | Literal["channel_icon"],
 ) -> tuple[str, str]:
-    """Return normalized identification information for a sensor for the given channel and upcoming status.
+    """
+    Return normalized identification information for a sensor for the given channel and upcoming status.
 
     The identification information consists of the sensor entity_id and the translation_key.
     For the entity_id, the channel id is normalized and cleaned up to form a valid entity_id.
@@ -91,7 +92,6 @@ def program_get_normalized_identification(
     :return: (translation_key, entity_id) tuple.
 
     """
-
     if kind == "program_sensor":
         translation_key = f"program_{mode}"
         entity_id = f"sensor.{normalize_for_entity_id(channel.id)}_{translation_key}"

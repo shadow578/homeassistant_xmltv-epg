@@ -46,7 +46,6 @@ def mock_coordinator_last_update_time():
 
 
 async def test_sensors_basic(
-    anyio_backend,
     hass,
     mock_xmltv_client_get_data,
     mock_coordinator_actual_now,
@@ -124,7 +123,6 @@ async def test_sensors_basic(
 
 
 async def test_program_sensor_attributes(
-    anyio_backend,
     hass,
     mock_xmltv_client_get_data,
     mock_coordinator_actual_now,
@@ -163,7 +161,6 @@ async def test_program_sensor_attributes(
 
 
 async def test_program_sensor_device(
-    anyio_backend,
     hass,
     mock_xmltv_client_get_data,
     mock_coordinator_actual_now,
@@ -198,7 +195,6 @@ async def test_program_sensor_device(
 
 
 async def test_last_update_sensor_attributes(
-    anyio_backend,
     hass,
     mock_xmltv_client_get_data,
     mock_coordinator_actual_now,
@@ -236,7 +232,6 @@ async def test_last_update_sensor_attributes(
 
 def test_sensor_entity_ids():
     """Test sensor entity ids match the expected values."""
-
     # status sensor
     translation_key, entity_id = XMLTVStatusSensor.get_normalized_identification(
         TVGuide(generator_name="TVXML.ORG")

@@ -38,7 +38,8 @@ def test_from_xml():
 
 
 def test_episode_num_system_season_episode():
-    """Test TVProgram.from_xml parses episode_num in SxxExx format.
+    """
+    Test TVProgram.from_xml parses episode_num in SxxExx format.
 
     as seen in https://github.com/shadow578/homeassistant_xmltv-epg/issues/32
     """

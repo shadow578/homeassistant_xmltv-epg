@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import field_validator
 from pydantic_xml import BaseXmlModel, attr, element, xml_field_validator
+from pydantic_xml.element.element import XmlElementReader
 
 from custom_components.xmltv_epg.model.omit_on_error_validator import (
     parse_list_omit_on_error,
@@ -63,7 +64,9 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
 
     @xml_field_validator("episode_raw")
     @classmethod
-    def _omit_invalid_episodes(cls, element, field_name) -> list:
+    def _omit_invalid_episodes(
+        cls, element: XmlElementReader, field_name: str
+    ) -> list[TVProgramEpisodeNumber]:
         """Omit invalid items from episodes while parsing."""
         return parse_list_omit_on_error(
             element, TVProgramEpisodeNumber, cls.__xml_search_mode__
@@ -71,7 +74,9 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
 
     @xml_field_validator("categories")
     @classmethod
-    def _omit_invalid_categories(cls, element, field_name) -> list:
+    def _omit_invalid_categories(
+        cls, element: XmlElementReader, field_name: str
+    ) -> list[TVProgramCategory]:
         """Omit invalid items from categories while parsing."""
         return parse_list_omit_on_error(
             element, TVProgramCategory, cls.__xml_search_mode__
@@ -80,7 +85,8 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
     @field_validator("start", "end", mode="before")
     @classmethod
     def parse_datetime(cls, value: str) -> datetime:
-        """Parse datetime from XMLTV format.
+        """
+        Parse datetime from XMLTV format.
 
         Example value "20240517124500 +0200" shall be parsed
         to datetime object for 17th May 2024, 12:45:00 UTC+2.
@@ -93,7 +99,8 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
     @field_validator("release_date", mode="before")
     @classmethod
     def parse_date(cls, value: str) -> date:
-        """Parse date from XMLTV format.
+        """
+        Parse date from XMLTV format.
 
         Example value "20200101" shall be parsed to date object for 1st Jan 2020.
         """
@@ -150,7 +157,8 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
 
     @property
     def full_title(self) -> str:
-        """Get the full title, including episode and / or subtitle, if available.
+        """
+        Get the full title, including episode and / or subtitle, if available.
 
         :Examples:
         (1)
@@ -199,7 +207,8 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
         return self.__channel
 
     def _link_channel(self, channel: "TVChannel"):
-        """Set the channel object for this program.
+        """
+        Set the channel object for this program.
 
         This method is internal and should not be called under normal circumstances.
         Cross-linking is handled by TVGuide.

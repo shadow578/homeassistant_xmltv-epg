@@ -134,11 +134,11 @@ TEST_CONFIGURATIONS = {
 
 
 def create_mock_session_for_get():
-    """Create a mock session that supports get().
+    """
+    Create a mock session that supports get().
 
     :return: (session, response object)
     """
-
     response = AsyncMock()
     response.raise_for_status = MagicMock()
 
@@ -154,14 +154,12 @@ def create_mock_session_for_get():
     ids=TEST_CONFIGURATIONS.keys(),
 )
 async def test_xmltv_client_get_data(
-    anyio_backend,
     url: str,
     content_type: str,
     content_encoding: str,
     compression_function: Callable | None,
 ):
     """Test XMLTVClient.async_get_data with variable configurations."""
-
     # prepare the session and response
     session, response = create_mock_session_for_get()
 

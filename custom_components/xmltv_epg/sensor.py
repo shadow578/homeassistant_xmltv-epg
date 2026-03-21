@@ -10,7 +10,9 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
 )
 from homeassistant.const import EntityCategory
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN, LOGGER, ChannelSensorMode
 from .coordinator import XMLTVDataUpdateCoordinator
@@ -19,9 +21,13 @@ from .helper import normalize_for_entity_id, program_get_normalized_identificati
 from .model import TVChannel, TVGuide
 
 
-async def async_setup_entry(hass, entry, async_add_devices):
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+):
     """Set up the sensor platform."""
-    coordinator: XMLTVDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: XMLTVDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]
     guide: TVGuide = coordinator.data
 
     LOGGER.debug(
@@ -50,7 +56,7 @@ async def async_setup_entry(hass, entry, async_add_devices):
                 XMLTVChannelSensor(coordinator, channel, ChannelSensorMode.PRIMETIME)
             )
 
-    async_add_devices(sensors)
+    async_add_entities(sensors)
 
 
 class XMLTVChannelSensor(XMLTVProgramEntity, SensorEntity):
@@ -142,7 +148,8 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
 
     @staticmethod
     def get_normalized_identification(guide: TVGuide) -> tuple[str, str]:
-        """Return normalized identification information for a sensor for the given guide.
+        """
+        Return normalized identification information for a sensor for the given guide.
 
         The identification information consists of the sensor entity_id and the translation_key.
         For the entity_id, the guide's generator_name is normalized and cleaned up to form a valid entity_id.
@@ -155,9 +162,10 @@ class XMLTVStatusSensor(XMLTVEntity, SensorEntity):
         :return: (translation_key, entity_id) tuple.
 
         """
-        assert guide.name is not None, (
-            "XMLTVStatusSensor failed to create id, .name was None!"
-        )
+        if guide.name is None:
+            raise ValueError(
+                "Guide name is required for sensor identification but was None."
+            )
 
         translation_key = "last_update"
         entity_id = f"sensor.{normalize_for_entity_id(guide.name)}_{translation_key}"
