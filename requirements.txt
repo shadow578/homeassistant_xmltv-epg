@@ -1,9 +1,0 @@
-homeassistant==2025.4.0
-pytest-homeassistant-custom-component>=0.13.232
-colorlog>=6.9.0
-ruff>=0.12.9
-pytest>=8.3.5
-anyio>=4.10.0
-pyright>=1.1.403
-pydantic>=2.10.6
-pydantic-xml>=2.18.0
