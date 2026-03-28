@@ -8,3 +8,4 @@
 - https://xmltvfr.fr/xmltv.php
 - http://xmltv.net
 - https://www.electronic-research.de/epg-service
+- https://www.open-epg.com/app/index.php
