@@ -10,7 +10,7 @@ dependencies = [
   "anyio>=4.12.1",
   "pyright>=1.1.408",
   "pydantic>=2.12.2",
-  "pydantic-xml>=2.19.0"
+  "pydantic-xml>=2.20.0"
 ]
 
 [tool.setuptools.packages.find]
