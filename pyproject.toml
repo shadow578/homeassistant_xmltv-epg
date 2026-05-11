@@ -9,7 +9,7 @@ dependencies = [
   "pytest>=9.0.0",
   "anyio>=4.13.0",
   "pyright>=1.1.409",
-  "pydantic>=2.12.2",
+  "pydantic>=2.13.4",
   "pydantic-xml>=2.19.0"
 ]
 
