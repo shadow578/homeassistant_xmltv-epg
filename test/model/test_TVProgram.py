@@ -221,6 +221,22 @@ def test_parse_program_release_date_partial_dates():
     assert program.release_date == date(1990, 1, 1)
 
 
+def test_parse_program_release_date_full_datetime():
+    """Test TVProgram.from_xml method parses date attribute with full datetime strings correctly."""
+    xml = """
+    <programme start="20200101010000 +0000" stop="20200101020000 +0000" channel="CH1">
+        <title>Program 1</title>
+        <desc>Description 1</desc>
+        <date>19960217000000 +0000</date>
+    </programme>
+    """
+
+    program = TVProgram.from_xml(xml)
+    assert program is not None
+
+    assert program.release_date == date(1996, 2, 17)
+
+
 def test_parse_program_language():
     """Test TVProgram.from_xml method parses language attribute correctly."""
     xml = """

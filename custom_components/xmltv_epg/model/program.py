@@ -109,6 +109,11 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
 
         value = value.strip()
 
+        # Tunarr (and some other sources) emit full datetime format
+        # e.g. "19960217000000 +0000" — truncate to date portion
+        if len(value) > 8:
+            value = value[:8]
+
         if len(value) == 8:  # YYYYMMDD
             return datetime.strptime(value, "%Y%m%d").date()
         elif len(value) == 6:  # YYYYMM
