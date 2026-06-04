@@ -106,7 +106,7 @@ class TVProgram(BaseXmlModel, tag="programme", search_mode="ordered"):
         """
         if isinstance(value, date):
             return value
-            
+
         value = value.strip()
 
         # Tunarr (and some other sources) emit full datetime format
