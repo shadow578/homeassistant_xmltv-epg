@@ -8,7 +8,7 @@ dependencies = [
   "colorlog>=6.10.1",
   "ruff>=0.15.18",
   "anyio>=4.14.0",
-  "pyright>=1.1.410",
+  "pyright>=1.1.411",
   "pydantic>=2.12.2",
   "pydantic-xml>=2.21.0"
 ]
