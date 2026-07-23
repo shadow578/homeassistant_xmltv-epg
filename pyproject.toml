@@ -6,7 +6,7 @@ dependencies = [
   "pytest-homeassistant-custom-component==0.13.319",
   "pytest==9.0.0",
   "colorlog>=6.11.0",
-  "ruff>=0.15.21",
+  "ruff>=0.15.22",
   "anyio>=4.14.2",
   "pyright>=1.1.411",
   "pydantic>=2.12.2",
